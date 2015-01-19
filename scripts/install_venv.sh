@@ -1,5 +1,23 @@
 #!/bin/bash
 
+########################################################################
+#                          INSTALL_VENV.SH                             #
+#                 Author: Ayrton Massey, s1208057                      #
+#                                                                      #
+#                                                                      #
+# Installs the dependencies for the project. The whole process will    #
+# take around 20 minutes and take up about 3.0GB of your disk quota.   #
+#                                                                      #
+# Run this from inside the scripts folder. The script will create a    #
+# virtual environment called venv in a folder beside your local        #
+# repo. It installs Polygon2, numpy, pySerial and ArgParse using pip,  #
+# then downloads opencv 2.4.10 and installs it. The script removes the #
+# MD5 hashing from cl2pp.cmake to prevent the crash at 71%. If         #
+# everything worked correctly, the controller should open if you're on #
+# a computer with access to the pitch video feed.                      #
+########################################################################
+
+
 #set up virtual environment
 cd ../../
 virtualenv venv
