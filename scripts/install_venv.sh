@@ -44,8 +44,12 @@ sed -i '/string(MD5 hash "${lines}")/d' ../cmake/cl2cpp.cmake
 make -j8
 make install
 
-#move cv2 to the right directory
+#remove cv2 compiled files
 cd ../../
+rm -rf opencv-2.4.10
+rm opencv-2.4.10.zip
+
+#move cv2 to the right directory
 mv venv/lib/python2.7/site-packages/* venv/lib/python2.6/site-packages/
 
 #try running the controller
