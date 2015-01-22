@@ -31,19 +31,25 @@ void cmd_PING()
 
 void cmd_RUN()
 {
-  double motor1;
-  double motor2;
-  double motor3;
+  double motor1 = 0.0;
+  double motor2 = 0.0;
+  double motor3 = 0.0;
   char* arg;
   
   arg = comm.next();
-  motor1 = atof(arg);
+  if(arg != NULL) {
+    motor1 = atof(arg);
+  }
   
   arg = comm.next();
-  motor2 = atof(arg);
+  if(arg != NULL) {
+    motor2 = atof(arg);
+  }
   
   arg = comm.next();
-  motor3 = atof(arg);
+  if(arg != NULL) {
+    motor3 = atof(arg);
+  }
   
   doRun();
 }
