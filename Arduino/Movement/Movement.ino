@@ -67,8 +67,8 @@ void loop()
 void doRun(int motor1, int motor2, int motor3)
 {
   doRunMotor(0, motor1);
-  doRunMotor(1, motor2);
-  doRunMotor(3, motor3);
+  doRunMotor(1, 0 - motor2); // Motor 2 is backwards
+  doRunMotor(2, 0 - motor3); // Motor 3 is backwards
 }
 
 void doRunMotor(int motor, int motor_speed)
@@ -80,7 +80,7 @@ void doRunMotor(int motor, int motor_speed)
     motorForward(motor, motor_speed);
     
   } else if(motor_speed < 0) {
-    motorBackward(motor, motor_speed);
+    motorBackward(motor, -motor_speed);
   }
 }
 
