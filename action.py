@@ -8,7 +8,8 @@ class Action():
     TURN_ANTICLOCKWISE = 'a'
     
     # Motor angles, starting from the front left, going anticlockwise
-    MOTOR_ANGLES = [ math.pi/3.0, math.pi, math.pi*5.0/3.0 ]
+    # MOTOR_ANGLES = [ math.pi/3.0, math.pi, math.pi*5.0/3.0 ]
+    MOTOR_ANGLES = [ math.pi*5.0/6.0, math.pi*3.0/2.0, math.pi/6.0 ]
     MOTORS = [ (math.cos(angle), math.sin(angle)) for angle in MOTOR_ANGLES ]
     
     def __init__(self, comm):
