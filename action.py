@@ -67,7 +67,7 @@ class Action():
         return commstr
     
     def _send_command(command, args):
-        commstr = _get_command_string(command, args)
+        self.serial.write( _get_command_string(command, args) )
     
     
     
