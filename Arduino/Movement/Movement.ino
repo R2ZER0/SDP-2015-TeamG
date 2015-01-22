@@ -9,23 +9,21 @@ SerialCommand comm;
 
 void setup()
 {
+  pinMode(13, OUTPUT);
+  digitalWrite(13, LOW);
+  
+  delay(5000);
+  
+  digitalWrite(13, HIGH);
+  
   // SDP Setup
   SDPsetup();
-  
-  // Enable setting the LED
-  pinMode(PIN_LED, OUTPUT);
-  digitalWrite(PIN_LED, HIGH);
-  
-  // Select the radio for serial
-  pinMode(PIN_RADIO, OUTPUT);    
-  digitalWrite(PIN_RADIO, HIGH);
-  
-  // Initialise serial-over-RF
-  Serial.begin(115200);
   
   // Initialse the command messenger
   comm.addCommand("PING", cmd_PING);
   comm.addCommand("RUN", cmd_RUN);
+  
+  Serial.println("STARTED");
 }
 
 void cmd_PING()
@@ -59,8 +57,17 @@ void cmd_RUN()
   doRun(motor1, motor2, motor3);
 }
 
+#define HEARTBEAT_RATE 10000
+int heartbeatticks = HEARTBEAT_RATE;
+int heartbeatcount = 0;
+
 void loop()
 {
+  if(heartbeatticks-- < 0) {
+    Serial.print("HB ");
+    Serial.println(heartbeatcount++);
+    heartbeatticks = HEARTBEAT_RATE;
+  }
   comm.readSerial();
 }
 
