@@ -33,6 +33,7 @@ class Action():
         elif(direction == self.TURN_ANTICLOCKWISE):
             motor_speed = -speed
       
+        motor_speed = self._normalise_speed(motor_speed)
         self._send_run([motor_speed, motor_speed, motor_speed])
   
     def stop(self):
@@ -56,12 +57,15 @@ class Action():
     # TODO: decide on the kick protocol etc.
   
     # Utility
-    def _calc_motor_speed(self, motor, angle, linear_speed):
-        speed = 100.0 * linear_speed * (math.cos(angle) * motor[0] - math.sin(angle) * motor[1] )
+    def _normalise_speed(self, speed):
         # We need the speed to be an integer between 100 and -100
-        speed = int(round(speed))
+        speed = int(round(100.0 * speed))
         speed = max(-100, min(speed, 100))
         return speed
+    
+    def _calc_motor_speed(self, motor, angle, linear_speed):
+        speed = linear_speed * (math.cos(angle) * motor[0] - math.sin(angle) * motor[1] )
+        return self._normalise_speed(speed)
     
     def _get_command_string(self, command, args):
         commstr = str(command)
