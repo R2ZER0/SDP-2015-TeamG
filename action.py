@@ -18,7 +18,7 @@ class Action():
     
     # Movement
     def move(self, angle, speed):
-        """Move the robot in the angle (radians) from the front"""
+        """Move the robot in the angle (radians) from the front, with speed -1 to +1"""
         motor_speeds = [ _calc_motor_speed(motor, angle, speed) for motor in MOTORS ]
         
         self._send_run(motor_speeds)
@@ -56,7 +56,11 @@ class Action():
   
     # Utility
     def _calc_motor_speed(motor, angle, linear_speed):
-        return linear_speed * (math.cos(angle) * motor[0] - math.sin(angle) * motor[1] )
+        speed = 100.0 * linear_speed * (math.cos(angle) * motor[0] - math.sin(angle) * motor[1] )
+        # We need the speed to be an integer between 100 and -100
+        speed = int(round(speed))
+        speed = max(-100, min(speed, 100))
+        return speed
     
     def _get_command_string(command, args):
         commstr = str(command)
