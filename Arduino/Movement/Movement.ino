@@ -1,3 +1,5 @@
+#include <Wire.h>
+#include <SDPArduino.h>
 #include <SerialCommand.h>
 
 const int PIN_LED   = 13;
@@ -7,6 +9,9 @@ SerialCommand comm;
 
 void setup()
 {
+  // SDP Setup
+  SDPsetup();
+  
   // Enable setting the LED
   pinMode(PIN_LED, OUTPUT);
   digitalWrite(PIN_LED, HIGH);
@@ -31,27 +36,27 @@ void cmd_PING()
 
 void cmd_RUN()
 {
-  double motor1 = 0.0;
-  double motor2 = 0.0;
-  double motor3 = 0.0;
+  int motor1 = 0.0;
+  int motor2 = 0.0;
+  int motor3 = 0.0;
   char* arg;
   
   arg = comm.next();
   if(arg != NULL) {
-    motor1 = atof(arg);
+    motor1 = atoi(arg);
   }
   
   arg = comm.next();
   if(arg != NULL) {
-    motor2 = atof(arg);
+    motor2 = atoi(arg);
   }
   
   arg = comm.next();
   if(arg != NULL) {
-    motor3 = atof(arg);
+    motor3 = atoi(arg);
   }
   
-  doRun();
+  doRun(motor1, motor2, motor3);
 }
 
 void loop()
@@ -59,10 +64,24 @@ void loop()
   comm.readSerial();
 }
 
-
-void doRun(double motor1, double motor2, double motor3)
+void doRun(int motor1, int motor2, int motor3)
 {
-  // TODO
+  doRunMotor(0, motor1);
+  doRunMotor(1, motor2);
+  doRunMotor(3, motor3);
+}
+
+void doRunMotor(int motor, int motor_speed)
+{
+  if(motor_speed == 0) {
+    motorStop(motor);
+    
+  } else if(motor_speed > 0) {
+    motorForward(motor, motor_speed);
+    
+  } else if(motor_speed < 0) {
+    motorBackward(motor, motor_speed);
+  }
 }
 
 
