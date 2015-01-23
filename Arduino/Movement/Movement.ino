@@ -8,14 +8,7 @@ const int PIN_RADIO = 8;
 SerialCommand comm;
 
 void setup()
-{
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
-  
-  delay(5000);
-  
-  digitalWrite(13, HIGH);
-  
+{  
   // SDP Setup
   SDPsetup();
   
