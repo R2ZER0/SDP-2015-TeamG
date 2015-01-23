@@ -24,16 +24,9 @@ class Action():
         
         self._send_run(motor_speeds)
   
-    def turn(self, direction, speed):
-        """Turn the robot in the given direction, clockwise/anticlockwise"""
-        motor_speed = 0.0
-        
-        if(direction == self.TURN_CLOCKWISE):
-            motor_speed = speed
-        elif(direction == self.TURN_ANTICLOCKWISE):
-            motor_speed = -speed
-      
-        motor_speed = self._normalise_speed(motor_speed)
+    def turn(self, speed):
+        """Turn the robot in the given direction, clockwise/anticlockwise"""      
+        motor_speed = self._normalise_speed(speed)
         self._send_run([motor_speed, motor_speed, motor_speed])
   
     def stop(self):
