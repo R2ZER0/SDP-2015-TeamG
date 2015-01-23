@@ -43,6 +43,7 @@ void cmd_LED()
   }
   
   digitalWrite(PIN_LED, HIGH);
+  Serial.println("DONE");
 }
 
 void cmd_PING()
@@ -73,6 +74,7 @@ void cmd_RUN()
   }
   
   doRun(motor1, motor2, motor3);
+  Serial.println("DONE");
 }
 
 void loop()
