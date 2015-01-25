@@ -8,6 +8,11 @@ Requires the pygame module and an XBOX 360 controller.
 '''
 
 import pygame
+from action import Action
+import math
+import serial
+import os
+import sys
 
 def query_yes_no(question,default="no"):
     valid = {"yes" : True, "y" : True, "no" : False, "n" : False}
@@ -30,6 +35,9 @@ def query_yes_no(question,default="no"):
             return valid[choice]
         else: 
             print "Please respond with 'yes', 'no', 'y' or 'n'."
+
+robot = None
+comm = None
 
 def __init__():
     pygame.init()
@@ -56,6 +64,9 @@ def select_joystick():
 def main():
     __init__()
 
+    comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
+    robot = Action(comm)
+
     clock = pygame.time.Clock()
 
     joy_id = select_joystick()
@@ -66,16 +77,33 @@ def main():
     joystick = pygame.joystick.Joystick(joy_id)
     joystick.init()
     print "Continuing with %s." % joystick.get_name()
+    print "num_axes: {axes}".format(axes = joystick.get_numaxes()) 
 
-    ''' Check for joystick events. '''
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.JOYBUTTONDOWN:
-                print "Button pressed:  '%d'" % event.button
-            if event.type == pygame.JOYBUTTONUP:
-                print "Button released: '%d'" % event.button
             if event.type == pygame.JOYAXISMOTION:
-                print "Axis motion ({id}): {pos}".format(id = event.axis, pos = joystick.get_axis(event.axis))
+                if joystick.get_axis(event.axis):
+                    x = None
+                    #do nothing
+
+        left_y = -1 * joystick.get_axis(1)
+        left_x = joystick.get_axis(0)
+
+        speed = math.sqrt((left_x * left_x) + (left_y * left_y))
+        
+        if speed > 1:
+            speed = 1
+        if speed < -1:
+            speed = -1
+
+        theta = math.atan2(left_x,left_y)
+
+        print theta
+
+        if speed > 0.5 :
+            robot.move(theta,speed)
+        else:
+            robot.stop()
 
         ''' Limit to 20 ticks/s '''
         clock.tick(20)
