@@ -83,8 +83,12 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.JOYAXISMOTION:
                 if joystick.get_axis(event.axis):
-                    x = None
-                    #do nothing
+                    pass
+            if event.type == pygame.JOYBUTTON:
+                if event.button == 5:
+                    robot.kick()
+                elif event.button == 4:
+                    robot.catch()
 
         left_y = -1 * joystick.get_axis(1)
         left_x = joystick.get_axis(0)
