@@ -104,7 +104,7 @@ void doRunMotor(int motor, int motor_speed)
 /* Kicker Commands */
 #define MOTOR_KICKER (3)
 
-#define KICKER_RUNNING_TIME (400)
+#define KICKER_RUNNING_TIME (500)
 
 #define KICKER_STATE_STOPPED  (0x01)
 #define KICKER_STATE_KICKING  (0x02)
@@ -116,18 +116,16 @@ unsigned long kicker_stop_time = 0L;
 void cmd_KICK()
 {
     kicker_stop_time = millis() + KICKER_RUNNING_TIME;
-    motorForward(MOTOR_KICKER, 100);
+    motorBackward(MOTOR_KICKER, 100);
     kicker_state = KICKER_STATE_KICKING;
-    
     Serial.println("DONE");
 }
 
 void cmd_CATCH()
-{    
-    motorBackward(MOTOR_KICKER, 100);
-    kicker_state = KICKER_STATE_CATCHING;
-    motorBackward(MOTOR_KICKER, 100);
-    
+{
+    kicker_stop_time = millis() + KICKER_RUNNING_TIME;
+    motorForward(MOTOR_KICKER, 100);
+    kicker_state = KICKER_STATE_KICKING;
     Serial.println("DONE");
 }
 
@@ -143,7 +141,7 @@ void loop()
   comm.readSerial();
   
   /* Check the kicker state */
-  if(kicker_state == KICKER_STATE_KICKING) {
+  if(kicker_state != KICKER_STATE_STOPPED) {
       if(millis() >= kicker_stop_time) {
           stop_kicker();
       }
