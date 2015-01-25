@@ -21,6 +21,7 @@ class Action():
     def move(self, angle, speed):
         """Move the robot in the angle (radians) from the front, with speed -1 to +1"""
         motor_speeds = [ self._calc_motor_speed(motor, angle, speed) for motor in self.MOTORS ]
+        motor_speeds = self._scale_speeds(motor_speeds)
         
         self._send_run(motor_speeds)
   
@@ -50,15 +51,18 @@ class Action():
     # TODO: decide on the kick protocol etc.
   
     # Utility
+    def _scale_speeds(self, speeds, scale):
+        maxspeed = max(speeds)
+        return map( lambda x: (x/maxspeed)*x*scale, speeds )        
+    
     def _normalise_speed(self, speed):
         # We need the speed to be an integer between 100 and -100
         speed = int(round(100.0 * speed))
         speed = max(-100, min(speed, 100))
         return speed
     
-    def _calc_motor_speed(self, motor, angle, linear_speed):
-        speed = linear_speed * (math.cos(angle) * motor[0] - math.sin(angle) * motor[1] )
-        return self._normalise_speed(speed)
+    def _calc_motor_speed(self, motor, angle):
+        return (math.cos(angle) * motor[0] - math.sin(angle) * motor[1])
     
     def _get_command_string(self, command, args):
         commstr = str(command)
