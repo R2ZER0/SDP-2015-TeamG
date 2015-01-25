@@ -35,10 +35,10 @@ class Action():
   
     # Kicking
     def kick(self):
-        pass
+        self._send_command("KICK",[])
     
     def catch(self):
-        pass
+        self._send_command("CATCH",[])
     
     
     # Private Methods #
