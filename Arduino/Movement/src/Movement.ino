@@ -3,7 +3,6 @@
 #include <SerialCommand.h>
 
 const int PIN_LED   = 13;
-const int PIN_RADIO = 8;
 
 SerialCommand comm;
 
@@ -12,17 +11,44 @@ void setup()
   // SDP Setup
   SDPsetup();
   
+  // Setup LED
+  pinMode(PIN_LED, OUTPUT);
+  digitalWrite(PIN_LED, HIGH);
+  
   // Initialse the command messenger
-  comm.addCommand("PING", cmd_PING);
-  comm.addCommand("RUN", cmd_RUN);
+  comm.addCommand("RUN",   cmd_RUN);
+  comm.addCommand("PING",  cmd_PING);
+  comm.addCommand("LED",   cmd_LED);
   
   Serial.println("STARTED");
+}
+
+int led_state = HIGH;
+
+void cmd_LED()
+{
+  char* arg = comm.next();
+  if(arg == NULL) {
+    // Flip the state if no argument given
+    switch(led_state) {
+      case HIGH: led_state = LOW;
+      case  LOW: led_state = HIGH; 
+    }
+    
+  } else if(arg == "HIGH") {
+    led_state = HIGH;
+    
+  } else if(arg == "LOW") {
+    led_state = LOW;
+  }
+  
+  digitalWrite(PIN_LED, HIGH);
+  Serial.println("DONE");
 }
 
 void cmd_PING()
 {
   Serial.println("PONG");
-  digitalWrite(PIN_LED, LOW);
 }
 
 void cmd_RUN()
@@ -48,19 +74,11 @@ void cmd_RUN()
   }
   
   doRun(motor1, motor2, motor3);
+  Serial.println("DONE");
 }
-
-#define HEARTBEAT_RATE 10000
-int heartbeatticks = HEARTBEAT_RATE;
-int heartbeatcount = 0;
 
 void loop()
 {
-  if(heartbeatticks-- < 0) {
-    Serial.print("HB ");
-    Serial.println(heartbeatcount++);
-    heartbeatticks = HEARTBEAT_RATE;
-  }
   comm.readSerial();
 }
 
