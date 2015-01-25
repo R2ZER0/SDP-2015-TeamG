@@ -18,6 +18,6 @@ while True:
             print(comm.readline())
             
     else:
-        cmd.rstrip()
-        comm.write(cmd + "\r\n")
-        comm.flush()
+      cmd.rstrip()
+      comm.write(cmd + "\r\n")
+      comm.flush()
