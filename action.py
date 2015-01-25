@@ -71,7 +71,6 @@ class Action():
     
     def _send_command(self, command, args):
         commstr = self._get_command_string(command, args)
-        print("Writing command: " + commstr)
         if self.comm is not None:
             self.comm.write(commstr)
             self.comm.flush()
