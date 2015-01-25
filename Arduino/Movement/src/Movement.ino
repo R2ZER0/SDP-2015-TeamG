@@ -19,6 +19,8 @@ void setup()
   comm.addCommand("RUN",   cmd_RUN);
   comm.addCommand("PING",  cmd_PING);
   comm.addCommand("LED",   cmd_LED);
+  comm.addCommand("KICK",  cmd_KICK);
+  comm.addCommand("CATCH", cmd_CATCH);
   
   Serial.println("STARTED");
 }
@@ -51,6 +53,7 @@ void cmd_PING()
   Serial.println("PONG");
 }
 
+/* Movement Commands */
 void cmd_RUN()
 {
   int motor1 = 0.0;
@@ -77,11 +80,6 @@ void cmd_RUN()
   Serial.println("DONE");
 }
 
-void loop()
-{
-  comm.readSerial();
-}
-
 void doRun(int motor1, int motor2, int motor3)
 {
   doRunMotor(0, motor1);
@@ -99,6 +97,54 @@ void doRunMotor(int motor, int motor_speed)
     
   } else if(motor_speed < 0) {
     motorBackward(motor, -motor_speed);
+  }
+}
+
+
+/* Kicker Commands */
+#define MOTOR_KICKER (3)
+
+#define KICKER_RUNNING_TIME (500)
+
+#define KICKER_STATE_STOPPED  (0x01)
+#define KICKER_STATE_KICKING  (0x02)
+#define KICKER_STATE_CATCHING (0x03)
+
+byte kicker_state = KICKER_STATE_STOPPED;
+unsigned long kicker_stop_time = 0L;
+
+void cmd_KICK()
+{
+    kicker_stop_time = millis() + KICKER_RUNNING_TIME;
+    motorBackward(MOTOR_KICKER, 100);
+    kicker_state = KICKER_STATE_KICKING;
+    Serial.println("DONE");
+}
+
+void cmd_CATCH()
+{
+    kicker_stop_time = millis() + KICKER_RUNNING_TIME;
+    motorForward(MOTOR_KICKER, 100);
+    kicker_state = KICKER_STATE_KICKING;
+    Serial.println("DONE");
+}
+
+void stop_kicker()
+{
+    motorStop(MOTOR_KICKER);
+    kicker_state = KICKER_STATE_STOPPED;
+}
+
+void loop()
+{
+  /* Process serial commands */
+  comm.readSerial();
+  
+  /* Check the kicker state */
+  if(kicker_state != KICKER_STATE_STOPPED) {
+      if(millis() >= kicker_stop_time) {
+          stop_kicker();
+      }
   }
 }
 
