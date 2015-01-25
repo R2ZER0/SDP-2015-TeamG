@@ -104,7 +104,7 @@ void doRunMotor(int motor, int motor_speed)
 /* Kicker Commands */
 #define MOTOR_KICKER (3)
 
-#define KICKER_RUNNING_TIME (500)
+#define KICKER_RUNNING_TIME (400)
 
 #define KICKER_STATE_STOPPED  (0x01)
 #define KICKER_STATE_KICKING  (0x02)
