@@ -116,7 +116,7 @@ unsigned long kicker_stop_time = 0L;
 void cmd_KICK()
 {
     kicker_stop_time = millis() + KICKER_RUNNING_TIME;
-    motorBackward(MOTOR_KICKER, 100);
+    motorForward(MOTOR_KICKER, 100);
     kicker_state = KICKER_STATE_KICKING;
     Serial.println("DONE");
 }
@@ -124,7 +124,7 @@ void cmd_KICK()
 void cmd_CATCH()
 {
     kicker_stop_time = millis() + KICKER_RUNNING_TIME;
-    motorForward(MOTOR_KICKER, 100);
+    motorBackward(MOTOR_KICKER, 100);
     kicker_state = KICKER_STATE_KICKING;
     Serial.println("DONE");
 }
