@@ -18,16 +18,18 @@ class Action():
     # Public methods #
     
     # Movement
-    def move(self, angle, speed):
+    def move(self, angle, scale):
         """Move the robot in the angle (radians) from the front, with speed -1 to +1"""
-        motor_speeds = [ self._calc_motor_speed(motor, angle, speed) for motor in self.MOTORS ]
-        motor_speeds = self._scale_speeds(motor_speeds)
+        motor_speeds = [ Action._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
+        motor_speeds = Action._normalise_speeds(motor_speeds)
+        motor_speeds = map(lambda x: x*scale, motor_speeds)
+        motor_speeds = map(Action._percentage_speed, motor_speeds)
         
         self._send_run(motor_speeds)
   
     def turn(self, speed):
         """Turn the robot in the given direction, clockwise/anticlockwise"""      
-        motor_speed = self._normalise_speed(speed)
+        motor_speed = _normalise_speed(speed)
         self._send_run([motor_speed, motor_speed, motor_speed])
   
     def stop(self):
@@ -51,20 +53,24 @@ class Action():
     # TODO: decide on the kick protocol etc.
   
     # Utility
-    def _scale_speeds(self, speeds, scale):
+    @staticmethod
+    def _normalise_speeds(speeds):
         maxspeed = max(speeds)
-        return map( lambda x: (x/maxspeed)*x*scale, speeds )        
+        return map( lambda x: (x/maxspeed)*x, speeds )        
     
-    def _normalise_speed(self, speed):
+    @staticmethod
+    def _percentage_speed(speed):
         # We need the speed to be an integer between 100 and -100
         speed = int(round(100.0 * speed))
         speed = max(-100, min(speed, 100))
         return speed
     
-    def _calc_motor_speed(self, motor, angle):
+    @staticmethod
+    def _calc_motor_speed(motor, angle):
         return (math.cos(angle) * motor[0] - math.sin(angle) * motor[1])
     
-    def _get_command_string(self, command, args):
+    @staticmethod
+    def _get_command_string(command, args):
         commstr = str(command)
         
         for arg in args:
@@ -74,7 +80,7 @@ class Action():
         return commstr
     
     def _send_command(self, command, args):
-        commstr = self._get_command_string(command, args)
+        commstr = Action._get_command_string(command, args)
         if self.comm is not None:
             self.comm.write(commstr)
             self.comm.flush()
