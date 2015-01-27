@@ -39,11 +39,11 @@ class Action():
         self._send_run(motor_speeds)
   
     # Kicking
-    def kick(self):
-        self._send_command("KICK",[])
+    def kick(self, scale=100):
+        self._send_command("KICK",[scale])
     
-    def catch(self):
-        self._send_command("CATCH",[])
+    def catch(self, scale=100):
+        self._send_command("CATCH",[scale])
 
     # Utility
     def ping(self):
