@@ -25,6 +25,19 @@ void setup()
   Serial.println("STARTED");
 }
 
+/* Get the next argument of the curret command, and convert it to an int */
+int getInt(int default_value)
+{
+    char* arg = comm.next();
+    if(arg == NULL) {
+        return default_value;
+    } else {
+        return atoi(arg);
+    }
+}
+
+
+/* Control the LED */
 int led_state = HIGH;
 
 void cmd_LED()
@@ -56,25 +69,9 @@ void cmd_PING()
 /* Movement Commands */
 void cmd_RUN()
 {
-  int motor1 = 0;
-  int motor2 = 0;
-  int motor3 = 0;
-  char* arg;
-  
-  arg = comm.next();
-  if(arg != NULL) {
-    motor1 = atoi(arg);
-  }
-  
-  arg = comm.next();
-  if(arg != NULL) {
-     motor2 = atoi(arg);
-  }
-  
-  arg = comm.next();
-  if(arg != NULL) {
-    motor3 = atoi(arg);
-  }
+  int motor1 = getInt(0);
+  int motor2 = getInt(0);
+  int motor3 = getInt(0);
   
   doRun(motor1, motor2, motor3);
   Serial.println("DONE");
@@ -98,17 +95,6 @@ void doRunMotor(int motor, int motor_speed)
   } else if(motor_speed < 0) {
     motorBackward(motor, -motor_speed);
   }
-}
-
-/* Get the next argument of the curret command, and convert it to an int */
-int getInt(int default_value)
-{
-    char* arg = comm.next();
-    if(arg == NULL) {
-        return default_value;
-    } else {
-        return atoi(arg);
-    }
 }
 
 /* A stop-gap measure for milestone 1, run the motors for a given amount of
