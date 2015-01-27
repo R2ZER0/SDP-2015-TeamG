@@ -100,6 +100,54 @@ void doRunMotor(int motor, int motor_speed)
   }
 }
 
+/* Get the next argument of the curret command, and convert it to an int */
+int getInt(int default_value)
+{
+    char* arg = comm.next();
+    if(arg == NULL) {
+        return default_value;
+    } else {
+        return atoi(arg);
+    }
+}
+
+/* A stop-gap measure for milestone 1, run the motors for a given amount of
+ * time and then stop. */
+#define RUNTM_STATE_RUNNING  (0x01)
+#define RUNTM_STATE_NOTINUSE (0x02)
+
+byte runtm_state = RUNTM_STATE_NOTINUSE;
+unsigned long runtm_stop_time = 0;
+
+void cmd_RUNTM()
+{
+    char* arg;
+    int motor1 = getInt(0);
+    int motor2 = getInt(0);
+    int motor3 = getInt(0);
+    int runmillis = getInt(0);
+    
+    runtm_stop_time = millis() + runmillis;
+    runtm_state = RUNTM_STATE_RUNNING;
+    doRun(motor1, motor2, motor3);
+}
+
+void stop_runtm()
+{
+    doRun(0, 0, 0);
+    runtm_state = RUNTM_STATE_NOTINUSE;
+}
+
+void service_runtm()
+{
+    if(runtm_state == RUNTM_STATE_RUNNING) {
+        /* If we have exceeded the running time, then stop */
+        if(runtm_stop_time < millis()) {
+            doRun(0, 0, 0);
+        }
+    }
+}
+
 
 /* Kicker Commands */
 #define MOTOR_KICKER (3)
