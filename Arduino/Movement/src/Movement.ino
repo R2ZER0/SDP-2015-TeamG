@@ -83,8 +83,8 @@ void cmd_RUN()
 void doRun(int motor1, int motor2, int motor3)
 {
   doRunMotor(0, motor1);
-  doRunMotor(1, 0 - motor2); // Motor 2 is backwards
-  doRunMotor(2, 0 - motor3); // Motor 3 is backwards
+  doRunMotor(1, motor2);
+  doRunMotor(2, motor3);
 }
 
 void doRunMotor(int motor, int motor_speed)
