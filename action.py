@@ -3,6 +3,8 @@ import math
 
 class Action():
     """Provides an interface to movement and other robot actions"""
+
+    Debug = False # set Action.Debug = True in your application to enable
   
     TURN_CLOCKWISE = 'c'
     TURN_ANTICLOCKWISE = 'a'
@@ -84,6 +86,8 @@ class Action():
     
     def _send_command(self, command, args):
         commstr = Action._get_command_string(command, args)
+        if self.Debug:
+            print "Sending command: " + commstr
         if self.comm is not None:
             self.comm.write(commstr)
             self.comm.flush()
