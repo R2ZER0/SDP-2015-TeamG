@@ -15,8 +15,8 @@ def forward10():
   '''
   Moves the Robot forward 10cm. Sleep time custom tuned for distance.
   '''
-  robot.move(0, 1)
-  time.sleep(0.2)
+  robot.move(0, -1)
+  time.sleep(0.47)
   robot.stop()
 
 
@@ -24,8 +24,8 @@ def backward20():
   '''
   Moves the Robot backwards 20cm. Sleep time custom tuned for distance.
   '''
-  robot.move(0, -1)
-  time.sleep(0.4)
+  robot.move(0, 1)
+  time.sleep(0.71)
   robot.stop()
 
 
@@ -33,13 +33,15 @@ def forward50():
   '''
   Moves the Robot forward 50cm. Sleep time custom tuned for distance.
   '''
-  robot.move(0, 1)
-  time.sleep(1.0)
+  robot.move(0, -1)
+  time.sleep(1.57)
   robot.stop()
 
 
 def kick():
   robot.kick()
+  time.sleep(1.0)
+  catch()
 
 
 def catch():
