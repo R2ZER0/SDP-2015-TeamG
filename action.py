@@ -44,6 +44,10 @@ class Action():
     
     def catch(self):
         self._send_command("CATCH",[])
+
+    # Utility
+    def ping(self):
+        self._send_command("PING", [])
     
     
     # Private Methods #
