@@ -54,9 +54,6 @@ class Action():
     
     # Commands
     def _send_run(self, speeds):
-        # Motor 3 is backwards
-        speeds[2] = 0 - speeds[2]
-        
         self._send_command("RUN", speeds)
     
     # TODO: decide on the kick protocol etc.

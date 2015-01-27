@@ -43,7 +43,7 @@ def kick():
   catch()
 
 def kick_pass():
-  robot.kick(40)
+  robot.kick(50)
   time.sleep(1)
   catch()
 
@@ -69,8 +69,12 @@ if __name__ == "__main__":
 
   # Establish communications
   print 'Using port %s' % (args.port)
-  comm = serial.Serial(args.port, 115200, timeout=None)
+
+  comm = serial.Serial(args.port, 115200)
   robot = Action(comm)
+
+  comm.write('PING' + '\r\n')
+  print comm.readline()
 
   # Kicking action
   if args.kick:
