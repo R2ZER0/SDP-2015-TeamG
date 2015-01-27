@@ -37,34 +37,39 @@ def forward50():
   time.sleep(1.57)
   robot.stop()
 
-
 def kick():
-  robot.kick()
-  time.sleep(1.0)
+  robot.kick(100)
+  time.sleep(1)
   catch()
 
+def kick_pass():
+  robot.kick(40)
+  time.sleep(1)
+  catch()
 
 def catch():
-  robot.catch()
+  robot.catch(100)
 
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
 
   # Add serial port as an optional argument
-  parser.add_argument("-p", "--port", default='/dev/ttyACM0', help="Serial port for the communication. Default:/dev/ttyACM0")
+  parser.add_argument("--port", default='/dev/ttyACM0', help="Serial port for the communication. Default:/dev/ttyACM0")
 
   # Add two mutually-exclusive possible actions: kick and distance
   action_group = parser.add_mutually_exclusive_group(required=True)
   action_group.add_argument("-d", "--distance", type=int, help="Distance to move. Valid: 10, -20, 50")
   action_group.add_argument("-k", "--kick", action="store_true", help="Activate Kicker")
   action_group.add_argument("-c", "--catch", action="store_true", help="Activate Grabber")
+  action_group.add_argument("-p", "--kick_pass", action="store_true", help="Pass to Attacker Zone")
 
   # Validate arguments
   args = parser.parse_args()
 
   # Establish communications
-  comm = serial.Serial(args.port, 115200, timeout=1)
+  print 'Using port %s' % (args.port)
+  comm = serial.Serial(args.port, 115200, timeout=None)
   robot = Action(comm)
 
   # Kicking action
@@ -74,6 +79,9 @@ if __name__ == "__main__":
   # Catching action
   elif args.catch:
     catch()
+
+  elif args.kick_pass:
+    kick_pass()
 
   # Distance kicking actions
   elif args.distance:
