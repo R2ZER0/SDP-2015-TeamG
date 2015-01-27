@@ -56,9 +56,9 @@ void cmd_PING()
 /* Movement Commands */
 void cmd_RUN()
 {
-  int motor1 = 0.0;
-  int motor2 = 0.0;
-  int motor3 = 0.0;
+  int motor1 = 0;
+  int motor2 = 0;
+  int motor3 = 0;
   char* arg;
   
   arg = comm.next();
@@ -68,7 +68,7 @@ void cmd_RUN()
   
   arg = comm.next();
   if(arg != NULL) {
-    motor2 = atoi(arg);
+     motor2 = atoi(arg);
   }
   
   arg = comm.next();
@@ -106,6 +106,8 @@ void doRunMotor(int motor, int motor_speed)
 
 #define KICKER_RUNNING_TIME (400)
 
+#define KICKER_DEFAULT_SCALE (100)
+
 #define KICKER_STATE_STOPPED  (0x01)
 #define KICKER_STATE_KICKING  (0x02)
 #define KICKER_STATE_CATCHING (0x03)
@@ -115,15 +117,35 @@ unsigned long kicker_stop_time = 0L;
 
 void cmd_KICK()
 {
-    kicker_stop_time = millis() + KICKER_RUNNING_TIME;
-    motorForward(MOTOR_KICKER, 100);
+    char* arg = comm.next();
+    int scale = KICKER_DEFAULT_SCALE;
+    if(arg != NULL) {
+        scale = atoi(arg);
+    }
+    
+    if(scale <= 40) {
+      scale = KICKER_DEFAULT_SCALE;
+    }
+  
+    kicker_stop_time = millis() + (KICKER_RUNNING_TIME * (100/scale));
+    motorForward(MOTOR_KICKER, scale);
     kicker_state = KICKER_STATE_KICKING;
     Serial.println("DONE");
 }
 
 void cmd_CATCH()
 {
-    kicker_stop_time = millis() + KICKER_RUNNING_TIME;
+    char* arg = comm.next();
+    int scale = KICKER_DEFAULT_SCALE;
+    if(arg != NULL) {
+        scale = atoi(arg);
+    }
+    
+    if(scale <= 40) {
+      scale = KICKER_DEFAULT_SCALE;
+    }
+  
+    kicker_stop_time = millis() + (KICKER_RUNNING_TIME * (100/scale));
     motorBackward(MOTOR_KICKER, 100);
     kicker_state = KICKER_STATE_KICKING;
     Serial.println("DONE");
