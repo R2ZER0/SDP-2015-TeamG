@@ -4,12 +4,24 @@ import serial
 from action import Action
 import math
 
-comm = serial.Serial("/dev/ttyACM6", 115200, timeout=1)
+comm = serial.Serial("/dev/ttyACM3", 115200, timeout=1)
 #comm = None
 robot = Action(comm)
 
 from flask import Flask
+from flask import send_from_directory
+import os
+
+static_dir = os.path.join(os.getcwd(), "ControlApp")
+print "serving from " + static_dir
+
 app = Flask(__name__)
+app.debug = False
+
+
+@app.route('/')
+def root():
+    return send_from_directory(static_dir, "control.html")
 
 @app.route("/stop")
 def do_stop():
@@ -38,13 +50,23 @@ def do_right():
 
 @app.route("/turncw")
 def do_turncw():
-    robot.turn(Action.TURN_CLOCKWISE, 0.5)
+    robot.turn(0.5)
     return "ok"
 
 @app.route("/turnacw")
 def do_turnacw():
-    robot.turn(Action.TURN_ANTICLOCKWISE, 0.5)
+    robot.turn(-0.5)
     return "ok"
+
+@app.route("/kick")
+def do_kick():
+    robot.kick()
+    return "ok"
+
+@app.route("/catch")
+def do_catch():
+    robot.catch()
+    return "ok"    
     
 if __name__ == "__main__":
     app.debug = True

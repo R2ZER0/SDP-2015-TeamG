@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+        <style>
+            html, body { height:100% }
+            .stop {
+                background: rgb(202, 60, 60); /* this is a maroon */
+            }
+            
+            button {
+                font-size: 200%;
+                width: 100%;
+                height: 120px;
+            }
+        </style>
+        
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    </head>
+    <body>
+        <div class="pure-g">
+            <div class="pure-u-1">
+                <button class="pure-button stop">S T O P</button>
+            </div>
+            
+            <div class="pure-u-1-3">
+                <button id="turnacw" class="pure-button">Turn ACW</button>
+            </div>
+            <div class="pure-u-1-3">
+                <button id="forward" class="pure-button">Forward</button>
+            </div>
+            <div class="pure-u-1-3">
+                <button id="turncw" class="pure-button">Turn CW</button>
+            </div>
+            
+            <div class="pure-u-1-3">
+                <button id="left" class="pure-button">Left</button>
+            </div>
+            <div class="pure-u-1-3">
+                <button id="stop" class="pure-button stop">S T O P</button>
+            </div>
+            <div class="pure-u-1-3">
+                <button id="right" class="pure-button">Right</button>
+            </div>
+            
+            <div class="pure-u-1-3">
+                <button id="kick" class="pure-button">Kick</button>
+            </div>
+            <div class="pure-u-1-3">
+                <button id="backward" class="pure-button">Backward</button>
+            </div>
+            <div class="pure-u-1-3">
+                <button id="catch" class="pure-button">Catch</button>
+            </div>
+        </div>
+        <script>
+            var baseurl = "/";
+            
+            function stop() { jQuery.get(baseurl + "stop"); }
+            function forward() { jQuery.get(baseurl + "forward"); }
+            function backward() { jQuery.get(baseurl + "backward"); }
+            function left() { jQuery.get(baseurl + "left"); }
+            function right() { jQuery.get(baseurl + "right"); }
+            function turncw() { jQuery.get(baseurl + "turncw"); }
+            function turnacw() { jQuery.get(baseurl + "turnacw"); }
+            function kick() { jQuery.get(baseurl + "kick"); }
+            function docatch() { jQuery.get(baseurl + "catch"); }
+        
+            jQuery(".stop").on("tap", stop);
+            jQuery("#forward").on("tap", forward);
+            jQuery("#backward").on("tap", backward);
+            jQuery("#left").on("tap", left);
+            jQuery("#right").on("tap", right);
+            jQuery("#turncw").on("tap", turncw);
+            jQuery("#turnacw").on("tap", turnacw);
+            jQuery("#kick").on("tap", kick);
+            jQuery("#catch").on("tap", docatch);
+            
+            jQuery(document).keydown(function(e) {
+                console.log("Got key: " + e.which);
+                switch(e.which) {
+                
+                    // space
+                    case 32: stop(); break;
+                
+                    // W 
+                    case 87: forward(); break;
+                
+                    // A
+                    case 97: left(); break;
+                    
+                    // S
+                    case 115: backward(); break;
+                    
+                    // D
+                    case 100: right(); break;
+                    
+                    // Q
+                    case 81: turnacw(); break;
+                   
+                    // E
+                    case 69: turncw(); break;
+                    
+                    // F
+                    case 102: docatch(); break;
+                    
+                    // G
+                    case 103: kick(); break;
+                    
+                    
+                    
+                }
+            });
+        </script>
+    </body>
+</html>
