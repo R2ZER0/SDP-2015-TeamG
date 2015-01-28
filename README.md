@@ -1,4 +1,4 @@
-##Systems Design Project - Group 7##
+##System Design Project - Group 9##
 
 *Thomas Cumming, Rikki Guy, Joseph Kennelly, Ayrton Massey, Robert Oyler, Sebastian Schulze, Ronan Turner*
 
