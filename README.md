@@ -6,6 +6,7 @@
 ------
 
 ###Future SDP teams
+
 The planner and vision are very good.
 
 We used an Arduino powered robot but the vision and planning can be effectively used even with the default NXT Brick. All it takes is to modify the Controller class in `controller.py`. 
@@ -58,6 +59,8 @@ tar -zcvf pygame-1.9.1release.tar.gz pygame-1.9.1release
 source venv/bin/activate
 pip install pygame-1.9.1release.tar.gz
 ```
+
+*Note: The XBOX 360 controller drivers are not present on DICE. It is not possible to install them because DICE does not have the dependencies required for the drivers.*
 
 ------
 ### Vision
