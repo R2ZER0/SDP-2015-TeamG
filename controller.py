@@ -8,7 +8,7 @@ import cv2
 import serial
 import warnings
 import time
-
+from planning.models import World
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -57,8 +57,11 @@ class Controller:
         # Set up postprocessing for vision
         self.postprocessing = Postprocessing()
 
+        # Set up world
+        self.world = World(our_side, pitch)
+
         # Set up main planner
-        self.planner = Planner(our_side=our_side, pitch_num=self.pitch)
+        self.planner = Planner(our_side=our_side, pitch_num=self.pitch, world=self.world)
 
         # Set up GUI
         self.GUI = GUI(calibration=self.calibration, arduino=self.arduino, pitch=self.pitch)
@@ -95,9 +98,10 @@ class Controller:
                 model_positions = self.postprocessing.analyze(model_positions)
 
                 # Find appropriate action
-                self.planner.update_world(model_positions)
-                attacker_actions = self.planner.plan('attacker')
-                defender_actions = self.planner.plan('defender')
+                #self.planner.update_world(model_positions)
+                self.world.update_positions(model_positions)
+                attacker_actions = self.planner.plan(self.world, 'attacker')
+                defender_actions = self.planner.plan(self.world, 'defender')
 
                 if self.attacker is not None:
                     self.attacker.execute(self.arduino, attacker_actions)
@@ -106,8 +110,8 @@ class Controller:
 
                 # Information about the grabbers from the world
                 grabbers = {
-                    'our_defender': self.planner._world.our_defender.catcher_area,
-                    'our_attacker': self.planner._world.our_attacker.catcher_area
+                    'our_defender': self.world.our_defender.catcher_area,
+                    'our_attacker': self.world.our_attacker.catcher_area
                 }
 
                 # Information about states

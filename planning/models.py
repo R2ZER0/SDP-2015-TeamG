@@ -349,6 +349,10 @@ class World(object):
         self._robots.append(Robot(1, 0, 0, 0, 0))
         self._robots.append(Robot(2, 0, 0, 0, 0))
         self._robots.append(Robot(3, 0, 0, 0, 0))
+
+        self.our_defender.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 12}
+        self.our_attacker.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 14}
+
         self._goals = []
         self._goals.append(Goal(0, 0, self._pitch.height/2.0, 0))
         self._goals.append(Goal(3, self._pitch.width, self._pitch.height/2.0, pi))
