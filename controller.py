@@ -1,3 +1,5 @@
+from action import Action
+from planning.strategies import AcquireBall
 from vision.vision import Vision, Camera, GUI
 from planning.planner import Planner
 from postprocessing.postprocessing import Postprocessing
@@ -40,9 +42,6 @@ class Controller:
 
         self.pitch = pitch
 
-        # Set up the Arduino communications
-        self.arduino = Arduino(comm_port, 115200, 1, comms)
-
         # Set up camera for frames
         self.camera = Camera(port=video_port, pitch=self.pitch)
         frame = self.camera.get_frame()
@@ -62,10 +61,10 @@ class Controller:
         self.world = World(our_side, pitch)
 
         # Set up main planner
-        self.planner = Planner(our_side=our_side, pitch_num=self.pitch, world=self.world)
+        #self.planner = Planner(our_side=our_side, pitch_num=self.pitch, world=self.world)
 
         # Set up GUI
-        self.GUI = GUI(calibration=self.calibration, arduino=self.arduino, pitch=self.pitch)
+        self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
 
         self.color = color
         self.side = our_side
@@ -73,8 +72,8 @@ class Controller:
 
         self.preprocessing = Preprocessing()
 
-        self.attacker = Attacker_Controller()
-        self.defender = Defender_Controller()
+        self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
+        self.robot = Action(self.comm)
 
     def wow(self):
         """
@@ -101,13 +100,10 @@ class Controller:
 
                 # Find appropriate action
                 self.world.update_positions(model_positions)
-                attacker_actions = self.planner.plan(self.world, 'attacker')
-                defender_actions = self.planner.plan(self.world, 'defender')
 
-                if self.attacker is not None:
-                    self.attacker.execute(self.arduino, attacker_actions)
-                if self.defender is not None:
-                    self.defender.execute(self.arduino, defender_actions)
+                # TEST STRATEGIES
+                strategy = AcquireBall(self.world,self.robot,'attacker')
+                strategy.execute()
 
                 # Information about the grabbers from the world
                 grabbers = {
@@ -116,8 +112,8 @@ class Controller:
                 }
 
                 # Information about states
-                attackerState = (self.planner.attacker_state, self.planner.attacker_strat_state)
-                defenderState = (self.planner.defender_state, self.planner.defender_strat_state)
+                attackerState = ('QWER', 'ASDF')
+                defenderState = ('QWER', 'ASDF')
 
                 # Use 'y', 'b', 'r' to change color.
                 c = waitKey(2) & 0xFF
@@ -132,158 +128,16 @@ class Controller:
                 counter += 1
 
         except:
-            if self.defender is not None:
-                self.defender.shutdown(self.arduino)
-            if self.attacker is not None:
-                self.attacker.shutdown(self.arduino)
-            raise
+            if self.robot is not None:
+                self.robot.stop()
 
         finally:
             # Write the new calibrations to a file.
             tools.save_colors(self.pitch, self.calibration)
-            if self.attacker is not None:
-                self.attacker.shutdown(self.arduino)
-            if self.defender is not None:
-                self.defender.shutdown(self.arduino)
+            if self.robot is not None:
+                self.robot.stop()
 
-
-class Robot_Controller(object):
-    """
-    Robot_Controller superclass for robot control.
-    """
-
-    def __init__(self):
-        """
-        Connect to Brick and setup Motors/Sensors.
-        """
-        self.current_speed = 0
-
-    def shutdown(self, comm):
-        # TO DO
-            pass
-
-
-class Defender_Controller(Robot_Controller):
-    """
-    Defender implementation.
-    """
-
-    def __init__(self):
-        """
-        Do the same setup as the Robot class, as well as anything specific to the Defender.
-        """
-        super(Defender_Controller, self).__init__()
-
-    def execute(self, comm, action):
-        """
-        Execute robot action.
-        """
-
-        if 'turn_90' in action:
-            comm.write('D_RUN_ENGINE %d %d\n' % (0, 0))
-            time.sleep(0.2)
-            comm.write('D_RUN_SHOOT %d\n' % int(action['turn_90']))
-            time.sleep(2.2)
-
-        #print action
-        left_motor = int(action['left_motor'])
-        right_motor = int(action['right_motor'])
-        speed = action['speed']
-
-        comm.write('D_SET_ENGINE %d %d\n' % (speed, speed))
-        comm.write('D_RUN_ENGINE %d %d\n' % (left_motor, right_motor))
-        if action['kicker'] != 0:
-            try:
-                comm.write('D_RUN_KICK\n')
-                time.sleep(0.5)
-            except StandardError:
-                pass
-        elif action['catcher'] != 0:
-            try:
-                comm.write('D_RUN_CATCH\n')
-            except StandardError:
-                pass
-
-    def shutdown(self, comm):
-        comm.write('D_RUN_KICK\n')
-        comm.write('D_RUN_ENGINE %d %d\n' % (0, 0))
-
-
-class Attacker_Controller(Robot_Controller):
-    """
-    Attacker implementation.
-    """
-
-    def __init__(self):
-        """
-        Do the same setup as the Robot class, as well as anything specific to the Attacker.
-        """
-        super(Attacker_Controller, self).__init__()
-
-    def execute(self, comm, action):
-        """
-        Execute robot action.
-        """
-        if 'turn_90' in action:
-            comm.write('A_RUN_ENGINE %d %d\n' % (0, 0))
-            time.sleep(0.2)
-            comm.write('A_RUN_SHOOT %d\n' % int(action['turn_90']))
-            # time.sleep(1.2)
-        else:
-            left_motor = int(action['left_motor'])
-            right_motor = int(action['right_motor'])
-            speed = int(action['speed'])
-            comm.write('A_SET_ENGINE %d %d\n' % (speed, speed))
-            comm.write('A_RUN_ENGINE %d %d\n' % (left_motor, right_motor))
-            if action['kicker'] != 0:
-                try:
-                    comm.write('A_RUN_KICK\n')
-                except StandardError:
-                    pass
-            elif action['catcher'] != 0:
-                try:
-                    comm.write('A_RUN_CATCH\n')
-                except StandardError:
-                    pass
-
-    def shutdown(self, comm):
-        comm.write('A_RUN_KICK\n')
-        comm.write('A_RUN_ENGINE %d %d\n' % (0, 0))
-
-
-class Arduino:
-
-    def __init__(self, port, rate, timeOut, comms):
-        self.serial = None
-        self.comms = comms
-        self.port = port
-        self.rate = rate
-        self.timeout = timeOut
-        self.setComms(comms)
-
-    def setComms(self, comms):
-        if comms > 0:
-            self.comms = 1
-            if self.serial is None:
-                try:
-                    self.serial = serial.Serial(self.port, self.rate, timeout=self.timeout)
-                except:
-                    print "No Arduino detected!"
-                    print "Continuing without comms."
-                    self.comms = 0
-                    #raise
-        else:
-            #self.write('A_RUN_KICK\n')
-            self.write('A_RUN_ENGINE %d %d\n' % (0, 0))
-            #self.write('D_RUN_KICK\n')
-            self.write('D_RUN_ENGINE %d %d\n' % (0, 0))
-            self.comms = 0
-
-    def write(self, string):
-        if self.comms == 1:
-            self.serial.write(string)
-
-
+# MAIN
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()

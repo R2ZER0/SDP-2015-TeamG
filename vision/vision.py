@@ -283,18 +283,15 @@ class GUI(object):
     def nothing(self, x):
         pass
 
-    def __init__(self, calibration, arduino, pitch):
+    def __init__(self, calibration, pitch):
         self.zones = None
         self.calibration_gui = CalibrationGUI(calibration)
-        self.arduino = arduino
         self.pitch = pitch
 
         cv2.namedWindow(self.VISION)
 
         cv2.createTrackbar(self.BG_SUB, self.VISION, 0, 1, self.nothing)
         cv2.createTrackbar(self.NORMALIZE, self.VISION, 0, 1, self.nothing)
-        cv2.createTrackbar(
-            self.COMMS, self.VISION, self.arduino.comms, 1, lambda x:  self.arduino.setComms(x))
 
     def to_info(self, args):
         """
