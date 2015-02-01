@@ -74,7 +74,7 @@ class Controller:
 
         self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
         self.robot = Action(self.comm)
-
+        
     def wow(self):
         """
         Ready your sword, here be dragons.
@@ -115,12 +115,15 @@ class Controller:
                 attackerState = ('QWER', 'ASDF')
                 defenderState = ('QWER', 'ASDF')
 
+                attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+                defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+
                 # Use 'y', 'b', 'r' to change color.
                 c = waitKey(2) & 0xFF
                 actions = []
                 fps = float(counter) / (time.clock() - timer)
                 # Draw vision content and actions
-
+                
                 self.GUI.draw(
                     frame, model_positions, actions, regular_positions, fps, attackerState,
                     defenderState, attacker_actions, defender_actions, grabbers,
