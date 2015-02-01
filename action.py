@@ -31,7 +31,7 @@ class Action():
   
     def turn(self, speed):
         """Turn the robot in the given direction, clockwise/anticlockwise"""      
-        motor_speed = _normalise_speed(speed)
+        motor_speed = Action._normalise_speeds([speed])
         self._send_run([motor_speed, motor_speed, motor_speed])
   
     def stop(self):
