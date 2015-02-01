@@ -77,17 +77,19 @@ def main():
     joystick = pygame.joystick.Joystick(joy_id)
     joystick.init()
     print "Continuing with %s." % joystick.get_name()
-    print "num_axes: {axes}".format(axes = joystick.get_numaxes()) 
+    print "RB: Kick\nLB: Catch\nLeft Analog Stick: Move"
 
+    catching = False
     while True:
         for event in pygame.event.get():
             if event.type == pygame.JOYAXISMOTION:
                 if joystick.get_axis(event.axis):
                     pass
-            if event.type == pygame.JOYBUTTON:
+            if event.type == pygame.JOYBUTTONDOWN:
                 if event.button == 5:
                     robot.kick()
-                elif event.button == 4:
+            if event.type == pygame.JOYBUTTONUP:
+                if event.button == 4:
                     robot.catch()
 
         left_y = -1 * joystick.get_axis(1)
@@ -101,8 +103,6 @@ def main():
             speed = -1
 
         theta = math.atan2(left_x,left_y)
-
-        print theta
 
         if speed > 0.5 :
             robot.move(theta,speed)
