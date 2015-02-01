@@ -3,6 +3,8 @@ import math
 
 class Action():
     """Provides an interface to movement and other robot actions"""
+
+    Debug = False # set Action.Debug = True in your application to enable
   
     TURN_CLOCKWISE = 'c'
     TURN_ANTICLOCKWISE = 'a'
@@ -18,15 +20,18 @@ class Action():
     # Public methods #
     
     # Movement
-    def move(self, angle, speed):
+    def move(self, angle, scale):
         """Move the robot in the angle (radians) from the front, with speed -1 to +1"""
-        motor_speeds = [ self._calc_motor_speed(motor, angle, speed) for motor in self.MOTORS ]
+        motor_speeds = [ Action._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
+        motor_speeds = Action._normalise_speeds(motor_speeds)
+        motor_speeds = map(lambda x: x*scale, motor_speeds)
+        motor_speeds = map(Action._percentage_speed, motor_speeds)
         
         self._send_run(motor_speeds)
   
     def turn(self, speed):
         """Turn the robot in the given direction, clockwise/anticlockwise"""      
-        motor_speed = self._normalise_speed(speed)
+        motor_speed = _normalise_speed(speed)
         self._send_run([motor_speed, motor_speed, motor_speed])
   
     def stop(self):
@@ -34,11 +39,15 @@ class Action():
         self._send_run(motor_speeds)
   
     # Kicking
-    def kick(self):
-        self._send_command("KICK",[])
+    def kick(self, scale=100):
+        self._send_command("KICK",[scale])
     
-    def catch(self):
-        self._send_command("CATCH",[])
+    def catch(self, scale=100):
+        self._send_command("CATCH",[scale])
+
+    # Utility
+    def ping(self):
+        self._send_command("PING", [])
     
     
     # Private Methods #
@@ -50,17 +59,24 @@ class Action():
     # TODO: decide on the kick protocol etc.
   
     # Utility
-    def _normalise_speed(self, speed):
+    @staticmethod
+    def _normalise_speeds(speeds):
+        maxspeed = max(speeds)
+        return map( lambda x: (x/maxspeed)*x, speeds )        
+    
+    @staticmethod
+    def _percentage_speed(speed):
         # We need the speed to be an integer between 100 and -100
         speed = int(round(100.0 * speed))
         speed = max(-100, min(speed, 100))
         return speed
     
-    def _calc_motor_speed(self, motor, angle, linear_speed):
-        speed = linear_speed * (math.cos(angle) * motor[0] - math.sin(angle) * motor[1] )
-        return self._normalise_speed(speed)
+    @staticmethod
+    def _calc_motor_speed(motor, angle):
+        return (math.cos(angle) * motor[0] - math.sin(angle) * motor[1])
     
-    def _get_command_string(self, command, args):
+    @staticmethod
+    def _get_command_string(command, args):
         commstr = str(command)
         
         for arg in args:
@@ -70,8 +86,9 @@ class Action():
         return commstr
     
     def _send_command(self, command, args):
-        commstr = self._get_command_string(command, args)
-        print("Writing command: " + commstr)
+        commstr = Action._get_command_string(command, args)
+        if self.Debug:
+            print "Sending command: " + commstr
         if self.comm is not None:
             self.comm.write(commstr)
             self.comm.flush()

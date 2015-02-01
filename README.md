@@ -1,12 +1,12 @@
-##Systems Design Project - Group 7##
+##System Design Project - Group 9##
 
-*Rowan Border, Grant Kelly, Victor Dumitrescu, Ryan Davies, Ignotas Sulzenko, Martin Dimitrov, Maneshka Paiva, Mac Chong, Milan Pavlik*
+*Thomas Cumming, Rikki Guy, Joseph Kennelly, Ayrton Massey, Robert Oyler, Sebastian Schulze, Ronan Turner*
 
-![alt text](http://i.imgur.com/5zEjxX8.jpg "Too Innovative")
+![alt text](http://i.imgur.com/Y6Z5NtE.png "I think he just says \"bloop bloop bloop\"")
 ------
 
-
 ###Future SDP teams
+
 The planner and vision are very good.
 
 We used an Arduino powered robot but the vision and planning can be effectively used even with the default NXT Brick. All it takes is to modify the Controller class in `controller.py`. 
@@ -26,59 +26,44 @@ Press the following keys to switch the thresholding scheme:
 
 Note that the colors of the plates themselves are ignored - you don't need them.
 
-
 ------
 ###Installation
 
+This project uses an Arduino. We connect to the Arduino via an RF Stick which we write to over a serial port.
+
 #### Linux/DICE
 
-To install the Polygon library, download the [source](https://bitbucket.org/jraedler/polygon2/downloads/Polygon2-2.0.6.zip), navigate inside and execute `python setup.py install --user`.
+The project has the following dependencies:
+- ArgParse
+- Polygon2
+- PySerial
+- OpenCV 2.4.5
+- Numpy
+- pygame (For `xbox360controller/`)
+- Flask (For `ControlApp/`)
+- Pyzmq (For the RF Console)
 
-To isntall Argparse for python, download [ArgParse](http://argparse.googlecode.com/files/argparse-1.2.1.tar.gz), extract and run `python setup.py install --user`. All done.
+##### Core Dependencies 
 
-There are a couple more libraries required:
-*serial* - can be removed if bluetooth is to be used (Use *python-nxt* to control the robot over bluetooth - *bluez* required)
+The run with `scripts/` as the working directory, `scripts/install_venv.sh` will install ArgParse, Polygon2, PySerial, OpenCV 2.4.5 and Numpy to a virtual envrionment in a directory named `venv` to the left of the repository folder. This script requires ~2.8GB of space to compile OpenCV but the files will be deleted afterward.
 
+##### pygame
 
+To install pygame to this virtual environment, download the [1.9.1 release](http://www.pygame.org/ftp/pygame-1.9.1release.tar.gz). Unfortunately debug statements were left in the source code, so to prevent the console spam this causes extract the files, navigate to the src/ folder and edit `joystick.c` to remove all `printf` statements. Compress the file again, activate the virtual environment and then `pip install` pygame from the new archive:
 
-#### Debian with root access
-[Python-nxt](https://code.google.com/p/nxt-python/) requires [bluez](http://www.bluez.org/) to be installed in order to communicate with the NXT over BlueTooth correctly. Assuming you are on a debian based Linux system, execute the following:
+```
+curl -O http://www.pygame.org/ftp/pygame-1.9.1release.tar.gz
+tar -zxvf pygame-1.9.1release.tar.gz
+//edit src/joystick.c to remove printf statements
+tar -zcvf pygame-1.9.1release.tar.gz pygame-1.9.1release
+source venv/bin/activate
+pip install pygame-1.9.1release.tar.gz
+```
 
-*sudo apt-get install bluez*.
-
-To install the python library, navigate to *nxt-python* inside the *lib* directory and execute *sudo python setup.py install* to install the library globally. Alternatively, install *virtualenv* and do the following:
-
-*virtualenv venv*<br>
-*start ./venv/bin/activate*<br>
-*sudo python setup.py install*<br>
+*Note: The XBOX 360 controller drivers are not present on DICE. It is not possible to install them because DICE does not have the dependencies required for the drivers.*
 
 ------
 ### Vision
 
 * At the moment OpenCV + Python are being used. A [book](http://programmingcomputervision.com/downloads/ProgrammingComputerVision_CCdraft.pdf) on Computer Vision with OpenCV in Python is a decent starting point about what OpenCV can do.
-* A detailed tutorial with examples and use cases can be found [here](https://opencv-python-tutroals.readthedocs.org/en/latest/py_tutorials/py_tutorials.html) - going through it can be handy to understand the code
-* For OpenCV installation instructions please get in touch with others or have a look at the scripts in *vision/*
-
-------
-### Installing OpenCV
-
-#### Linux/DICE
-* Download [OpenCV](http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.8/opencv-2.4.8.zip/download)
-* Extract the contents
-* When on computers with with video feed, navigate to */disk/scratch/sdp/* and create a directory for OpenCV
-* Copy extracted contents over to this directory
-* Create directory `build` and navigate inside
-* Execute 
-```
-cmake -D CMAKE_INSTALL_PREFIX=~/.local ..` or *cmake -D WITH_OPENCL=OFF -D WITH_CUDA=OFF -D BUILD_opencv_gpu=OFF -D BUILD_opencv_gpuarithm=OFF -D BUILD_opencv_gpubgsegm=OFF -D BUILD_opencv_gpucodec=OFF -D BUILD_opencv_gpufeatures2d=OFF -D BUILD_opencv_gpufilters=OFF -D BUILD_opencv_gpuimgproc=OFF -D BUILD_opencv_gpulegacy=OFF -D BUILD_opencv_gpuoptflow=OFF -D BUILD_opencv_gpustereo=OFF -D BUILD_opencv_gpuwarping=OFF -D CMAKE_INSTALL_PREFIX=~/.local ..
-```
-to install without GPU libraries
-* Execute `make` and wait (for quite some time)
-* Execute `make install`
-* Run `ipython` and do `import cv2`, if all executes fine then you're set.
-
-
-#### Installing OpenCV on OS X
-The problem with installing OpenCV on OS X is because the Python library was installed in the wrong directory. To fix this..:
-* Go to *usr/local/share/bin*
-* Copy the contents from *python2.7/site-packages* to */Library/Python/2.7/site-packages*
+* A detailed tutorial with examples and use cases can be found [here](https://opencv-python-tutroals.readthedocs.org/en/latest/py_tutorials/py_tutorials.html) - going through it can be handy to understand the code *
