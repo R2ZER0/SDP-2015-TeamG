@@ -85,7 +85,6 @@ class AcquireBall(Task):
                     self.robot.catch()
                     self.robot_info.catcher = 'closed'
 
-
 '''Movement task. Rotate to face the point (x,y) and go to it.'''
 class MoveToPoint(Task):
 
