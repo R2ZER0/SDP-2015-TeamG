@@ -111,6 +111,17 @@ def has_matched(robot, x=None, y=None, angle=None,
         angle_matched = abs(angle) < angle_threshold
     return dist_matched and angle_matched
 
+# 2015
+def has_ball_been_caught(robot, ball):
+    """
+    If the grabber is closed and the ball is within the grabber area, we've (probably)
+    caught the ball
+    """
+    if robot.catcher=='closed' and robot.catcher_area.isInside(ball.x, ball.y):
+        return True
+    else:
+        return False
+
 
 def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False):
     '''
