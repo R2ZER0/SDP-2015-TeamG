@@ -156,19 +156,19 @@ def dist(x, y, angle, poly):
 	for p in Polygon.Utils.pointList(poly):
 		a = math.atan((p[1] - y)/(p[0] - x))
 		if not fst and (angle - 45) > pointAngle and a > (angle - 45) or (angle - 45) < pointAngle and a < (angle - 45):
-			alpha = math.acos (((p1[0] - x) * (p[0] - p1[0]) + (p1[1] - y) * (p[1] - p1[1]))/(math.sqrt((p1[0] - x)*(p1[0] - x) + (p1[1] - y)*(p1[1] - y))*math.sqrt((p1[0] - p[0])*(p1[0] - p[0]) + (p1[1] - p[1])*(p1[1] - p[1]))))
+			alpha = math.acos(((p1[0] - x) * (p[0] - p1[0]) + (p1[1] - y) * (p[1] - p1[1]))/(hypot((p1[0] - x), (p1[1] - y))*hypot((p1[0] - p[0]), (p1[1] - p[1]))))
 			beta = 180 - angle - 45 + a - alpha
-			seg[0] = ((p1[0] - x) * (p1[0] - x) + (p1[1] - y) * (p1[1] - y)) * math.sin(alpha) / math.sin(beta)
+			seg[0] = hypot((p1[0] - x),(p1[1] - y)) * math.sin(alpha) / math.sin(beta)
 			fst = True
 		if not snd and angle > pointAngle and a > angle or angle < pointAngle and a < angle:
-			alpha = math.acos (((p1[0] - x) * (p[0] - p1[0]) + (p1[1] - y) * (p[1] - p1[1]))/(math.sqrt((p1[0] - x)*(p1[0] - x) + (p1[1] - y)*(p1[1] - y))*math.sqrt((p1[0] - p[0])*(p1[0] - p[0]) + (p1[1] - p[1])*(p1[1] - p[1]))))
+			alpha = math.acos(((p1[0] - x) * (p[0] - p1[0]) + (p1[1] - y) * (p[1] - p1[1]))/(hypot((p1[0] - x), (p1[1] - y))*hypot((p1[0] - p[0]), (p1[1] - p[1]))))
 			beta = 180 - angle + a - alpha
-			seg[1] = ((p1[0] - x) * (p1[0] - x) + (p1[1] - y) * (p1[1] - y)) * math.sin(alpha) / math.sin(beta)
+			seg[1] = hypot((p1[0] - x),(p1[1] - y)) * math.sin(alpha) / math.sin(beta)
 			snd = True
 		if not third and angle + 45 > pointAngle and a > angle + 45 or angle + 45 < pointAngle and a < angle + 45:
-			alpha = math.acos (((p1[0] - x) * (p[0] - p1[0]) + (p1[1] - y) * (p[1] - p1[1]))/(math.sqrt((p1[0] - x)*(p1[0] - x) + (p1[1] - y)*(p1[1] - y))*math.sqrt((p1[0] - p[0])*(p1[0] - p[0]) + (p1[1] - p[1])*(p1[1] - p[1]))))
+			alpha = math.acos(((p1[0] - x) * (p[0] - p1[0]) + (p1[1] - y) * (p[1] - p1[1]))/(hypot((p1[0] - x), (p1[1] - y))*hypot((p1[0] - p[0]), (p1[1] - p[1]))))
 			beta = 180 - angle + 45 + a - alpha
-			seg[2] = ((p1[0] - x) * (p1[0] - x) + (p1[1] - y) * (p1[1] - y)) * math.sin(alpha) / math.sin(beta)
+			seg[2] = hypot((p1[0] - x),(p1[1] - y)) * math.sin(alpha) / math.sin(beta)
 			third = True
 		if fst and snd and third:
 			break
