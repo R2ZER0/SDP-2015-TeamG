@@ -4,7 +4,7 @@ from random import randint
 from action import Action
 import pdb
 
-class Strategy(object):
+class Task(object):
 
     ATTACKER='attacker'
     DEFENDER='defender'
@@ -20,7 +20,7 @@ class Strategy(object):
     def execute(self):
         pass
 
-class AcquireBall(Strategy):
+class AcquireBall(Task):
 
     def __init__(self,world,robot,role):
         super(AcquireBall,self).__init__(world,robot,role)

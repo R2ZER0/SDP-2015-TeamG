@@ -1,5 +1,5 @@
 from action import Action
-from planning.strategies import AcquireBall
+from planning.tasks import AcquireBall
 from vision.vision import Vision, Camera, GUI
 from planning.planner import Planner
 from postprocessing.postprocessing import Postprocessing
@@ -101,9 +101,9 @@ class Controller:
                 # Find appropriate action
                 self.world.update_positions(model_positions)
 
-                # TEST STRATEGIES
-                strategy = AcquireBall(self.world,self.robot,'attacker')
-                strategy.execute()
+                # TEST TASKS
+                task = AcquireBall(self.world,self.robot,'attacker')
+                task.execute()
 
                 # Information about the grabbers from the world
                 grabbers = {
