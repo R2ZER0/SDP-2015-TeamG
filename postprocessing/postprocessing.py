@@ -35,7 +35,10 @@ class Postprocessing(object):
             delta_x = info['x'] - self._vectors['ball']['vec'].x
             delta_y = info['y'] - self._vectors['ball']['vec'].y
             velocity = hypot(delta_y, delta_x)/(self._time - self._vectors['ball']['time'])
-            angle = atan2(delta_y, delta_x) % (2*pi)
+            if velocity == 0:
+                angle = 0
+            else:
+                angle = atan2(delta_y, delta_x) % (2*pi)
             self._vectors['ball']['vec'] = Vector(info['x'], info['y'], angle, velocity)
             self._vectors['ball']['time'] = self._time
             return Vector(int(info['x']), int(info['y']), angle, velocity)
