@@ -18,7 +18,7 @@ class Controller:
     Primary source of robot control. Ties vision and planning together.
     """
 
-    def __init__(self, pitch, color, our_side, video_port=0, comm_port='/dev/ttyUSB0', comms=1):
+    def __init__(self, pitch, color, our_side, our_role, video_port=0, comm_port='/dev/ttyUSB0', comms=1):
         """
         Entry point for the SDP system.
 
@@ -36,6 +36,7 @@ class Controller:
         assert pitch in [0, 1]
         assert color in ['yellow', 'blue']
         assert our_side in ['left', 'right']
+        assert our_role in ['att', 'def']
 
         self.pitch = pitch
 
@@ -68,6 +69,7 @@ class Controller:
 
         self.color = color
         self.side = our_side
+        self.role = our_role
 
         self.preprocessing = Preprocessing()
 
@@ -98,7 +100,6 @@ class Controller:
                 model_positions = self.postprocessing.analyze(model_positions)
 
                 # Find appropriate action
-                #self.planner.update_world(model_positions)
                 self.world.update_positions(model_positions)
                 attacker_actions = self.planner.plan(self.world, 'attacker')
                 defender_actions = self.planner.plan(self.world, 'defender')
@@ -288,14 +289,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("pitch", help="[0] Main pitch, [1] Secondary pitch")
     parser.add_argument("side", help="The side of our defender ['left', 'right'] allowed.")
-    parser.add_argument("color", help="The color of our team - ['yellow', 'blue'] allowed.")
+    parser.add_argument("role", help="The role of our robot ['att', 'def'] allowed.")
+    parser.add_argument("color", help="The color of our team ['yellow', 'blue'] allowed.")
     parser.add_argument(
         "-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
 
     args = parser.parse_args()
     if args.nocomms:
         c = Controller(
-            pitch=int(args.pitch), color=args.color, our_side=args.side, comms=0).wow()
+            pitch=int(args.pitch), color=args.color, our_side=args.side, our_role=args.role, comms=0).wow()
     else:
         c = Controller(
-            pitch=int(args.pitch), color=args.color, our_side=args.side).wow()
+            pitch=int(args.pitch), color=args.color, our_side=args.side, our_role=args.role).wow()
