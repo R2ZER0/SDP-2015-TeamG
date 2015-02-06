@@ -3,7 +3,6 @@ from collisions import *
 from tasks import *
 from utilities import *
 
-# Note: Needs slight modification to work with final task set
 class Planner:
 
     def __init__(self, our_side, pitch_num, world):
