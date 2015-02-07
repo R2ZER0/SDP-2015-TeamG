@@ -16,6 +16,7 @@ from planning.models import Vector, World
 import cv2
 import numpy as np
 import sys
+import random
 import math
 
 import pymunk
@@ -72,6 +73,7 @@ class SimulatedCamera:
 		'''
 		Draws the pitch background, zones, and borders to the image.
 		'''
+		cv2.fillConvexPoly(self.frame, np.array([[0,0], [640,0], [640,480], [0,480]]), (50,50,50))
 		# Draw white border
 		cv2.fillConvexPoly(self.frame, np.array([[0,100], [50,0], [590,0], [640, 100], [640,380], [590, 480], [50,480], [0,380]]), (230,224,226))
 
@@ -98,8 +100,8 @@ class SimulatedCamera:
 		cv2.fillConvexPoly(self.frame, np.array(points), (0, 255, 0))
 
 		# draw dot
-		dot_point = self._trans_point((robot.x+10, robot.y), (robot.x,robot.y), robot.angle)
-		cv2.circle(self.frame, (dot_point[0], dot_point[1]), 5, (0,0,0), -1)
+		dot_point = self._trans_point((robot.x+20, robot.y), (robot.x,robot.y), robot.angle)
+		cv2.circle(self.frame, (dot_point[0], dot_point[1]), 4, (0,0,0), -1)
 
 		# draw i
 		i_points = [[robot.x, robot.y-5], [robot.x-15, robot.y-5],
@@ -157,32 +159,47 @@ class SimulatedAction:
 
 	def move(self, angle, scale):
 		"""Move the robot in the angle (radians) from the front, with speed -1 to +1"""
-		motor_speeds = [ SimulatedAction._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
+		motor_speeds = [ scale * SimulatedAction._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
 		#motor_speeds = SimulatedAction._normalise_speeds(motor_speeds)
 		#motor_speeds = map(lambda x: x*scale, motor_speeds)
-		#motor_speeds = map(SimulatedAction._percentage_speed, motor_speeds)
-
+		#motor_speeds = map(SimulatedAction._percentage_speed, motor_speeds)	
 		self._send_run(motor_speeds)
   
 	def turn(self, speed):
+		speed = speed / 5
 		"""Turn the robot in the given direction, clockwise/anticlockwise"""      
 		speed = int(speed)
 		self._send_run([speed, speed, speed])
   
 	def stop(self):
-		pass
+		self.simulator.our_attacker_body.angular_velocity = 0
+		self.simulator.our_attacker_body.velocity = (0,0)
   
 	# Kicking
-	def kick(self, scale=50):
-		robot = self.simulator.our_attacker_body
+	def kick(self, scale=100):
+		world = self.simulator.world
+		robot = world.our_attacker
 
-		dx = scale * math.cos(robot.angle)
-		dy = scale * math.sin(robot.angle)
+		if self.simulator.ball_posssessed:
+			self.simulator.ball_posssessed = False
 
-		self.simulator.ball_body.apply_impulse((dx,dy), (0,0))
+			dx = scale * math.cos(robot.angle)
+			dy = scale * math.sin(robot.angle)
+
+			self.simulator.ball_body.apply_impulse((dx, dy), (0,0))
 	
 	def catch(self, scale=100):
-		pass
+		world = self.simulator.world
+		robot = world.our_attacker
+
+		if robot.can_catch_ball(world.ball):
+			self.simulator.ball_posssessed = True
+			catcher_center = (robot.x + (30 * math.cos(robot.angle)), robot.y + (30 * math.sin(robot.angle)))
+			world.ball.vector = Vector(catcher_center[0], catcher_center[1], 0, 0)
+			self.simulator.ball_body.position = (catcher_center[0], catcher_center[1])
+
+	def open_catcher(self, scale=100):
+		self.kick(100)
 
 	# Private
 
@@ -204,6 +221,8 @@ class SimulatedAction:
 		return (math.cos(angle) * motor[0] - math.sin(angle) * motor[1])
 
 	def _send_run(self, speeds):
+		self.stop()
+
 		robot = self.simulator.our_attacker_body
 
 		# calculate current angle of wheels around robot body
@@ -238,6 +257,8 @@ class Simulator:
 	# Body for the ball
 	ball_body = None
 
+	ball_posssessed = False
+
 	def __init__(self):
 
 		# Initialise the world
@@ -248,9 +269,16 @@ class Simulator:
 		self.world.our_attacker.vector = Vector(400, 240, 0, 0)
 		self.world.their_defender.vector = Vector(560, 240, 0, 0)
 		self.world.their_attacker.vector = Vector(240, 240, 0, 0)
-		self.world.ball.vector = Vector(320, 240, 0, 0)
+		self.world.ball.vector = Vector(400, 120, 0, 0)
 
 		self._construct_world()
+
+	def move_ball(self):
+
+		dx = random.randint(10,200) - 100
+		dy = random.randint(10,200) - 100
+		
+		self.ball_body.apply_impulse((dx,dy),(0,0))
 
 	def _construct_world(self):
 		'''
@@ -328,12 +356,19 @@ class Simulator:
 		'''
 		self.space.step(dt)
 
+		# If we have the ball, continue moving it each update
+		if self.ball_posssessed:
+			robot = self.world.our_attacker
+			catcher_center = (robot.x + (30 * math.cos(robot.angle)), robot.y + (30 * math.sin(robot.angle)))
+			self.world.ball.vector = Vector(catcher_center[0], catcher_center[1], 0, 0)
+			self.ball_body.position = (catcher_center[0], catcher_center[1])
+
 		# Manual damping on robot's angular velocities
 		for body in self._bodies():
 			if body.angular_velocity > 0.1:
-				body.angular_velocity -= 0.01
+				body.angular_velocity -= 0.005
 			elif body.angular_velocity < -0.1:
-				body.angular_velocity += 0.01
+				body.angular_velocity += 0.005
 			else:
 				body.angular_velocity = 0
 
@@ -369,7 +404,7 @@ if __name__ == '__main__':
 	while (c != 27 and c != 1048603):  # the ESC key
 		
 		# Retrieve updated world
-		world = sim.update()
+		world = sim.update(2)
 
 		# Draw frame
 		cam.draw(world)

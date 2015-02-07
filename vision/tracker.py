@@ -46,7 +46,8 @@ class Tracker(object):
                 cv2.RETR_TREE,
                 cv2.CHAIN_APPROX_SIMPLE
             )
-            # print contours
+
+            #print contours
             return contours
         except:
             return None
@@ -207,12 +208,12 @@ class RobotTracker(Tracker):
             mask_frame = frame.copy()
 
             # Fill the dummy frame
-            cv2.rectangle(mask_frame, (0, 0), (width, height), (0, 0, 0), -1)
-            cv2.circle(mask_frame, (width / 2, height / 2), 9, (255, 255, 255), -1)
+            #cv2.rectangle(mask_frame, (0, 0), (width, height), (0, 0, 0), -1)
+            #cv2.circle(mask_frame, (width / 2, height / 2), 9, (255, 255, 255), -1)
 
             # Mask the original image
-            mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
-            frame = cv2.bitwise_and(frame, frame, mask=mask_frame)
+            #mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
+            #frame = cv2.bitwise_and(frame, frame, mask=mask_frame)
 
             adjustment = self.calibration['dot']
             contours = self.get_contours(frame, adjustment)
@@ -276,7 +277,6 @@ class RobotTracker(Tracker):
                     dot_temp = Center(dot[0] - self.offset, dot[1])
 
                     # Find two points from plate_corners that are the furthest from the dot
-
                     distances = [
                         (
                             (dot_temp.x - p[0])**2 + (dot_temp.y - p[1])**2,  # distance
@@ -294,7 +294,7 @@ class RobotTracker(Tracker):
                     first = front[0]
                     front_rear_distances = [
                         (
-                            (first[1] - p[0])**2 + (first[2] - p[1])**2,
+                            (first[1] - p[1])**2 + (first[2] - p[2])**2,
                             p[1],
                             p[2]
                         ) for p in rear]
