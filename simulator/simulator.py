@@ -100,7 +100,7 @@ class SimulatedCamera:
 		cv2.fillConvexPoly(self.frame, np.array(points), (0, 255, 0))
 
 		# draw dot
-		dot_point = self._trans_point((robot.x+20, robot.y), (robot.x,robot.y), robot.angle)
+		dot_point = self._trans_point((robot.x+10, robot.y), (robot.x,robot.y), robot.angle)
 		cv2.circle(self.frame, (dot_point[0], dot_point[1]), 4, (0,0,0), -1)
 
 		# draw i
@@ -273,10 +273,10 @@ class Simulator:
 
 		self._construct_world()
 
-	def move_ball(self):
+	def move_ball(self, angle):
 
-		dx = random.randint(10,200) - 100
-		dy = random.randint(10,200) - 100
+		dx = 25 * math.cos(angle)
+		dy = 25 * math.sin(angle)
 		
 		self.ball_body.apply_impulse((dx,dy),(0,0))
 
@@ -290,14 +290,14 @@ class Simulator:
 
 		# Construct the pitch boundaries
 		static_body = pymunk.Body()
-		static_lines = [pymunk.Segment(static_body, Vec2d(0,100), Vec2d(50,0), 1),
-						pymunk.Segment(static_body, Vec2d(50,0), Vec2d(590,0), 1),
-						pymunk.Segment(static_body, Vec2d(590,0), Vec2d(640,100), 1),
-						pymunk.Segment(static_body, Vec2d(640,100), Vec2d(640,380), 1),
-						pymunk.Segment(static_body, Vec2d(640,380), Vec2d(590,480), 1),
-						pymunk.Segment(static_body, Vec2d(590,480), Vec2d(50,480), 1),
-						pymunk.Segment(static_body, Vec2d(50,480), Vec2d(0,380), 1),
-						pymunk.Segment(static_body, Vec2d(0,380), Vec2d(0,100), 1)]
+		static_lines = [pymunk.Segment(static_body, Vec2d(0,100), Vec2d(50,0), 10),
+						pymunk.Segment(static_body, Vec2d(50,0), Vec2d(590,0), 10),
+						pymunk.Segment(static_body, Vec2d(590,0), Vec2d(640,100), 10),
+						pymunk.Segment(static_body, Vec2d(640,100), Vec2d(640,380), 10),
+						pymunk.Segment(static_body, Vec2d(640,380), Vec2d(590,480), 10),
+						pymunk.Segment(static_body, Vec2d(590,480), Vec2d(50,480), 10),
+						pymunk.Segment(static_body, Vec2d(50,480), Vec2d(0,380), 10),
+						pymunk.Segment(static_body, Vec2d(0,380), Vec2d(0,100), 10)]
 
 		# Increase friction of each border
 		for line in static_lines:
@@ -336,7 +336,7 @@ class Simulator:
 		return body
 
 	def _construct_ball(self, ball):
-		mass = 5.0
+		mass = 9001.0
 		moment = pymunk.moment_for_circle(mass, 0, 10, (0,0))
 		body = pymunk.Body(mass, moment)
 		body.position = Vec2d(ball.x, ball.y)
