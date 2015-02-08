@@ -70,6 +70,7 @@ void cmd_LED()
 void cmd_PING()
 {
   Serial.println("PONG");
+  Serial.println("DONE");
 }
 
 /* Movement Commands */
