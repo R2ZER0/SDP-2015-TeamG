@@ -100,13 +100,19 @@ static void cmd_MPU() {
     } else if(strcmp(subcmd, "CALIB") == 0) {
         success = Calibrate();        
         
-    } else if(strcmp(subcmd, "HOME") == 0) {
-        success = WaitForStabilisation();
-        if(success) {
-            yawOffset = -yawPitchRoll[0];
-            Serial.print("Set offset of ");
-            Serial.println(yawOffset, DECIMAL_PLACES);
+    } else if(strcmp(subcmd, "SETHOME") == 0) {
+        float home_rotation = 0.0;
+        char* arg = comm->next();
+        if(arg != NULL) {
+            home_rotation = atof(arg);
         }
+        
+        yawOffset = home_rotation - yawPitchRoll[0];
+#ifdef MPU_DEBUG
+        Serial.print("Set offset of ");
+        Serial.println(yawOffset, DECIMAL_PLACES);
+#endif
+        success = true;
     }
     
     Serial.println(success ? "DONE" : "FAILED");
