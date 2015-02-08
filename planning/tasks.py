@@ -41,12 +41,19 @@ class AcquireBall(Task):
 
     '''The distance the robot must be from the ball in order to catch
     it.'''
-    CATCH_DISTANCE = 35
+    CATCH_DISTANCE = 30
 
     def __init__(self,world,robot,role):
         super(AcquireBall,self).__init__(world,robot,role)
 
+        self.turning = False
+        self.complete = False
+
     def execute(self):
+
+        if self.complete:
+            return
+
         ball_x = self.world.ball.x
         ball_y = self.world.ball.y
 
@@ -61,6 +68,8 @@ class AcquireBall(Task):
             don't function properly below ~60% power. Plot the curve on
             wolfram alpha to see what it looks like.'''
             rotation_speed = (math.log10((abs(angle_to_turn) * 10) + 1) / math.log10((math.pi * 10) + 1)) * 40 + 60
+            self.turning = True
+
             #Turn left or right.
             if angle_to_turn < 0:
                 self.robot.turn(rotation_speed)
@@ -68,22 +77,29 @@ class AcquireBall(Task):
                 self.robot.turn(-rotation_speed)
         #Otherwise, move toward the ball.
         else:
+            if self.turning:
+                self.robot.stop()
+                self.turning = False
+
             #Open the catcher.
             if self.robot_info.catcher == 'closed':
                 self.robot.open_catcher()
                 self.robot_info.catcher = 'open'
+
             #Find the distance to the ball.
             displacement = self.robot_info.get_displacement_to_point(ball_x,ball_y)
             #If we are too far away, move closer.
             if displacement > self.CATCH_DISTANCE:
-                move_speed = 1
+                move_speed = 100
                 self.robot.move(0,move_speed)
+
             #Otherwise, attempt to catch the ball.
             else:
                 self.robot.stop()
                 if self.robot_info.catcher == 'open':
                     self.robot.catch()
                     self.robot_info.catcher = 'closed'
+                    self.complete = True
 
 '''Movement task. Rotate to face the point (x,y) and go to it.'''
 class MoveToPoint(Task):
@@ -109,7 +125,7 @@ class MoveToPoint(Task):
         self.x = x
         self.y = y
 
-    def execute():
+    def execute(self):
         # Find the distance to the point x,y.
         displacement = self.robot_info.get_displacement_to_point(self.x,self.y)
 
@@ -149,18 +165,24 @@ class KickToPoint(Task):
     x = 0
     '''The y value of the point.'''
     y = 0
+
+    kicked = False
     
     def __init__(self,world,robot,role,x,y):
         super(KickToPoint,self).__init__(world,robot,role)
         self.x = x
         self.y = y
 
-    def execute():
+    def execute(self):
+
+        if self.kicked:
+            return
+
         # Find the angle between the robot's orientation and the point.
         angle_to_turn = self.robot_info.get_rotation_to_point(self.x,self.y)
-        
+
         # If the robot is not facing the point...
-        if angle_to_turn > self.ANGLE_THRESHOLD:
+        if abs(angle_to_turn) > self.ANGLE_THRESHOLD:
             # Rotation speed decreases as the angle required decreases.
             rotation_speed = (math.log10((abs(angle_to_turn) * 10) + 1) / math.log10((math.pi * 10) + 1)) * 40 + 60
             # Turn left or right.
@@ -170,7 +192,8 @@ class KickToPoint(Task):
                 self.robot.turn(-rotation_speed)
         #Else the robot is facing the point...
         else:
-            robot.kick()
+            self.robot.kick()
+            self.kicked = True
 
 '''Shoot task. Rotate robot to face the goal and then kick.'''
 class Shoot(KickToPoint):
