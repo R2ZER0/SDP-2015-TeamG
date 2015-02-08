@@ -21,7 +21,7 @@ RED_HIGHER = np.array([9, 255, 255])
 YELLOW_LOWER = np.array([9, 50, 50])
 YELLOW_HIGHER = np.array([11, 255, 255])
 
-PITCHES = ['Pitch_0', 'Pitch_1']
+PITCHES = ['Pitch_0', 'Pitch_1', 'Sim']
 
 
 def get_zones(width, height, filename=PATH+'/calibrations/croppings.json', pitch=0):
