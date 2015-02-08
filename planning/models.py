@@ -216,7 +216,8 @@ class Robot(PitchObject):
         '''
         Get if the ball is in the catcher zone but may not have possession
         '''
-        return self.catcher_area.isInside(ball.x, ball.y)
+        box = self.catcher_area.boundingBox()
+        return box[0] <= ball.x <= box[1] and box[2] <= ball.y <= box[3]
 
     def has_ball(self, ball):
         '''
@@ -411,8 +412,8 @@ class World(object):
         # Define catchment areas for our robots. If the ball enters these areas then our robot
         # believes it can catch the ball. Width is parallel to front/rear and height is parallel
         # to the sides of our robot.
-        self.our_defender.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 12}
-        self.our_attacker.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 14}
+        self.our_defender.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 25}
+        self.our_attacker.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 25}
 
         # Calculate the goals as being in fixes positions halfway up the pitch. The latter
         # goal 'faces' towards the left of the pitch.

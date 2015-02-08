@@ -336,7 +336,7 @@ class Simulator:
 		return body
 
 	def _construct_ball(self, ball):
-		mass = 9001.0
+		mass = 2.0
 		moment = pymunk.moment_for_circle(mass, 0, 10, (0,0))
 		body = pymunk.Body(mass, moment)
 		body.position = Vec2d(ball.x, ball.y)
