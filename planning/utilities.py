@@ -134,6 +134,29 @@ def choose_attacker_destination(world):
                 return (x,y)
     return False
 
+#2015
+def choose_attacker_destination(world):
+    """
+    If the attacker isn't already at a point where it could try to score,
+    try each point in it's zone to see if we could if we moved there instead.
+    If we find such a point, return it. 
+    Returns False if we can't find a clear point anywhere (shouldn't really happen),
+    and the current position if we can already shoot from there
+    """
+    OUR_ATTACKER_ZONE=world.our_attacker.zone
+    if not(is_attacker_shot_blocked(world, world.our_attacker, world.their_defender)):
+        return (world.our_attacker.x, world.our_attacker.y)
+    else:
+        for (x,y) in pointList(world.pitch.zones[ATTACKER_ZONE]):
+            ghostDefaultAngle=0
+            ghostDefaultVel=0
+            ghost=Robot(OUR_ATTACKER_ZONE, x, y, ghostDefaultVel, ghostDefaultAngle)
+            # Ghost is us if we moved to (x,y)
+            if not(is_attacker_shot_blocked(world, ghost, world.their_defender)):
+                return (x,y)
+    return False
+
+
 def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False):
     '''
     Simplistic view of calculating the speed: no modes or trying to be careful
