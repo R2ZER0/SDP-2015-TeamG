@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <SDPArduino.h>
 #include <SerialCommand.h>
+#include "MPU.h"
 
 const int PIN_LED   = 13;
 
@@ -21,6 +22,11 @@ void setup()
   comm.addCommand("LED",   cmd_LED);
   comm.addCommand("KICK",  cmd_KICK);
   comm.addCommand("CATCH", cmd_CATCH);
+
+#ifdef HAS_MPU6050  
+  // Initialise MPU
+  MPU_setup(&comm);
+#endif
   
   Serial.println("STARTED");
 }
@@ -164,6 +170,10 @@ void loop()
           stop_kicker();
       }
   }
+  
+#ifdef HAS_MPU6050
+    MPU_service();
+#endif
 }
 
 
