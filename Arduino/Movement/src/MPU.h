@@ -6,4 +6,6 @@
 void MPU_setup(SerialCommand* _comm);
 void MPU_service();
 
+extern float yawPitchRoll[3];
+
 #endif /* _MPU_H_ */
