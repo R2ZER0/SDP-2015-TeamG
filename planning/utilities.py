@@ -1,6 +1,7 @@
 from math import tan, pi, hypot, log
 from planning.models import Robot
 from Polygon import *
+from Polygon.Utils import pointList
 
 DISTANCE_MATCH_THRESHOLD = 15
 ANGLE_MATCH_THRESHOLD = pi/10
