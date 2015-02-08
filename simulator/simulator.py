@@ -159,6 +159,7 @@ class SimulatedAction:
 
 	def move(self, angle, scale):
 		"""Move the robot in the angle (radians) from the front, with speed -1 to +1"""
+
 		motor_speeds = [ scale * SimulatedAction._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
 		#motor_speeds = SimulatedAction._normalise_speeds(motor_speeds)
 		#motor_speeds = map(lambda x: x*scale, motor_speeds)

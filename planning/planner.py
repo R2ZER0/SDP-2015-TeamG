@@ -120,7 +120,7 @@ class Planner:
                     self._current_task.execute()
 
             elif state == self.MOVING_TO_POINT_STATE:
-                if not(our_attacker.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0):
+                if abs(our_attacker.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 30:
                     """
                     If the robot's displacement from the point we're trying to move to 
                     is't zero, we aren't there yet
@@ -194,7 +194,7 @@ class Planner:
                     self._current_task.execute()
 
             elif state == self.MOVING_TO_POINT_STATE:
-                if not(robot.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0):
+                if abs(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 20:
                     """
                     If the robot's displacement from the point we're trying to move to 
                     is't zero, we aren't there yet

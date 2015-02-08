@@ -41,7 +41,7 @@ class AcquireBall(Task):
 
     '''The distance the robot must be from the ball in order to catch
     it.'''
-    CATCH_DISTANCE = 30
+    CATCH_DISTANCE = 40
 
     def __init__(self,world,robot,role):
         super(AcquireBall,self).__init__(world,robot,role)
@@ -136,7 +136,7 @@ class MoveToPoint(Task):
         angle_to_turn = self.robot_info.get_rotation_to_point(self.x,self.y)
 
         # If the robot is not facing the point...
-        if angle_to_turn > angle_threshold:
+        if abs(angle_to_turn) > angle_threshold:
             # Rotation speed decreases as the angle required decreases.
             rotation_speed = (math.log10((abs(angle_to_turn) * 10) + 1) / math.log10((math.pi * 10) + 1)) * 40 + 60
             # Turn left or right.
@@ -148,7 +148,7 @@ class MoveToPoint(Task):
         else:
             # If the robot is too far away...
             if displacement > self.DISP_TOLERANCE:
-                move_speed = 1
+                move_speed = 100
                 self.robot.move(0,move_speed)
             # Else the robot has completed the task.
             else:
