@@ -154,6 +154,46 @@ class MoveToPoint(Task):
             else:
                 self.robot.stop()
 
+'''Turn to point task.'''
+class TurnToPoint(Task):
+
+    '''The largest angle (0 - math.pi) between the robot and the ball
+    before we need to turn to face the robot.'''
+    ANGLE_THRESHOLD = 0.2
+    
+    '''The x value of the point.'''
+    x = 0
+    '''The y value of the point.'''
+    y = 0
+    
+    complete = False
+
+    def __init__(self,world,robot,role,x,y):
+        super(TurnToPoint,self).__init__(world,robot,role)
+        self.x = x
+        self.y = y
+
+    def execute(self):
+
+        if self.complete:
+            return
+
+        # Find the angle between the robot's orientation and the point.
+        angle_to_turn = self.robot_info.get_rotation_to_point(self.x,self.y)
+        
+        # If the robot is not facing the point...
+        if abs(angle_to_turn) > self.ANGLE_THRESHOLD:
+            # Rotation speed decreases as the angle required decreases.
+            rotation_speed = (math.log10((abs(angle_to_turn) * 10) + 1) / math.log10((math.pi * 10) + 1)) * 40 + 60
+            # Turn left or right.
+            if angle_to_turn < 0:
+                self.robot.turn(rotation_speed)
+            else:
+                self.robot.turn(-rotation_speed)
+        else:
+            self.complete = True
+            self.robot.stop()
+
 '''Generic kick to point task. Rotate to face the point (x,y) and kick.'''
 class KickToPoint(Task):
 

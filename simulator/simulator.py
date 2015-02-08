@@ -160,14 +160,14 @@ class SimulatedAction:
 	def move(self, angle, scale):
 		"""Move the robot in the angle (radians) from the front, with speed -1 to +1"""
 
-		motor_speeds = [ scale * SimulatedAction._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
+		motor_speeds = [ 1.5*scale * SimulatedAction._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
 		#motor_speeds = SimulatedAction._normalise_speeds(motor_speeds)
 		#motor_speeds = map(lambda x: x*scale, motor_speeds)
 		#motor_speeds = map(SimulatedAction._percentage_speed, motor_speeds)	
 		self._send_run(motor_speeds)
   
 	def turn(self, speed):
-		speed = speed / 5
+		speed = speed / 3
 		"""Turn the robot in the given direction, clockwise/anticlockwise"""      
 		speed = int(speed)
 		self._send_run([speed, speed, speed])

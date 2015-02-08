@@ -19,6 +19,7 @@ class Planner:
         self.MOVING_TO_POINT_STATE = 'MOVING_TO_POINT_STATE'
         self.SHOOTING_STATE = 'SHOOTING_STATE'
         self.REVERTING_TO_IDLE_STATE = 'REVERTING_TO_IDLE_STATE'
+        self.REVERTING_TO_IDLE_ROTATE = 'REVERTING_TO_IDLE_ROTATE'
         self.CLEARING_STATE = 'CLEARING_STATE'
 
         self._current_state=self.INITIAL_STATE
@@ -158,21 +159,37 @@ class Planner:
                     self._current_task.execute()
 
             elif state == self.REVERTING_TO_IDLE_STATE:
-                if not(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0) and not(self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y)):
+
+                if abs(our_defender.get_displacement_to_point(idle_x, idle_y)) > 20 and not(self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y)):
                     """
                     If the robot's displacement from the point we're trying to move to 
                     is't zero, we aren't there yet
                     """
                     self._current_task.execute()
 
-                elif not(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
+                elif self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
                     self._current_state=self.ACQUIRING_BALL_STATE
                     self._current_task=AcquireBall(world, robot, role)
                     self._current_task.execute()
 
-                elif our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0:
-                    self._current_task=None
-                    self._current_state=self.INITIAL_STATE
+                elif abs(our_defender.get_displacement_to_point(idle_x, idle_y)) < 20:
+                    self._current_task=TurnToPoint(world, robot, role, idle_x*2, idle_y)
+                    self._current_state=self.REVERTING_TO_IDLE_ROTATE
+                    self._current_task.execute()
+
+            elif state == self.REVERTING_TO_IDLE_ROTATE:
+
+                if self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
+                    self._current_state=self.ACQUIRING_BALL_STATE
+                    self._current_task=AcquireBall(world, robot, role)
+                    self._current_task.execute()
+                
+                elif not self._current_task.complete:
+                    self._current_task.execute()
+
+                else:
+                    self._current_task = None
+                    self._current_state = self.INITIAL_STATE
 
             elif state == self.ACQUIRING_BALL_STATE:
                 if not(our_defender.has_ball(ball)) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
