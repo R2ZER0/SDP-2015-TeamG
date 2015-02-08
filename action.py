@@ -17,7 +17,7 @@ class Command():
         if not self.isValid():
             raise Exception("Attempt to create invalid command" + self)
         
-    def getCommandString():
+    def getCommandString(self):
         return self.command + " " + (" ".join(self.args))
     
     def isValid(self):
@@ -38,8 +38,8 @@ class MpuCommand(Command):
         super(MpuCommand, self).__init__("MPU", [subcmd] + args)
         
     def isValid(self):
-        return (super(MpuCommand, self).isValid()) and
-               (self.args[0] in ["INIT", "SETHOME", "GETYAW", "STABL", "CALIB"])
+        return ((super(MpuCommand, self).isValid()) and
+               (self.args[0] in ["INIT", "SETHOME", "GETYAW", "STABL", "CALIB"]))
 
 
 class Commander():
@@ -134,7 +134,7 @@ class Action():
         return [ Command("RUN", []) ]
 
     # Kicking
-    @clasmethod
+    @classmethod
     def kick(cls, scale=100):
         """Kick the kicker"""
         return [ Command("KICK", [scale]) ]
