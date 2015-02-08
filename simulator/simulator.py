@@ -386,12 +386,7 @@ class Simulator:
 		return self.world
 
 	def _fix_angle(self, angle):
-
-		if angle < 0:
-			angle += 2*math.pi
-		elif angle >= 2*math.pi:
-			angle = angle % (2*math.pi)
-		return angle
+		return angle % (2*math.pi)
 
 if __name__ == '__main__':
 	sim = Simulator()
