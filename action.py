@@ -5,9 +5,6 @@ class Action():
     """Provides an interface to movement and other robot actions"""
 
     Debug = False # set Action.Debug = True in your application to enable
-  
-    TURN_CLOCKWISE = 'c'
-    TURN_ANTICLOCKWISE = 'a'
     
     # Motor angles, starting from the front left, going anticlockwise
     # MOTOR_ANGLES = [ math.pi/3.0, math.pi, math.pi*5.0/3.0 ]
