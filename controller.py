@@ -7,6 +7,7 @@ from postprocessing.postprocessing import Postprocessing
 from preprocessing.preprocessing import Preprocessing
 import vision.tools as tools
 from cv2 import waitKey
+import math
 import cv2
 import serial
 import warnings
@@ -40,11 +41,11 @@ class Controller:
 		assert pitch in [0, 1, 2]
 		assert color in ['yellow', 'blue']
 		assert our_side in ['left', 'right']
-		assert our_role in ['att', 'def']
+		assert our_role in ['attacker', 'defender']
 
 		self.pitch = pitch
 
-		pdb.set_trace()
+		#pdb.set_trace()
 
 		# Set up camera for frames
 		if sim:
@@ -76,7 +77,7 @@ class Controller:
 		self.world = World(our_side, pitch)
 
 		# Set up main planner
-		#self.planner = Planner(our_side=our_side, pitch_num=self.pitch, world=self.world)
+		self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
 
 		# Set up GUI
 		self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
@@ -101,7 +102,7 @@ class Controller:
 		while c != 27:  # the ESC key
 
 			if self.sim:
-				world = self.simulator.update(0.5)
+				world = self.simulator.update(0.25)
 				self.camera.draw(world)
 
 			frame = self.camera.get_frame()
@@ -121,7 +122,7 @@ class Controller:
 			self.world.update_positions(model_positions)
 
 			# TEST TASKS
-			task.execute()
+			self.planner.plan()
 
 			# Information about the grabbers from the world
 			grabbers = {
@@ -130,8 +131,8 @@ class Controller:
 			}
 
 			# Information about states
-			attackerState = ('QWER', 'ASDF')
-			defenderState = ('QWER', 'ASDF')
+			attackerState = (self.planner._current_state, self.planner._current_state)
+			defenderState = (self.planner._current_state, self.planner._current_state)
 
 			attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
 			defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
@@ -139,8 +140,14 @@ class Controller:
 			# Use 'y', 'b', 'r' to change color.
 			c = waitKey(2) & 0xFF
 
-			if c == 32:
-				self.simulator.move_ball()
+			if c == ord('g'):
+				self.simulator.move_ball(math.pi/2)
+			elif c == ord('t'):
+				self.simulator.move_ball(-math.pi/2)
+			elif c == ord('f'):
+				self.simulator.move_ball(math.pi)
+			elif c == ord('h'):
+				self.simulator.move_ball(0)
 
 			actions = []
 			fps = float(counter) / (time.clock() - timer)
@@ -173,11 +180,13 @@ if __name__ == '__main__':
 	parser.add_argument("color", help="The color of our team ['yellow', 'blue'] allowed.")
 	parser.add_argument(
 		"-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
+	parser.add_argument(
+		"-s", "--sim", help="Enables simulation.", action="store_true")
 
 	args = parser.parse_args()
 	if args.nocomms:
 		c = Controller(
-			pitch=int(args.pitch), color=args.color, our_side=args.side, our_role=args.role, comms=0, sim=True).wow()
+			pitch=int(args.pitch), color=args.color, our_side=args.side, our_role=args.role, comms=0, sim=args.sim).wow()
 	else:
 		c = Controller(
-			pitch=int(args.pitch), color=args.color, our_side=args.side, our_role=args.role, sim=True).wow()
+			pitch=int(args.pitch), color=args.color, our_side=args.side, our_role=args.role, sim=args.sim).wow()
