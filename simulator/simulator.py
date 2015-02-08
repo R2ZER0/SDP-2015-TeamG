@@ -173,13 +173,13 @@ class SimulatedAction:
 		self._send_run([speed, speed, speed])
   
 	def stop(self):
-		self.simulator.our_attacker_body.angular_velocity = 0
-		self.simulator.our_attacker_body.velocity = (0,0)
+		self.simulator.our_body.angular_velocity = 0
+		self.simulator.our_body.velocity = (0,0)
   
 	# Kicking
 	def kick(self, scale=100):
 		world = self.simulator.world
-		robot = world.our_attacker
+		robot = self.simulator.our_robot
 
 		if self.simulator.ball_posssessed:
 			self.simulator.ball_posssessed = False
@@ -191,7 +191,7 @@ class SimulatedAction:
 	
 	def catch(self, scale=100):
 		world = self.simulator.world
-		robot = world.our_attacker
+		robot = self.simulator.our_robot
 
 		if robot.can_catch_ball(world.ball):
 			self.simulator.ball_posssessed = True
@@ -224,7 +224,7 @@ class SimulatedAction:
 	def _send_run(self, speeds):
 		self.stop()
 
-		robot = self.simulator.our_attacker_body
+		robot = self.simulator.our_body
 
 		# calculate current angle of wheels around robot body
 		wheel_angles = map( lambda x: x - math.pi/2 + robot.angle, self.MOTOR_ANGLES )
@@ -260,19 +260,36 @@ class Simulator:
 
 	ball_posssessed = False
 
-	def __init__(self):
+	role = None
+
+	def __init__(self, role):
 
 		# Initialise the world
 		self.world = World(our_side='left', pitch_num=1)
+		self.role = role
 
 		# Assign initial positions
 		self.world.our_defender.vector = Vector(80, 240, 0, 0)
 		self.world.our_attacker.vector = Vector(400, 240, 0, 0)
 		self.world.their_defender.vector = Vector(560, 240, 0, 0)
 		self.world.their_attacker.vector = Vector(240, 240, 0, 0)
-		self.world.ball.vector = Vector(400, 120, 0, 0)
+		self.world.ball.vector = Vector(120, 120, 0, 0)
 
 		self._construct_world()
+
+	@property
+	def our_body(self):
+		if self.role == 'attacker':
+			return self.our_attacker_body
+		else:
+			return self.our_defender_body
+
+	@property
+	def our_robot(self):
+		if self.role == 'attacker':
+			return self.world.our_attacker
+		else:
+			return self.world.our_defender
 
 	def move_ball(self, angle):
 
@@ -359,7 +376,7 @@ class Simulator:
 
 		# If we have the ball, continue moving it each update
 		if self.ball_posssessed:
-			robot = self.world.our_attacker
+			robot = self.our_robot
 			catcher_center = (robot.x + (30 * math.cos(robot.angle)), robot.y + (30 * math.sin(robot.angle)))
 			self.world.ball.vector = Vector(catcher_center[0], catcher_center[1], 0, 0)
 			self.ball_body.position = (catcher_center[0], catcher_center[1])

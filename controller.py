@@ -50,7 +50,7 @@ class Controller:
 		# Set up camera for frames
 		if sim:
 			self.sim = sim
-			self.simulator = Simulator()
+			self.simulator = Simulator(our_role)
 			self.robot = SimulatedAction(self.simulator)
 			self.camera = SimulatedCamera()
 		else:

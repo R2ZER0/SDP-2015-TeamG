@@ -53,6 +53,7 @@ class Planner:
     def plan(self):
         ball = self._world.ball
         our_attacker = self._world.our_attacker
+        our_defender = self._world.our_defender
         their_attacker = self._world.their_attacker
 
         world = self._world
@@ -60,9 +61,11 @@ class Planner:
         robot = self._robot
         
         state = self._current_state
-        (idle_x, idle_y) = world.pitch.zones[our_attacker.zone].center()
+
         #pdb.set_trace()
         if self._role == 'attacker':
+            (idle_x, idle_y) = world.pitch.zones[our_attacker.zone].center()
+
             """Attacker state machine"""
             if state == self.INITIAL_STATE:
                 if self._world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y):
@@ -145,6 +148,8 @@ class Planner:
                     self._current_task.execute()
 
         elif self._role=='defender':
+            (idle_x, idle_y) = world.pitch.zones[our_defender.zone].center()
+
             """Defender state machine"""
             if state == self.INITIAL_STATE:
                 if self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
@@ -153,45 +158,51 @@ class Planner:
                     self._current_task.execute()
 
             elif state == self.REVERTING_TO_IDLE_STATE:
-                if not(robot.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0) and not(self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y)):
+                if not(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0) and not(self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y)):
                     """
                     If the robot's displacement from the point we're trying to move to 
                     is't zero, we aren't there yet
                     """
                     self._current_task.execute()
 
-                elif not(robot.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
+                elif not(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
                     self._current_state=self.ACQUIRING_BALL_STATE
                     self._current_task=AcquireBall(world, robot, role)
                     self._current_task.execute()
 
-                elif robot.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0:
+                elif our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0:
                     self._current_task=None
                     self._current_state=self.INITIAL_STATE
 
             elif state == self.ACQUIRING_BALL_STATE:
-                if not(robot.has_ball(ball)) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
+                if not(our_defender.has_ball(ball)) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
                     self._current_task = AcquireBall(world, robot, role)
                     self._current_task.execute()
 
-                elif not(robot.has_ball(ball)) and not(self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y)):
+                elif not(our_defender.has_ball(ball)) and not(self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y)):
                     """
                     The ball hasn't been caught, and has left the zone; we can't possibly get it now
                     so we revert back to being idle in our zone
                     """
                     self._current_state = self.REVERTING_TO_IDLE_STATE
                     self._current_task = MoveToPoint(world, robot, role, idle_x, idle_y)
-                    self_current_task.execute()
+                    self._current_task.execute()
 
-                elif robot.has_ball(ball) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
+                elif our_defender.has_ball(ball) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
                     """
                     We have the ball in our grasp, proceed to next state and invoke the next task
                     """
                     # For milestone 2. Defender will move 2 widths' worth to the right before kicking away
-                    (x_dest, y_dest) = (robot.x, (robot.y + (2 * robot.width)))
-                    self._current_state = self.MOVING_TO_POINT_STATE
-                    self._current_task = MoveToPoint(world, robot, role, x_dest, y_dest)
-                    self._current_task.execute()
+                    if our_defender.x < world.pitch.zones[our_defender.zone].center()[0]:
+                        (x_dest, y_dest) = (our_defender.x + our_defender.width, our_defender.y)
+                        self._current_state = self.MOVING_TO_POINT_STATE
+                        self._current_task = MoveToPoint(world, robot, role, x_dest, y_dest)
+                        self._current_task.execute()
+                    else:
+                        self._current_state = self.CLEARING_STATE
+                        zone_center = world.pitch.zones[our_attacker.zone].center()
+                        self._current_task = KickToPoint(world, robot, role, zone_center[0], zone_center[1])
+                        self._current_task.execute()
 
             elif state == self.MOVING_TO_POINT_STATE:
                 if abs(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 20:
@@ -203,15 +214,19 @@ class Planner:
 
                 else:
                     self._current_state = self.CLEARING_STATE
-                    self._current_task = KickToPoint(world, robot, role, world.pitch.zones[their_attacker.zone].x, world.pitch.zones[their_attacker.zone].y)
+                    zone_center = world.pitch.zones[our_attacker.zone].center()
+                    self._current_task = KickToPoint(world, robot, role, zone_center[0], zone_center[1])
                     self._current_task.execute()
 
             elif state == self.CLEARING_STATE:
-                """
-                If we're in this state, we've already kicked the ball away (assuming the KickToPoint
-                task fires the kicker as soon as it's execute() function is called), so revert back to the 
-                initial starting state
-                """
-                self._current_state = self.REVERTING_TO_IDLE_STATE
-                self._current_task = MoveToPoint(world, robot, role, idle_x, idle_y)
-                self._current_task.execute()
+                if not self._current_task.kicked:
+                    self._current_task.execute()
+                else:
+                    """
+                    If we're in this state, we've already kicked the ball away (assuming the KickToPoint
+                    task fires the kicker as soon as it's execute() function is called), so revert back to the 
+                    initial starting state
+                    """
+                    self._current_state = self.REVERTING_TO_IDLE_STATE
+                    self._current_task = MoveToPoint(world, robot, role, idle_x, idle_y)
+                    self._current_task.execute()
