@@ -1,5 +1,4 @@
 from planning.models import Vector
-from copy import deepcopy
 from math import atan2, pi, hypot
 
 
@@ -34,7 +33,7 @@ class Postprocessing(object):
         if not(info['x'] is None) and not (info['y'] is None):
             delta_x = info['x'] - self._vectors['ball']['vec'].x
             delta_y = info['y'] - self._vectors['ball']['vec'].y
-            velocity = hypot(delta_y, delta_x)/(self._time - self._vectors['ball']['time'])
+            velocity = round( hypot(delta_y, delta_x)/(self._time - self._vectors['ball']['time']) )
             if velocity == 0:
                 angle = 0
             else:
@@ -43,7 +42,7 @@ class Postprocessing(object):
             self._vectors['ball']['time'] = self._time
             return Vector(int(info['x']), int(info['y']), angle, velocity)
         else:
-            return deepcopy(self._vectors['ball']['vec'])
+            return self._vectors['ball']['vec']
 
     def analyze_robot(self, key, info):
         '''
@@ -71,4 +70,4 @@ class Postprocessing(object):
             self._vectors[key]['time'] = self._time
             return Vector(info['x'], info['y'], info['angle'], velocity)
         else:
-            return deepcopy(self._vectors[key]['vec'])
+            return self._vectors[key]['vec']

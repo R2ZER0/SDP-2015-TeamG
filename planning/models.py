@@ -399,6 +399,7 @@ class World(object):
         self.our_defender.vector = pos_dict['our_defender']
         self.their_defender.vector = pos_dict['their_defender']
         self.ball.vector = pos_dict['ball']
+<<<<<<< Updated upstream
         # Checking if the robot locations make sense:
         # Is the side correct:
         if self._allowWarning:
@@ -410,3 +411,6 @@ class World(object):
                 > self.our_attacker.x > self.their_defender.x)):
                 print "WARNING: The sides are probably wrong!"
                 self._allowWarning = False
+
+=======
+>>>>>>> Stashed changes

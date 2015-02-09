@@ -55,6 +55,7 @@ class DataScraper:
 
 	def run(self):
 		f = open('data.txt', 'w')
+		cv2.namedWindow("Test")
 		cache = [] # oldest is first, newest is last
 		for i in range(9):
 			frame = self.camera.get_frame()
@@ -65,41 +66,43 @@ class DataScraper:
 
 			# Find appropriate action
 			self.world.update_positions(model_positions)
-			
 			newFeat = [self.world._ball.x, self.world._ball.y , math.cos(self.world._ball.angle) * self.world._ball.velocity, math.sin(self.world._ball.angle) * self.world._ball.velocity]
-			for z in self.world._pitch._zones:
-				if z.isInside(self.world._ball.x, self.world._ball.y):
-					newFeat.extend(pre.dist(self.world._ball.x, self.world._ball.y, self.world._ball.angle, z))
 			cache.append(newFeat)
+
 		counter = 1L
 		timer = time.clock()
-		
-		while True:
+		c = True
+		grab = False
+		while c != 27:
 			frame = self.camera.get_frame()
 			# Find object positions
 			# model_positions have their y coordinate inverted
 			model_positions, regular_positions = self.vision.locate(frame)
 			model_positions = self.postprocessing.analyze(model_positions)
-			# Find appropriate action
 			self.world.update_positions(model_positions)
-			
 			newFeat = [self.world._ball.x, self.world._ball.y , math.cos(self.world._ball.angle) * self.world._ball.velocity, math.sin(self.world._ball.angle) * self.world._ball.velocity]
-			
-			for z in self.world._pitch._zones:
-				if z.isInside(self.world._ball.x, self.world._ball.y):
-					newFeat.extend(pre.dist(self.world._ball.x, self.world._ball.y, self.world._ball.angle, z))
-			
+			if grab:			
+				i = buildfeature(cache)
+				for n in i:
+					f.write(str(n) + " ")
+				f.write("-> ")
+				f.write(str(newFeat[0] - cache[7][0]) + " " + str(newFeat[1] - cache[7][1]))
+				f.write("\n")
 			old = cache.pop(0)
 			cache.append(newFeat)
-			old.extend(cache[0])
-			old.extend(cache[1])
-			old.extend(cache[2])
-			old.extend(cache[3])
-			old.extend(cache[4])
-			pattern = [old, [newFeat[0], newFeat[1]]]
-			f.write(str(pattern))
-			f.write("\n")
+			print newFeat
 			counter += 1
+			c = waitKey(2) & 0xFF
+			if c == 32:
+				grab = not grab
+def buildfeature(cache):
+	i = []
+	for f in range(6):
+		i.append(cache[f][0] - cache[7][0])
+		i.append(cache[f][1] - cache[7][1])
+		i.extend(cache[f][2:])
+	print i
+	return i
 
 if __name__ == '__main__':
 	import argparse
