@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <SDPArduino.h>
 #include <SerialCommand.h>
-#include "MPU.h"
+//#include "MPU.h"
 
 const int PIN_LED   = 13;
 
@@ -9,6 +9,7 @@ SerialCommand comm;
 
 void setup()
 {  
+  Serial.println("Running SDPsetup()");
   // SDP Setup
   SDPsetup();
   
@@ -16,6 +17,7 @@ void setup()
   pinMode(PIN_LED, OUTPUT);
   digitalWrite(PIN_LED, HIGH);
   
+  Serial.println("Initialising Commands");
   // Initialse the command messenger
   comm.addCommand("RUN",   cmd_RUN);
   comm.addCommand("PING",  cmd_PING);
@@ -23,11 +25,12 @@ void setup()
   comm.addCommand("KICK",  cmd_KICK);
   comm.addCommand("CATCH", cmd_CATCH);
 
-#ifdef HAS_MPU6050  
+#ifdef HAS_MPU6050 
+  Serial.println("Initialising MPU");
   // Initialise MPU
   MPU_setup(&comm);
 #endif
-  
+
   Serial.println("STARTED");
 }
 
