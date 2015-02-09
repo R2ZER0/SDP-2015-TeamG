@@ -5,6 +5,12 @@
 
 const int PIN_LED   = 13;
 
+#define MOTOR_MOTOR1  0
+#define MOTOR_MOTOR2  2
+#define MOTOR_MOTOR3  3
+#define MOTOR_KICKER  1
+#define MOTOR_CATCHER 5
+
 SerialCommand comm;
 
 void setup()
@@ -89,9 +95,9 @@ void cmd_RUN()
 
 void doRun(int motor1, int motor2, int motor3)
 {
-  doRunMotor(0, motor1);
-  doRunMotor(1, motor2);
-  doRunMotor(2, motor3);
+  doRunMotor(MOTOR_MOTOR1, motor1);
+  doRunMotor(MOTOR_MOTOR2, motor2);
+  doRunMotor(MOTOR_MOTOR3, motor3);
 }
 
 void doRunMotor(int motor, int motor_speed)
@@ -108,8 +114,6 @@ void doRunMotor(int motor, int motor_speed)
 }
 
 /* Kicker Commands */
-#define MOTOR_KICKER (3)
-
 #define KICKER_RUNNING_TIME (400)
 
 #define KICKER_DEFAULT_SCALE (100)
