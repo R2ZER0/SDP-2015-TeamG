@@ -482,3 +482,4 @@ class World(object):
                 > self.our_attacker.x > self.their_defender.x)):
                 print "WARNING: The sides are probably wrong!"
                 self._allowWarning = False
+                # 
