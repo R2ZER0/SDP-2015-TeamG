@@ -14,7 +14,7 @@ if len(sys.argv) > 2:
 
 comm = serial.Serial(serial_port, 115200)
 
-valid_commands = ["PING", "LED", "RUN", "KICK", "CATCH", "MPU"]
+valid_commands = ["PING", "RELEASE", "RUN", "KICK", "CATCH", "MPU"]
 
 # Wait for STARTED
 print("Waiting for STARTED, could take 10-15 seconds...")
