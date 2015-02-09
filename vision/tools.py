@@ -28,8 +28,8 @@ def get_zones(width, height, filename=PATH+'/calibrations/croppings.json', pitch
     calibration = get_croppings(filename, pitch)
     zones_poly = [calibration[key] for key in ['Zone_0', 'Zone_1', 'Zone_2', 'Zone_3']]
 
-    maxes = [max(zone, key=lambda x: x[0])[0] for zone in zones_poly[:3]]
-    mins = [min(zone, key=lambda x: x[0])[0] for zone in zones_poly[1:]]
+    maxes = sorted([max(zone, key=lambda x: x[0])[0] for zone in zones_poly[:3]])
+    mins = sorted([min(zone, key=lambda x: x[0])[0] for zone in zones_poly[1:]])
     mids = [(maxes[i] + mins[i]) / 2 for i in range(3)]
     mids.append(0)
     mids.append(width)
