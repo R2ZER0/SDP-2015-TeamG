@@ -87,10 +87,7 @@ class Planner:
 
             elif state == self.REVERTING_TO_IDLE_STATE:
                 if not(our_attacker.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0) and not(self._world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y)):
-                    """
-                    If the robot's displacement from the point we're trying to move to 
-                    is't zero, we aren't there yet
-                    """
+                    """We aren't there yet"""
                     self._current_task.execute()
 
                 elif not(our_attacker.get_displacement_to_point(self._current_task.x, self._current_task.y) == 0) and self._world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y):
@@ -134,10 +131,7 @@ class Planner:
 
             elif state == self.MOVING_TO_SHOOT_STATE:
                 if abs(our_attacker.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 30:
-                    """
-                    If the robot's displacement from the point we're trying to move to 
-                    is't zero, we aren't there yet
-                    """
+                    """We aren't there yet"""
                     self._current_task.execute()
                 else:
                     self._current_state = self.SHOOTING_STATE
@@ -291,10 +285,6 @@ class Planner:
 
             elif state == self.MOVING_TO_CLEAR_STATE:
                 if abs(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 20:
-                    """
-                    If the robot's displacement from the point we're trying to move to 
-                    is't zero, we aren't there yet
-                    """
                     self._current_task.execute()
 
                 else:
