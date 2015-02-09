@@ -293,8 +293,8 @@ class Simulator:
 
 	def move_ball(self, angle):
 
-		dx = 25 * math.cos(angle)
-		dy = 25 * math.sin(angle)
+		dx = 5 * math.cos(angle)
+		dy = 5 * math.sin(angle)
 		
 		self.ball_body.apply_impulse((dx,dy),(0,0))
 
@@ -344,6 +344,7 @@ class Simulator:
 		moment = pymunk.moment_for_poly(mass, points, (0,0))
 		body = pymunk.Body(mass, moment)
 		body.position = Vec2d(robot.x, robot.y)
+		body.angle = robot.angle
 		shape = pymunk.Poly(body, points, (0,0))
 
 		shape.elasticity = 0

@@ -115,22 +115,28 @@ def has_matched(robot, x=None, y=None, angle=None,
 
 #2015
 def current_ball_controller(world):
-    if world.their_defender.has_ball(world.ball):
+    ball = world.ball
+    if robot_ball_distance(world.their_defender, ball) < 50:
         return world.their_defender
-    elif world.their_attacker.has_ball(world.ball):
+    elif robot_ball_distance(world.their_attacker, ball) < 50:
         return world.their_attacker
-    elif world.our_attacker.has_ball(world.ball):
+    elif robot_ball_distance(world.our_attacker, ball) < 50:
         return  world.our_attacker
-    elif world.our_defender.has_ball(world.ball):
+    elif robot_ball_distance(world.our_defender, ball) < 50:
         return  world.our_defender
 
 #2015 
 def enemy_possess_ball(world):
     """Returns true when a robot on the opposing team has possession of the ball"""
-    if world.their_defender.has_ball(world.ball) or world.their_attacker.has_ball(world.ball):
+    if robot_ball_distance(world.their_defender, world.ball) < 40:
         return True
-    else:
-        return False
+    elif robot_ball_distance(world.their_attacker, world.ball) < 40:
+        return True
+
+    return False
+
+def robot_ball_distance(robot, ball):
+    return robot.get_displacement_to_point(ball.x,ball.y)
 
 #2015
 def choose_attacker_destination(world):

@@ -156,27 +156,36 @@ class Planner:
                 if enemy_possess_ball(world):
                     possessing_robot = current_ball_controller(world)
                     pred_ball_y = predict_y_intersection(world, our_defender.x, possessing_robot) # Do we need other args for possessing_robot()
-                    last_predicted_y = pred_ball_y
-                    self._current_state = ENEMY_HAVE_BALL_STATE
-                    self._current_task = MoveToPoint(world, robot, role, robot.x, pred_ball_y)
-                    self._current_task.execute()
+                    
+                    if not pred_ball_y is None: 
+                        last_predicted_y = pred_ball_y
+                        self._current_state =self.ENEMY_HAVE_BALL_STATE
+                        self._current_task = MoveToPoint(world, robot, role, our_defender.x, pred_ball_y)
+                        self._current_task.execute()
 
                 else:
                     self._current_task = None
-                    self._current_state = IDLE_STATE
+                    self._current_state = self.IDLE_STATE
 
-            elif state == ENEMY_HAVE_BALL_STATE:
+            elif state == self.ENEMY_HAVE_BALL_STATE:
                 if not(enemy_possess_ball(world)):
                     """If they've lost possession for whatever reason, revert back to initial state"""
-                    self._current_state = REVERTING_TO_IDLE_STATE
+                    self._current_state = self.REVERTING_TO_IDLE_STATE
                     self._current_task = MoveToPoint(world, robot, role, idle_x, idle_y)
                     self._current_task.execute()
                 else:
                     possessing_robot = current_ball_controller(world)
+                    
                     pred_ball_y = predict_y_intersection(world, our_defender.x, possessing_robot) # Do we need other args for possessing_robot()
-                    if not(pred_ball_y == last_predicted_y):
+                    
+                    if pred_ball_y is None:
+                        self._current_state = self.INITIAL_STATE
+                        self._current_task = None
+                        return
+
+                    if last_predicted_y is None or not(pred_ball_y == last_predicted_y):
                         """Their robot has moved, re-calculate predicted y"""
-                        self._current_task = MoveToPoint(world, robot, role, robot.x, pred_ball_y)
+                        self._current_task = MoveToPoint(world, robot, role, our_defender.x, pred_ball_y)
                         self._current_task.execute()
                         last_predicted_y = pred_ball_y
                     elif abs(our_defender.get_displacement_to_point(idle_x, idle_y)) > 20:
@@ -185,24 +194,30 @@ class Planner:
                     elif abs(our_defender.get_displacement_to_point(idle_x, idle_y)) <= 20:
                         """We're there, proceed to next state/task"""
                         self._current_task = None
-                        self._current_state = IDLE_STATE
+                        self._current_state = self.IDLE_STATE
 
-            elif state == IDLE_STATE:
-                if not(enemy_possess_ball(world)) and not(self._world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y)):
+            elif state == self.IDLE_STATE:
+                if not(enemy_possess_ball(world)) and not(self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y)):
                     """If they've lost possession for whatever reason, revert back to initial state"""
-                    self._current_state = REVERTING_TO_IDLE_STATE
+                    self._current_state = self.REVERTING_TO_IDLE_STATE
                     self._current_task = MoveToPoint(world, robot, role, idle_x, idle_y)
                     self._current_task.execute()
                 elif enemy_possess_ball(world):
                     possessing_robot = current_ball_controller(world)
                     pred_ball_y = predict_y_intersection(world, our_defender.x, possessing_robot) # Do we need other args for possessing_robot()
-                    if not(pred_ball_y == last_predicted_y):
+                    if pred_ball_y is None:
+                        self._current_state = self.INITIAL_STATE
+                        self._current_task = None
+                        return
+
+                    if last_predicted_y is None or not(pred_ball_y == last_predicted_y):
                         """Their robot has moved, re-calculate predicted y"""
-                        self._current_state = ENEMY_HAVE_BALL_STATE
-                        self._current_task = MoveToPoint(world, robot, role, robot.x, pred_ball_y)
+                        self._current_state = self.ENEMY_HAVE_BALL_STATE
+                        self._current_task = MoveToPoint(world, robot, role, our_defender.x, pred_ball_y)
                         self._current_task.execute()
                         last_predicted_y = pred_ball_y
-                elif not(enemy_possess_ball(world)) and self._world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y):
+
+                elif not(enemy_possess_ball(world)) and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
                         self._current_state = self.ACQUIRING_BALL_STATE
                         self._current_task = AcquireBall(world, robot, role)
                         self._current_task.execute()
@@ -212,9 +227,14 @@ class Planner:
                 if enemy_possess_ball(world):
                     possessing_robot = current_ball_controller(world)
                     pred_ball_y = predict_y_intersection(world, our_defender.x, possessing_robot) # Do we need other args for possessing_robot()
+                    if pred_ball_y is None:
+                        self._current_state = self.INITIAL_STATE
+                        self._current_task = None
+                        return
+
                     last_predicted_y = pred_ball_y
-                    self._current_state = ENEMY_HAVE_BALL_STATE
-                    self._current_task = MoveToPoint(world, robot, role, robot.x, pred_ball_y)
+                    self._current_state = self.ENEMY_HAVE_BALL_STATE
+                    self._current_task = MoveToPoint(world, robot, role, our_defender.x, pred_ball_y)
                     self._current_task.execute()
 
                 elif abs(our_defender.get_displacement_to_point(idle_x, idle_y)) > 20 and not(self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y)):
@@ -237,9 +257,14 @@ class Planner:
                 if enemy_possess_ball(world):
                     possessing_robot = current_ball_controller(world)
                     pred_ball_y = predict_y_intersection(world, our_defender.x, possessing_robot) # Do we need other args for possessing_robot()
+                    if pred_ball_y is None:
+                        self._current_state = self.INITIAL_STATE
+                        self._current_task = None
+                        return
+
                     last_predicted_y = pred_ball_y
-                    self._current_state = ENEMY_HAVE_BALL_STATE
-                    self._current_task = MoveToPoint(world, robot, role, robot.x, pred_ball_y)
+                    self._current_state = self.ENEMY_HAVE_BALL_STATE
+                    self._current_task = MoveToPoint(world, robot, role, our_defender.x, pred_ball_y)
                     self._current_task.execute()
 
                 elif self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
@@ -268,7 +293,7 @@ class Planner:
                     self._current_task = MoveToPoint(world, robot, role, idle_x, idle_y)
                     self._current_task.execute()
 
-                elif our_defender.has_ball(ball) #and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
+                elif our_defender.has_ball(ball): #and self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
                     """
                     We have the ball in our grasp, proceed to next state and invoke the next task
                     """
