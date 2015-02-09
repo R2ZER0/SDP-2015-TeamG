@@ -224,10 +224,11 @@ class Robot(PitchObject):
         '''
         return (self._catcher == 'closed') and self.can_catch_ball(ball)
 
-    def get_rotation_to_point(self, x, y):
+    def get_rotation_to_point(self, x, y):        
         '''
-        This method returns an angle by which the robot needs to rotate to achieve alignment.
-        It takes either an x, y coordinate of the object that we want to rotate to
+        Returns: 
+            An angle to which this robot should rotate to be facing the given point,
+            within the range [-pi,pi]
         '''
         delta_x = x - self.x
         delta_y = y - self.y
@@ -245,7 +246,8 @@ class Robot(PitchObject):
 
     def get_displacement_to_point(self, x, y):
         '''
-        This method returns the displacement between the robot and the (x, y) coordinate.
+        Returns:
+            The displacement between our robot's center and the given x,y position.
         '''
         delta_x = x - self.x
         delta_y = y - self.y
@@ -254,16 +256,26 @@ class Robot(PitchObject):
 
     def get_direction_to_point(self, x, y):
         '''
-        This method returns the displacement and angle to coordinate x, y.
+        Returns:
+            A tuple, containing:
+                [0]     The displacement to the given x,y position
+                [1]     The angle between our robot and the given x,y position
         '''
         return self.get_displacement_to_point(x, y), self.get_rotation_to_point(x, y)
 
     def get_pass_path(self, target):
         '''
-        Gets a path represented by a Polygon for the area for passing ball between two robots
+        Calculates a polygon representing the passing 'channel' between our robot and the 
+        given target. This channel is a Polygon instance constructed between the front
+        of our robot and the front of the target object.
+
+        Returns:
+            A Polygon instance containing the above defined area.
         '''
         robot_poly = self.get_polygon()
         target_poly = target.get_polygon()
+
+        # [0] index is Front-left of a Robot, [1] index is Front-Right of a Robot.
         return Polygon(robot_poly[0], robot_poly[1], target_poly[0], target_poly[1])
 
     def __repr__(self):
@@ -273,12 +285,20 @@ class Robot(PitchObject):
 
 
 class Ball(PitchObject):
+    '''
+    The Ball is a simple PitchObject with predefined constants for dimensions. Represents
+    our ball on the Pitch.
+    '''
 
     def __init__(self, x, y, angle, velocity):
         super(Ball, self).__init__(x, y, angle, velocity, BALL_WIDTH, BALL_LENGTH, BALL_HEIGHT)
 
 
 class Goal(PitchObject):
+    '''
+    The Goal class represents a goal in the Pitch and is simply a PitchObject with the zone
+    property to allow querying of the goal's zone.
+    '''
 
     def __init__(self, zone, x, y, angle):
         super(Goal, self).__init__(x, y, angle, 0, GOAL_WIDTH, GOAL_LENGTH, GOAL_HEIGHT)
@@ -295,15 +315,27 @@ class Goal(PitchObject):
 
 class Pitch(object):
     '''
-    Class that describes the pitch
+    The Pitch class represents the full physical pitch and separates the pitch into zones based upon the
+    croppings provided in croppings.json. Zones are specified as Polygon objects.
     '''
 
     def __init__(self, pitch_num):
+        '''
+        Sets up a new Pitch with the given number. Retrieves zones using tools.py get_croppings, thus pitch_num
+        must be a valid pitch number.
+
+        Attributes:
+            pitch_num   A number within [0,1,2], with 0: main area pitch, 1: side area pitch, 2: simulator pitch.
+        '''
+
+        # Retrieve croppings from croppings.json with the given pitch key
         config_json = tools.get_croppings(pitch=pitch_num)
 
+        # Retrieve width and height as the difference between the x,y extremes
         self._width = max([point[0] for point in config_json['outline']]) - min([point[0] for point in config_json['outline']])
         self._height = max([point[1] for point in config_json['outline']]) - min([point[1] for point in config_json['outline']])
-        # Getting the zones:
+        
+        # Invert the y due to differences with CV's y coordinates
         self._zones = []
         self._zones.append(Polygon([(x, self._height - y) for (x, y) in config_json['Zone_0']]))
         self._zones.append(Polygon([(x, self._height - y) for (x, y) in config_json['Zone_1']]))
@@ -312,7 +344,16 @@ class Pitch(object):
 
     def is_within_bounds(self, robot, x, y):
         '''
-        Checks whether the position/point planned for the robot is reachable
+        Convenience function, checks whether the given x,y position is within the given robot's 
+        zone.
+
+        Attributes:
+            robot   The robot to check for containment
+            x       The target x position
+            y       The target y position
+
+        Returns:
+            True if the robot's zone contains the given x,y position.
         '''
         zone = self._zones[robot.zone]
         return zone.isInside(x, y)
@@ -327,6 +368,10 @@ class Pitch(object):
 
     @property
     def zones(self):
+        '''
+        Returns:
+            The full list of zones available on this Pitch.
+        '''
         return self._zones
 
     def __repr__(self):
@@ -335,14 +380,27 @@ class Pitch(object):
 
 class World(object):
     '''
-    This class describes the environment
+    The World class is the high level model describing the entire world through the Pitch model and the 
+    PitchObjects contained within. Heavily passed around, this serves as the querying object for many
+    different modules.
     '''
 
     def __init__(self, our_side, pitch_num):
+        '''
+        Initialises a new World instance, with the given side serving to identify robot positionings
+        and pitch number used to pull the correct croppings for the Pitch.
+
+        Attributes:
+            our_side    Either 'left' or 'right', used to identify robot positions
+            pitch_num   Value in the range [0,1,2], with 0: main pitch, 1: side pitch, 2: simulator.
+        '''
         assert our_side in ['left', 'right']
+
         self._pitch = Pitch(pitch_num)
+
         self._our_side = our_side
         self._their_side = 'left' if our_side == 'right' else 'right'
+
         self._ball = Ball(0, 0, 0, 0)
         self._robots = []
         self._robots.append(Robot(0, 0, 0, 0, 0))
@@ -350,13 +408,19 @@ class World(object):
         self._robots.append(Robot(2, 0, 0, 0, 0))
         self._robots.append(Robot(3, 0, 0, 0, 0))
 
+        # Define catchment areas for our robots. If the ball enters these areas then our robot
+        # believes it can catch the ball. Width is parallel to front/rear and height is parallel
+        # to the sides of our robot.
         self.our_defender.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 12}
         self.our_attacker.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 14}
 
+        # Calculate the goals as being in fixes positions halfway up the pitch. The latter
+        # goal 'faces' towards the left of the pitch.
         self._goals = []
         self._goals.append(Goal(0, 0, self._pitch.height/2.0, 0))
         self._goals.append(Goal(3, self._pitch.width, self._pitch.height/2.0, pi))
 
+        # Initially true, this ensures we only receive one warning for the sides being wrong.
         self._allowWarning = True
 
     @property
@@ -392,20 +456,27 @@ class World(object):
         return self._pitch
 
     def update_positions(self, pos_dict):
-        ''' This method will update the positions of the pitch objects
-            that it gets passed by the vision system '''
+        '''Receives a dictionary containing vectors for each of the PitchObjects
+        in the scene and updates the models with the new positionings.
+
+        Attributes:
+            pos_dict    A dictionary containing a vector for each of:
+                        ['our_attacker', 'their_attacker', 'our_defender', 'their_defender', 'ball']
+        '''
         self.our_attacker.vector = pos_dict['our_attacker']
         self.their_attacker.vector = pos_dict['their_attacker']
         self.our_defender.vector = pos_dict['our_defender']
         self.their_defender.vector = pos_dict['their_defender']
         self.ball.vector = pos_dict['ball']
-        # Checking if the robot locations make sense:
-        # Is the side correct:
+
+        # Only warn once
         if self._allowWarning:
+
             if (self._our_side == 'left' and not(self.our_defender.x < self.their_attacker.x
                 < self.our_attacker.x < self.their_defender.x)):
                 print "WARNING: The sides are probably wrong!"
                 self._allowWarning = False
+
             if (self._our_side == 'right' and not(self.our_defender.x > self.their_attacker.x
                 > self.our_attacker.x > self.their_defender.x)):
                 print "WARNING: The sides are probably wrong!"
