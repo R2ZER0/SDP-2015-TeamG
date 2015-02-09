@@ -118,7 +118,7 @@ class Action():
         motor_speeds = [ cls._calc_motor_speed(motor, angle) for motor in cls.MOTORS ]
         motor_speeds = cls._normalise_speeds(motor_speeds)
         motor_speeds = map(lambda x: x*scale, motor_speeds)
-        motor_speeds = map(cls._percentage_speed, motor_speeds)
+        motor_speeds = map(lambda x: cls._percentage_speed(x), motor_speeds)
         
         return [ Command("RUN", motor_speeds) ]
   
