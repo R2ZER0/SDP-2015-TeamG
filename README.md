@@ -2,7 +2,7 @@
 
 *Thomas Cumming, Rikki Guy, Joseph Kennelly, Ayrton Massey, Robert Oyler, Sebastian Schulze, Ronan Turner*
 
-![alt text](http://i.imgur.com/Y6Z5NtE.png "I think he just says \"bloop bloop bloop\"")
+![alt text](http://i.imgur.com/Y6Z5NtE.png "I think he just says ""bloop bloop bloop"")
 ------
 
 ###Future SDP teams
@@ -39,9 +39,10 @@ The project has the following dependencies:
 - PySerial
 - OpenCV 2.4.5
 - Numpy
-- pygame (For `xbox360controller/`)
-- Flask (For `ControlApp/`)
-- Pyzmq (For the RF Console)
+- unittest2 	(For unit testing support on Python 2.6)
+- pygame 		(For `xbox360controller/`)
+- Flask 		(For `ControlApp/`)
+- Pyzmq 		(For the RF Console)
 
 ##### Core Dependencies 
 

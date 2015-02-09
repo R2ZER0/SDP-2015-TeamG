@@ -28,6 +28,7 @@ pip install Polygon2
 pip install numpy
 pip install pySerial
 pip install ArgParse
+pip install unittest2
 
 #download cv2
 curl -L -O http://downloads.sourceforge.net/project/opencvlibrary/opencv-unix/2.4.10/opencv-2.4.10.zip

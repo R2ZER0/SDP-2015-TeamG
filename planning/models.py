@@ -349,9 +349,15 @@ class World(object):
         self._robots.append(Robot(1, 0, 0, 0, 0))
         self._robots.append(Robot(2, 0, 0, 0, 0))
         self._robots.append(Robot(3, 0, 0, 0, 0))
+
+        self.our_defender.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 12}
+        self.our_attacker.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 14}
+
         self._goals = []
         self._goals.append(Goal(0, 0, self._pitch.height/2.0, 0))
         self._goals.append(Goal(3, self._pitch.width, self._pitch.height/2.0, pi))
+
+        self._allowWarning = True
 
     @property
     def our_attacker(self):
@@ -395,9 +401,12 @@ class World(object):
         self.ball.vector = pos_dict['ball']
         # Checking if the robot locations make sense:
         # Is the side correct:
-        if (self._our_side == 'left' and not(self.our_defender.x < self.their_attacker.x
-            < self.our_attacker.x < self.their_defender.x)):
-            print "WARNING: The sides are probably wrong!"
-        if (self._our_side == 'right' and not(self.our_defender.x > self.their_attacker.x
-            > self.our_attacker.x > self.their_defender.x)):
-            print "WARNING: The sides are probably wrong!"
+        if self._allowWarning:
+            if (self._our_side == 'left' and not(self.our_defender.x < self.their_attacker.x
+                < self.our_attacker.x < self.their_defender.x)):
+                print "WARNING: The sides are probably wrong!"
+                self._allowWarning = False
+            if (self._our_side == 'right' and not(self.our_defender.x > self.their_attacker.x
+                > self.our_attacker.x > self.their_defender.x)):
+                print "WARNING: The sides are probably wrong!"
+                self._allowWarning = False
