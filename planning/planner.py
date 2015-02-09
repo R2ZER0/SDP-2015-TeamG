@@ -36,6 +36,7 @@ class Planner:
         self._current_state=self.INITIAL_STATE
         self._current_task=None
     
+    # Do we need this stuff?
     @property
     def attacker_strat_state(self):
         return self._attacker_current_strategy.current_state
