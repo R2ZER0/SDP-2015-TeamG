@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import tools
 import argparse
-
+import math
 FRAME_NAME = 'ConfigureWindow'
 
 WHITE = (255,255,255)
@@ -54,24 +54,38 @@ class Configure(object):
 
                 self.image = cv2.undistort(image, CMATRIX, DIST, None, NCMATRIX)
 
-                # Get various data about the image from the user
-                self.get_pitch_outline()
-
                 self.get_zone('Zone_0', 'draw LEFT Defender')
                 self.get_zone('Zone_1', 'draw LEFT Attacker')
                 self.get_zone('Zone_2', 'draw RIGHT Attacker')
                 self.get_zone('Zone_3', 'draw RIGHT Defender')
+		
+		self.data['Zone_3'].extend(self.data['Zone_2'])
+		self.data['Zone_2'].extend(self.data['Zone_1'])
+		self.data['Zone_1'].extend(sorted(self.data['Zone_0'], key = lambda x : x[0], reverse = True)[:2])
+		minx = min(self.data['outline'], key = lambda x: x[0])[0]
+		miny = min(self.data['outline'], key = lambda x: x[1])[1]		
+		
+		for k in ['Zone_0', 'Zone_1', 'Zone_2', 'Zone_3']:
+			self.data[k] = [(x-minx, y-miny) for (x,y) in self.data[k]]
+		for k in ['outline', 'Zone_0', 'Zone_1', 'Zone_2', 'Zone_3']:
+			self.data[k] = self.sortPoly(self.data[k])
 
                 self.get_goal('Zone_0')
                 self.get_goal('Zone_3')
 
+		self.draw_poly(self.reshape())
                 print 'Press any key to finish.'
                 cv2.waitKey(0)
                 cv2.destroyAllWindows()
 
                 # Write out the data
-                # self.dump('calibrations/calibrate.json', self.data)
                 tools.save_croppings(pitch=self.pitch, data=self.data)
+	
+	def sortPoly(self, points):
+		cent = (sum([p[0] for p in points])/len(points), sum([p[1] for p in points])/len(points))
+		# sort by polar angle
+		points.sort(key=lambda p: math.atan2(p[1]-cent[1],p[0]-cent[0]))
+		return points
 
         def reshape(self):
                 return np.array(self.data[self.drawing], np.int32).reshape((-1,1,2))
@@ -82,13 +96,14 @@ class Configure(object):
 
         def get_zone(self, key, message):
                 print '%s. %s' % (message, "Continue by pressing q")
-                self.drawing, k = key, True
+                self.drawing = key
+		k = True
 
                 while k != ord('q'):
                         cv2.imshow(FRAME_NAME, self.image)
                         k = cv2.waitKey(100) & 0xFF
 
-                self.draw_poly(self.reshape())
+                
 
         def get_pitch_outline(self):
                 """
@@ -116,6 +131,7 @@ class Configure(object):
                         color = self.color
                         cv2.circle(self.image, (x-1, y-1), 2, color, -1)
                         self.data[self.drawing].append((x,y))
+			self.data['outline'].append((x,y))
 
         def get_goal(self, zone):
                 """
