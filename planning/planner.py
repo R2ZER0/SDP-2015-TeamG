@@ -20,6 +20,8 @@ class Planner:
 
         self.ACQUIRING_BALL_STATE = 'ACQUIRING_BALL_STATE'
 
+        self.ENEMY_HAVE_BALL_STATE='ENEMY_HAVE_BALL_STATE'
+
         self.MOVING_TO_SHOOT_STATE = 'MOVING_TO_SHOOT_STATE'
         self.MOVING_TO_CLEAR_STATE = 'MOVING_TO_CLEAR_STATE'
 
@@ -154,6 +156,11 @@ class Planner:
 
             """Defender state machine"""
             if state == self.INITIAL_STATE:
+                if enemy_possess_ball(world):
+                    pred_ball_y = predict_y_intersection(world, our_defender.x, )
+                    self._current_task=ENEMY_HAVE_BALL_STATE
+
+
                 if self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
                     self._current_state = self.ACQUIRING_BALL_STATE
                     self._current_task = AcquireBall(world, robot, role)
