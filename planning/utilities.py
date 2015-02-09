@@ -113,6 +113,14 @@ def has_matched(robot, x=None, y=None, angle=None,
         angle_matched = abs(angle) < angle_threshold
     return dist_matched and angle_matched
 
+#2015 
+def enemy_possess_ball(world):
+    """Returns true when a robot on the opposing team has possession of the ball"""
+    if world.their_defender.has_ball(world.ball) or world.their_attacker.has_ball(world.ball):
+        return True
+    else:
+        return False
+
 #2015
 def choose_attacker_destination(world):
     """
