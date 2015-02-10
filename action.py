@@ -1,5 +1,6 @@
 # movement.py
 import math
+import motor_calibration
 
 class Action():
     """Provides an interface to movement and other robot actions"""
@@ -25,6 +26,7 @@ class Action():
         #motor_speeds = [ Action._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
         motor_speeds = Action._calc_motor_speed(angle)
         motor_speeds = Action._normalise_speeds(motor_speeds)
+        motor_speeds = motor_calibration.get_calibrated_speeds(motor_speeds)
         motor_speeds = map(lambda x: x*(-100), motor_speeds)
         #motor_speeds = map(Action._percentage_speed, motor_speeds)
         print motor_speeds
