@@ -1,3 +1,8 @@
+
+'''
+Convenience setup colours values for GUI drawing.
+'''
+
 BGR_COMMON = {
     'red': (0, 0, 255),
     'green': (0, 255, 0),
