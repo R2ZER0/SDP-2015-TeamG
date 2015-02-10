@@ -19,11 +19,11 @@ def get_calibrated_speeds(speeds):
     speeds = np.array(speeds)
     speeds = np.sign(speeds) * np.interp(np.abs(speeds), _NORMALISED_X, _NORMALISED_Y)
 
-    # normalise to between 0.45 and 1.0
+    # normalise to between 0.3 and 1.0
     norm_top = 1.0
-    norm_bottom = 0.45
+    norm_bottom = 0.3
 
-    speeds /= (norm_top - norm_bottom)
+    speeds *= (norm_top - norm_bottom)
     speeds += norm_bottom
 
     return speeds
