@@ -11,7 +11,7 @@ class Action():
     
     # Motor angles, starting from the front left, going anticlockwise
     # MOTOR_ANGLES = [ math.pi/3.0, math.pi, math.pi*5.0/3.0 ]
-    MOTOR_ANGLES = [ math.pi*5.0/6.0, math.pi*3.0/2.0, math.pi/6.0 ]
+    MOTOR_ANGLES = [ math.pi*5.0/3.0, math.pi/2.0, math.pi*4/3.0 ]
     MOTORS = [ (math.cos(angle), math.sin(angle)) for angle in MOTOR_ANGLES ]
     
     def __init__(self, comm):
@@ -22,17 +22,18 @@ class Action():
     # Movement
     def move(self, angle, scale):
         """Move the robot in the angle (radians) from the front, with speed -1 to +1"""
-        motor_speeds = [ Action._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
+        #motor_speeds = [ Action._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
+        motor_speeds = Action._calc_motor_speed(angle)
         motor_speeds = Action._normalise_speeds(motor_speeds)
-        motor_speeds = map(lambda x: x*scale, motor_speeds)
-        motor_speeds = map(Action._percentage_speed, motor_speeds)
-        
-        self._send_run(motor_speeds)
+        motor_speeds = map(lambda x: x*(-100), motor_speeds)
+        #motor_speeds = map(Action._percentage_speed, motor_speeds)
+        print motor_speeds
+        self._send_run([int(motor_speeds[0]), int(motor_speeds[1]), int(motor_speeds[2])])
   
     def turn(self, speed):
-        """Turn the robot in the given direction, clockwise/anticlockwise"""
-        speed = int(speed)
-        self._send_run([-speed, speed, speed])
+        """Turn the robot in the given direction, clockwise/anticlockwise"""      
+        #motor_speed = _normalise_speed(speed)
+        self._send_run([speed, speed, speed])
   
     def stop(self):
         motor_speeds = [ 0.0, 0.0, 0.0 ]
@@ -55,14 +56,14 @@ class Action():
     # Commands
     def _send_run(self, speeds):
         self._send_command("RUN", speeds)
-    
+        
     # TODO: decide on the kick protocol etc.
   
     # Utility
     @staticmethod
     def _normalise_speeds(speeds):
-        maxspeed = max(speeds)
-        return map( lambda x: (x/maxspeed)*x, speeds )        
+        maxspeed = max([abs(s) for s in speeds])
+        return map( lambda x: (x/maxspeed), speeds )        
     
     @staticmethod
     def _percentage_speed(speed):
@@ -72,9 +73,13 @@ class Action():
         return speed
     
     @staticmethod
-    def _calc_motor_speed(motor, angle):
-        return (math.cos(angle) * motor[0] - math.sin(angle) * motor[1])
-    
+    def _calc_motor_speed( angle):
+        m = [0,0,0]
+        m[0] = math.cos(angle) - math.sin(angle)/(2+math.sqrt(3))
+        m[1] = 2*math.sin(angle)/(2+math.sqrt(3))
+        m[2] = -math.cos(angle) - math.sin(angle)/(2+math.sqrt(3))
+        return m
+
     @staticmethod
     def _get_command_string(command, args):
         commstr = str(command)
