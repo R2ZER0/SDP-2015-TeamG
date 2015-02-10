@@ -157,11 +157,9 @@ class Planner:
 
         elif self._role=='defender':
             # DEFENDER STATE MACHINE FOR MILESTONE 2
-            # Ghost robot representing kicking machine
-            kicking_mach = Robot(1, X, Y, ANGLE) # Need to get x y angle vals for the kicker machine
 
             if state == self.M2_INITIAL_D_STATE:
-                pred_ball_y = predict_y_intersection(world, our_defender.x, kicking_mach)
+                pred_ball_y = predict_y_intersection(world, our_defender.x, their_attacker)
                 if world.ball.velocity == 0:
                     self._current_task = None
                     self._current_state = M2_INITIAL_D_STATE
@@ -172,20 +170,20 @@ class Planner:
                         self._current_task.execute()
                     elif pred_ball_y == None:
                         return
-            elif state == M2_ACQUIRING_BALL_D_STATE:
+            elif state == self.M2_ACQUIRING_BALL_D_STATE:
                 if abs(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 20:
                     """Predicted final ball resting place is the same, but we're not there yet, so keep going"""
                     self._current_task.execute() 
                 else:
                     self._current_state = M2_IDLE_D_STATE
                     self._current_task = None
-            elif state == M2_IDLE_D_STATE:
+            elif state == self.M2_IDLE_D_STATE:
                 if self._world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
                     self._current_state = M2_ACQUIRING_BALL_D_STATE
                     self._current_task = AcquireBall(world, robot, role)
                 else:
                     return
-            elif state == M2_ACQUIRING_BALL_D_STATE:
+            elif state == self.M2_ACQUIRING_BALL_D_STATE:
                 if _current_task.complete():
                     if our_defender.x < world.pitch.zones[our_defender.zone].center()[0]:
                         (x_dest, y_dest) = (our_defender.x + our_defender.width, our_defender.y)
@@ -199,7 +197,7 @@ class Planner:
                         self._current_task.execute()
                 else:
                     self._current_task.execute()
-            elif state == M2_MOVING_TO_CLEAR_D_STATE:
+            elif state == self.M2_MOVING_TO_CLEAR_D_STATE:
                 if self._current_task.complete():
                     self._current_task.execute()
 
@@ -208,13 +206,12 @@ class Planner:
                     zone_center = world.pitch.zones[our_attacker.zone].center()
                     self._current_task = KickToPoint(world, robot, role, zone_center[0], zone_center[1])
                     self._current_task.execute()
-            elif state == M2_CLEARING_D_STATE:
+            elif state == self.M2_CLEARING_D_STATE:
                  if not self._current_task.kicked:
                     self._current_task.execute()
                  else:
-                    self._current_state = self.REVERTING_TO_IDLE_STATE
-                    self._current_task = MoveToPoint(world, robot, role, idle_x, idle_y)
-                    self._current_task.execute()
+                    self._current_state = self.M2_IDLE_D_STATE
+                    self._current_task = None
             # (idle_x, idle_y) = world.pitch.zones[our_defender.zone].center()
             # last_predicted_y = None
 
