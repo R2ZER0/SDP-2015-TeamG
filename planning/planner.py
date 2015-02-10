@@ -40,6 +40,7 @@ class Planner:
         self.M2_ACQUIRING_BALL_D_STATE = 'M2_ACQUIRING_BALL_D_STATE'
         self.M2_MOVING_TO_CLEAR_D_STATE = 'M2_MOVING_TO_CLEAR_D_STATE'
         self.M2_CLEARING_D_STATE = 'M2_CLEARING_D_STATE'
+        self.M2_MOVING_TO_ACQUIRE_BALL_D_STATE = 'M2_MOVING_TO_ACQUIRE_BALL_D_STATE'
 
         self._current_state=self.INITIAL_STATE
         self._current_task=None
@@ -159,19 +160,19 @@ class Planner:
             # DEFENDER STATE MACHINE FOR MILESTONE 2
 
             if state == self.M2_INITIAL_D_STATE:
-                pred_ball_y = predict_y_intersection(world, our_defender.x, their_attacker)
+                pred_ball_y = predict_y_intersection(world, our_defender.x, their_attacker) # their defender? 
                 if world.ball.velocity == 0:
                     self._current_task = None
                     self._current_state = M2_INITIAL_D_STATE
                 else:
                     if not(pred_ball_y == None):
-                        self._current_state = M2_ACQUIRING_BALL_D_STATE
+                        self._current_state = M2_MOVING_TO_ACQUIRE_BALL_D_STATE
                         self._current_task = MoveToPoint(world, robot, role, our_defender.x , pred_ball_y)
                         self._current_task.execute()
                     elif pred_ball_y == None:
                         return
-            elif state == self.M2_ACQUIRING_BALL_D_STATE:
-                if abs(our_defender.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 20:
+            elif state == self.M2_MOVING_TO_ACQUIRE_BALL_D_STATE:
+                if not(self._current_task.complete()):
                     """Predicted final ball resting place is the same, but we're not there yet, so keep going"""
                     self._current_task.execute() 
                 else:
