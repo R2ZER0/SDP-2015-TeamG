@@ -57,7 +57,11 @@ class Controller:
 			self.sim = None
 			self.camera = Camera(port=video_port, pitch=self.pitch)
 
-			self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
+			if comms:
+				self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
+			else:
+				self.comm = None
+
 			self.robot = Action(self.comm)
 		
 		frame = self.camera.get_frame()
