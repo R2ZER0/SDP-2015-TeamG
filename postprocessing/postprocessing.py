@@ -83,7 +83,16 @@ class Postprocessing(object):
         '''
         if not(info['x'] is None) and not(info['y'] is None) and not(info['angle'] is None):
 
+            # Reject angle if it has altered further than it should have
+            old_angle = self._vectors[key]['vec'].angle
             robot_angle = info['angle']
+
+            diff = min((2 * pi) - abs(old_angle - robot_angle), abs(old_angle - robot_angle))
+            # Pi/4 threshold on angle adjustment between frames
+            if self._vectors[key]['time'] > 10 and diff > pi/2:
+                info['angle'] = old_angle
+                robot_angle = old_angle
+                print 'Rejected new angle'
 
             delta_x = info['x'] - self._vectors[key]['vec'].x
             delta_y = info['y'] - self._vectors[key]['vec'].y

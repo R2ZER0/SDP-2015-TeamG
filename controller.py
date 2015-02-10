@@ -58,7 +58,7 @@ class Controller:
 			self.camera = Camera(port=video_port, pitch=self.pitch)
 
 			if comms:
-				self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
+				self.comm = serial.Serial("/dev/ttyACM1", 115200, timeout=1)
 			else:
 				self.comm = None
 
@@ -164,14 +164,15 @@ class Controller:
 			counter += 1
 
 		#except:
-		#	if self.robot is not None:
-		#		self.robot.stop()
+		#	
 
 		#finally:
 			# Write the new calibrations to a file.
 			#tools.save_colors(self.pitch, self.calibration)
 			#if self.robot is not None:
 			#	self.robot.stop()
+		if self.robot is not None:
+			self.robot.stop()
 		tools.save_colors(self.pitch, self.calibration)
 
 # MAIN

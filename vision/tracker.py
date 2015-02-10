@@ -187,7 +187,7 @@ class RobotTracker(Tracker):
         contours = self.get_contours(frame.copy(), adjustments)
         return self.get_contour_corners(self.join_contours(contours))
 
-    def get_dot(self, frame, x_offset, y_offset):
+    def get_dot(self, frame, x_offset, y_offset, plate_corners):
         """
         Find center point of the black dot on the plate.
 
@@ -208,12 +208,12 @@ class RobotTracker(Tracker):
             mask_frame = frame.copy()
 
             # Fill the dummy frame
-            #cv2.rectangle(mask_frame, (0, 0), (width, height), (0, 0, 0), -1)
-            #cv2.circle(mask_frame, (width / 2, height / 2), 9, (255, 255, 255), -1)
+            cv2.rectangle(mask_frame, (0, 0), (width, height), (0, 0, 0), -1)
+            cv2.circle(mask_frame, (width / 2, height / 2), 9, (255, 255, 255), -1)
 
             # Mask the original image
-            #mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
-            #frame = cv2.bitwise_and(frame, frame, mask=mask_frame)
+            mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
+            frame = cv2.bitwise_and(frame, frame, mask=mask_frame)
 
             adjustment = self.calibration['dot']
             contours = self.get_contours(frame, adjustment)
@@ -253,6 +253,7 @@ class RobotTracker(Tracker):
 
         # (1) Find the plates
         plate_corners = self.get_plate(frame)
+        print plate_corners
 
         if plate_corners is not None:
             # Find the bounding box
@@ -270,7 +271,9 @@ class RobotTracker(Tracker):
                 ]
 
                 # (3) Search for the dot
-                dot = self.get_dot(plate_frame, plate_bound_box.x + self.offset, plate_bound_box.y)
+                # 
+                # Pass in corners of the plate for dot estimation
+                dot = self.get_dot(plate_frame, plate_bound_box.x + self.offset, plate_bound_box.y, plate_corners)
 
                 if dot is not None:
                     # Since get_dot adds offset, we need to remove it
