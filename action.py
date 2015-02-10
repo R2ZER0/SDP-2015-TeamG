@@ -87,13 +87,12 @@ class Action():
         self._send_command("CATCH",[scale])
 
     def open_catcher(self, scale=100):
-        """Sends the command to open the catcher to the robot. Currently 
-        implemented simply as a kick.
+        """Sends the command to open the catcher to the robot.
 
         Attributes:
             scale   Power scale for the catch. Range [0,100]. Default 100.
         """
-        self.kick(scale)
+        self._send_command("RELEASE", [scale])
 
     # Utility
     def ping(self):
