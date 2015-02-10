@@ -48,24 +48,20 @@ class Action():
         
         self._send_run(motor_speeds)
   
-    def turn(self, speed):
+    def turn(self, speed):AD
         """Turn the robot with the given power.
 
         Attributes:
             speed   The speed of the turn, range is [-100,100]. Positive values
                     result in clockwise rotation, negative in anticlockwise.
         """
-
-        # Speed must be an integer, otherwise movement may fail
-        speed = int(speed)
-
-        # Motor 3 requires negation due to fitting
-        self._send_run([speed, speed, -speed])
+        self._send_run([int(speed), int(speed), int(speed)])
   
     def stop(self):
         """Stops the robot's movement by setting all motors to zero.
         """
-        self._send_run([0,0,0])
+        motor_speeds = [ int(0), int(0), int(0) ]
+        self._send_run(motor_speeds)
   
     def kick(self, scale=100):
         """Sends the kick command to the robot. Performs no checking of the 
