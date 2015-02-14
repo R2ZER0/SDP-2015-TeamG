@@ -3,6 +3,24 @@ from planning.models import Robot
 from Polygon import *
 from Polygon.Utils import pointList
 
+'''
+Utilities contains various convenience functions utilised throughout the
+planning module.
+
+Attributes:
+    DISTANCE_MATCH_THRESHOLD    Generic distance threshold allowance for considering an object
+                                being equal to a position.
+    ANGLE_MATCH_THRESHOLD       Generic angle threshold allowance before we consider the object
+                                matching an angle.
+    BALL_ANGLE_THRESHOLD        Angle threshold for more careful tasks; e.g catching a ball
+
+    MAX_DISPLACEMENT_SPEED      Our maximum power to move at
+    MAX_ANGLE_SPEED             Our maximum turning speed
+
+    BALL_VELOCITY               Used by strategies as a lower threshold on when to consider the
+                                ball moving.
+'''
+
 DISTANCE_MATCH_THRESHOLD = 15
 ANGLE_MATCH_THRESHOLD = pi/10
 BALL_ANGLE_THRESHOLD = pi/20
@@ -12,21 +30,44 @@ BALL_VELOCITY = 3
 
 
 def is_shot_blocked(world, our_robot, their_robot):
+    '''Convenience function for checking if one robot's shot is blocked
+    by another.
+
+    Attributes:
+        world       The world state to retrieve positions from
+        our_robot   The Robot model representing our robot
+        their_robot The Robot model we wish to check is blocking
+
+    Returns:
+        True, if the shot is blocked by their Robot, False otherwise.
     '''
-    Checks if our robot could shoot past their robot
-    '''
+
+    # Check for the ball being intersected by their robot
     predicted_y = predict_y_intersection(
         world, their_robot.x, our_robot, full_width=True, bounce=True)
+    
+    # If direct intersection, return True
     if predicted_y is None:
         return True
+    
     print '##########', predicted_y, their_robot.y, their_robot.length
     print abs(predicted_y - their_robot.y) < their_robot.length
+    
+    # Check if their robot is wide enough to overlap with the predicted
+    # y intersection
     return abs(predicted_y - their_robot.y) < their_robot.length
 
-
 def is_attacker_shot_blocked(world, our_attacker, their_defender):
-    '''
-    Checks if our attacker would score if it would immediately turn and shoot.
+    '''Check if our is blocked by the other robot by considering if 
+    the given robot is parallel to us within some threshold.
+
+    Attributes:
+        world           The world state to retrieve positions from
+        our_attacker    Our robot to check
+        their_defender  Their robot to check parallel state.
+
+    Returns:
+        True if the other robot is parallel to us within 40px threshold.
     '''
 
     # Acceptable distance that the opponent defender can be relative to our
@@ -39,6 +80,21 @@ def is_attacker_shot_blocked(world, our_attacker, their_defender):
 
 
 def can_score(world, our_robot, their_goal, turn=0):
+    '''Determines if our robot is facing, or would be if it turned the given
+    amount, the opponent's goal ready to score.
+
+    Attributes:
+        world       The world state
+        our_robot   The robot we're checking facing direction for
+        their_goal  The goal we wish to shoot into
+        turn        [Default: 0], an optional turning offset that allows checking if we
+                    could score if we turned the given amount.
+
+    Returns:
+        True if the ball kicked from our facing direction, with turn offset if given,
+        would result in the ball reaching the goal.
+    '''
+
     # Offset the robot angle if need be
     robot_angle = our_robot.angle + turn
     goal_zone_poly = world.pitch.zones[their_goal.zone][0]
@@ -58,24 +114,50 @@ def can_score(world, our_robot, their_goal, turn=0):
     return goal_posts[0][1] < predicted_y < goal_posts[1][1]
 
 def predict_y_intersection(world, predict_for_x, robot, full_width=False, bounce=False):
+        '''Calculates where the ball will be placed once it reaches the given x-coordinate
+        if it were to be kicked by the robot passed in. Supports calculating the ball
+        position even if it were bounced off the wall of the pitch.
+
+        Attributes:
+            world           The world model
+            predict_for_x   Which x-coordinate to extrapolate the ball's y value for
+            robot           The robot to judge the kicking angle from
+            full_width      [Default: False]. If True, uses the full width of the pitch as
+                            the upper and lower y-values for bounce tests, calculated based on
+                            croppings of the pitch.
+            bounce          [Default: False]. If True, determines if the ball will bounce off the
+                            top/bottom of the Pitch before reaching x-position, and adjust for this.
+
+        Returns:
+            None if the robot is facing the wrong direction for the given x-position, or the predicted
+            y position of the ball if successful.
         '''
-        Predicts the (x, y) coordinates of the ball shot by the robot
-        Corrects them if it's out of the bottom_y - top_y range.
-        If bounce is set to True, predicts for a bounced shot
-        Returns None if the robot is facing the wrong direction.
-        '''
+
         x = robot.x
         y = robot.y
-        top_y = world._pitch.height - 60 if full_width else world.our_goal.y + (world.our_goal.width/2) - 30
-        bottom_y = 60 if full_width else world.our_goal.y - (world.our_goal.width/2) + 30
         angle = robot.angle
+
+        # Calculate extremes of the pitch using fixed offset if full_width is True, otherwise, use our goal
+        # coordinates as a relative point
+        top_y = world._pitch.height - 60 if full_width else world.our_goal.y + (world.our_goal.width/2) - 30
+        bottom_y = 60 if ful_width else world.our_goal.y - (world.our_goal.width/2) + 30
+
+        # Only predict if the robot is facing the correct location to the predicted x position
         if (robot.x < predict_for_x and not (pi/2 < angle < 3*pi/2)) or (robot.x > predict_for_x and (3*pi/2 > angle > pi/2)):
+
             if bounce:
+
+                # Check if the change in y given the x displacement would bring us outside of the pitch, indicating
+                # a bounce
                 if not (0 <= (y + tan(angle) * (predict_for_x - x)) <= world._pitch.height):
+
                     bounce_pos = 'top' if (y + tan(angle) * (predict_for_x - x)) > world._pitch.height else 'bottom'
+                    
                     x += (world._pitch.height - y) / tan(angle) if bounce_pos == 'top' else (0 - y) / tan(angle)
                     y = world._pitch.height if bounce_pos == 'top' else 0
+                    
                     angle = (-angle) % (2*pi)
+
             predicted_y = (y + tan(angle) * (predict_for_x - x))
             # Correcting the y coordinate to the closest y coordinate on the goal line:
             if predicted_y > top_y:
@@ -86,31 +168,31 @@ def predict_y_intersection(world, predict_for_x, robot, full_width=False, bounce
         else:
             return None
 
-
-def grab_ball():
-    return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 1, 'speed': 1000}
-
-
-def kick_ball():
-    return {'left_motor': 0, 'right_motor': 0, 'kicker': 1, 'catcher': 0, 'speed': 1000}
-
-
-def open_catcher():
-    return {'left_motor': 0, 'right_motor': 0, 'kicker': 1, 'catcher': 0, 'speed': 1000}
-
-
-def turn_shoot(orientation):
-    return {'turn_90': orientation, 'left_motor': 0, 'right_motor': 0, 'kicker': 1, 'catcher': 0, 'speed': 1000}
-
-
 def has_matched(robot, x=None, y=None, angle=None,
                 angle_threshold=ANGLE_MATCH_THRESHOLD, distance_threshold=DISTANCE_MATCH_THRESHOLD):
+    '''Convenience function; checks if the given Robot is at the provided x,y position and/or angle
+    to within the defined thresholds.
+
+    Attributes:
+        robot               The Robot to check accuracy of
+        x                   The x-position to test, None if testing angle only
+        y                   The y-position to test, None if testing angle only
+        angle               The angle to test, None if testing position only
+        angle_threshold     Threshold under which angle will be considered equal, [Default: ANGLE_MATCH_THRESHOLD]
+        distance_threshold  Threshold under which distance will be considered equal, [Default: DISTANCE_MATCH_THRESHOLD]
+
+    Returns:
+        True if the Robot has matched the desired thresholds to angle and distance.
+    '''
     dist_matched = True
     angle_matched = True
+    
     if not(x is None and y is None):
         dist_matched = hypot(robot.x - x, robot.y - y) < distance_threshold
+    
     if not(angle is None):
         angle_matched = abs(angle) < angle_threshold
+    
     return dist_matched and angle_matched
 
 #2015
@@ -174,7 +256,6 @@ def choose_attacker_destination(world):
 
     return (None,None)
 
-
 def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False):
     '''
     Simplistic view of calculating the speed: no modes or trying to be careful
@@ -212,8 +293,3 @@ def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False
 
         else:
             return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0, 'speed': general_speed}
-
-
-
-def do_nothing():
-    return calculate_motor_speed(0, 0)
