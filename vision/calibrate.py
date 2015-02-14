@@ -42,9 +42,8 @@ class Configure(object):
                 '''
                 Initialises the Configure GUI for the supplied parameters.
 
-                Atributes:
-                        pitch   The number of the pitch to calibrate croppings for.
-                                0 indicates the main pitch, 1 the side pitch.
+                :param pitch: The number of the pitch to calibrate croppings for. \
+                        0 indicates the main pitch, 1 the side pitch.
                 '''
                 self.pitch = pitch
 
@@ -73,9 +72,8 @@ class Configure(object):
                 Run constructs a new OpenCV window, displays the frame for cropping and
                 begins the routine of the program asking for user input.
 
-                Attributes:
-                        camera  True indicates using the camera feed, False will use a 
-                                image entitled '00000001.jpg' instead.
+                :param camera: True indicates using the camera feed, False will use a \
+                        image entitled '00000001.jpg' instead.
                 '''
                 frame = cv2.namedWindow(FRAME_NAME)
 
@@ -137,8 +135,7 @@ class Configure(object):
                 '''
                 Draws a series of points as a polygon onto our frame.
 
-                Attributes:
-                        points  A series of polygon points
+                :param points: A series of polygon points
                 '''
                 cv2.polylines(self.image, [points], True, self.color)
                 cv2.imshow(FRAME_NAME, self.image)
@@ -148,9 +145,8 @@ class Configure(object):
                 Initialises the request for positions of a new zone. Assigns the zone's
                 key as the new drawing index and begins tracking points. 
 
-                Attributes:
-                        key     The area's key: ['outline', 'Zone_0', 'Zone_1', 'Zone_2', 'Zone_3']
-                        message The message to prompt the user
+                :param key: The area's key: ['outline', 'Zone_0', 'Zone_1', 'Zone_2', 'Zone_3']
+                :param message: The message to prompt the user
                 '''
                 print '%s. %s' % (message, "Continue by pressing q")
                 self.drawing = key

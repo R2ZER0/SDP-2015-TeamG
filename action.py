@@ -2,7 +2,6 @@
 import math
 import motor_calibration
 
-
 class Action():
     '''Provides an interface between desired movement and the Robot. Accepts
     a communication object to write to.
@@ -23,8 +22,7 @@ class Action():
     def __init__(self, comm):
         '''Initialises an Action instance with the given communication object.
 
-        Attributes:
-            comm    A pySerial serial object for communication
+        :param comm: A pySerial serial object for communication
         '''
         self.comm = comm
     
@@ -33,10 +31,9 @@ class Action():
     def move(self, angle, scale):
         """Moves the robot in the given angle with given scale as power value.
 
-        Attributes:
-            angle   The direction of movement, in radians, relative to x-axis 
-                    of robot
-            scale   Power-scale for this movement, range: -1 to 1
+        :param angle: The direction of movement, in radians, relative to x-axis \
+                of robot
+        :param scale: Power-scale for this movement, range: -1 to 1
         """
 
         motor_speeds = [ Action._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
@@ -51,8 +48,7 @@ class Action():
     def turn(self, speed):AD
         """Turn the robot with the given power.
 
-        Attributes:
-            speed   The speed of the turn, range is [-100,100]. Positive values
+        :param speed: The speed of the turn, range is [-100,100]. Positive values \
                     result in clockwise rotation, negative in anticlockwise.
         """
         self._send_run([int(speed), int(speed), int(speed)])
@@ -67,8 +63,7 @@ class Action():
         """Sends the kick command to the robot. Performs no checking of the 
         kicker's state prior to kicking.
 
-        Attributes:
-            scale   Power scale for this kick. Range [0,100]. Default 100.
+        :param scale: Power scale for this kick. Range [0,100]. Default 100.
         """
         # Note, scale must be in list form
         self._send_command("KICK",[scale])
@@ -77,16 +72,14 @@ class Action():
         """Sends the catch command to the robot. Performns no checking of the 
         catcher's position prior to catching.
 
-        Attributes:
-            scale   Power scale for this catch. Range [0,100]. Default 100.
+        :param scale: Power scale for this catch. Range [0,100]. Default 100.
         """
         self._send_command("CATCH",[scale])
 
     def open_catcher(self, scale=100):
         """Sends the command to open the catcher to the robot.
 
-        Attributes:
-            scale   Power scale for the catch. Range [0,100]. Default 100.
+        :param scale: Power scale for the catch. Range [0,100]. Default 100.
         """
         self._send_command("RELEASE", [scale])
 
@@ -103,8 +96,7 @@ class Action():
     def _send_run(self, speeds):
         """Convenience function for sending the given motor speeds to the Robot.
 
-        Attributes:
-            speeds  A list of motor speeds for each motor. Range [-100,100].
+        :param speeds: A list of motor speeds for each motor. Range [-100,100].
         """
         self._send_command("RUN", speeds)
 
@@ -118,8 +110,7 @@ class Action():
     def _percentage_speed(speed):
         """Constrains speed to be within the range [-100,100].
 
-        Attributes:
-            speed   A speed in the range [-1,1]
+        :param speed: A speed in the range [-1,1]
         """
         speed = int(round(100.0 * speed))
         speed = max(-100, min(speed, 100))
@@ -138,9 +129,8 @@ class Action():
         """Constructs a suitable syntax command string for sending the given
         command to the Robot with supplied arguments.
 
-        Attributes:
-            command     A command string
-            args        None, single argument, multiple argument, or a list.
+        :param command: A command string
+        :param args: None, single argument, multiple argument, or a list.
         """
         commstr = str(command)
         
@@ -154,9 +144,8 @@ class Action():
     def _send_command(self, command, *args):
         """Sends the given command to the robot, with arguments.
 
-        Attributes:
-            command     A command string
-            args        None, single argument, multiple argument, or a list.
+        :param command: A command string
+        :param args: None, single argument, multiple argument, or a list.
         """
         commstr = Action._get_command_string(command, args)
 

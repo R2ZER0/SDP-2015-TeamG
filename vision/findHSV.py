@@ -47,8 +47,7 @@ class CalibrationGUI(object):
         Initialises the calibration frame with a new calibration dictionary, to which modifications
         are written as trackbar settings are moved.
 
-        Attributes:
-            calibration     A containing values for each colour, and for each setting.
+        :param calibration: A containing values for each colour, and for each setting.
         '''
 
         self.color = 'plate'
@@ -91,9 +90,8 @@ class CalibrationGUI(object):
         Called whenever a new frame is available, displays the new frame and performs thresholding, displaying 
         the resultant masked image. Also attempts to perform any changes due on the given keypress.
 
-        Attributes:
-            frame   The new image frame to threshold
-            key     A character keypress code 
+        :param frame: The new image frame to threshold
+        :param key: A character keypress code 
         '''
 
         # Escape key is 255. If not, attempt to change colour - will throw an exception if not found in the
@@ -128,11 +126,8 @@ class CalibrationGUI(object):
         Applies the given contrast / blur preprocessing steps to the frame and then thresholds
         using our HSV settings. 
 
-        Attributes:
-            frame   A frame to preprocess and threshold 
-
-        Returns:
-            A masked frame, masked using our settings with preprocessing applied.
+        :param frame: A frame to preprocess and threshold 
+        :returns: A masked frame, masked using our settings with preprocessing applied.
         '''
 
         # Apply basic blur to the image

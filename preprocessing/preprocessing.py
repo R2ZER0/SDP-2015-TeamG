@@ -34,9 +34,8 @@ class Preprocessing(object):
         Accepts a given frame and options and runs the preprocessing steps specified by
         options.
 
-        Attributes:
-            frame   The image to preprocess
-            options A dictionary containing True/False values for each preprocessing task.
+        :param frame: The image to preprocess
+        :param options: A dictionary containing True/False values for each preprocessing task.
         '''
         self.options = options
 
@@ -73,11 +72,8 @@ class Preprocessing(object):
         '''
         Normalises the given frame purely on it's saturation value.
 
-        Attributes:
-            frame   The image frame to normalise 
-
-        Returns:
-            A new frame, with the saturation values normalised and converted
+        :param frame: The image frame to normalise 
+        :returns: A new frame, with the saturation values normalised and converted \
             back to BGR indexing.
         '''
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)

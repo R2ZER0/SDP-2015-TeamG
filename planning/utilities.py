@@ -33,13 +33,10 @@ def is_shot_blocked(world, our_robot, their_robot):
     '''Convenience function for checking if one robot's shot is blocked
     by another.
 
-    Attributes:
-        world       The world state to retrieve positions from
-        our_robot   The Robot model representing our robot
-        their_robot The Robot model we wish to check is blocking
-
-    Returns:
-        True, if the shot is blocked by their Robot, False otherwise.
+    :param world: The world state to retrieve positions from
+    :param our_robot: The Robot model representing our robot
+    :param their_robot: The Robot model we wish to check is blocking
+    :returns: True, if the shot is blocked by their Robot, False otherwise.
     '''
 
     # Check for the ball being intersected by their robot
@@ -61,13 +58,10 @@ def is_attacker_shot_blocked(world, our_attacker, their_defender):
     '''Check if our is blocked by the other robot by considering if 
     the given robot is parallel to us within some threshold.
 
-    Attributes:
-        world           The world state to retrieve positions from
-        our_attacker    Our robot to check
-        their_defender  Their robot to check parallel state.
-
-    Returns:
-        True if the other robot is parallel to us within 40px threshold.
+    :param world: The world state to retrieve positions from
+    :param our_attacker: Our robot to check
+    :param their_defender: Their robot to check parallel state.
+    :returns: True if the other robot is parallel to us within 40px threshold.
     '''
 
     # Acceptable distance that the opponent defender can be relative to our
@@ -83,15 +77,13 @@ def can_score(world, our_robot, their_goal, turn=0):
     '''Determines if our robot is facing, or would be if it turned the given
     amount, the opponent's goal ready to score.
 
-    Attributes:
-        world       The world state
-        our_robot   The robot we're checking facing direction for
-        their_goal  The goal we wish to shoot into
-        turn        [Default: 0], an optional turning offset that allows checking if we
+    :param world: The world state
+    :param our_robot: The robot we're checking facing direction for
+    :param their_goal: The goal we wish to shoot into
+    :param turn: [Default: 0], an optional turning offset that allows checking if we \
                     could score if we turned the given amount.
 
-    Returns:
-        True if the ball kicked from our facing direction, with turn offset if given,
+    :returns: True if the ball kicked from our facing direction, with turn offset if given,
         would result in the ball reaching the goal.
     '''
 
@@ -118,18 +110,16 @@ def predict_y_intersection(world, predict_for_x, robot, full_width=False, bounce
         if it were to be kicked by the robot passed in. Supports calculating the ball
         position even if it were bounced off the wall of the pitch.
 
-        Attributes:
-            world           The world model
-            predict_for_x   Which x-coordinate to extrapolate the ball's y value for
-            robot           The robot to judge the kicking angle from
-            full_width      [Default: False]. If True, uses the full width of the pitch as
-                            the upper and lower y-values for bounce tests, calculated based on
+        :param world: The world model
+        :param predict_for_x: Which x-coordinate to extrapolate the ball's y value for
+        :param robot: The robot to judge the kicking angle from
+        :param full_width: [Default: False]. If True, uses the full width of the pitch as \
+                            the upper and lower y-values for bounce tests, calculated based on \
                             croppings of the pitch.
-            bounce          [Default: False]. If True, determines if the ball will bounce off the
+        :param bounce: [Default: False]. If True, determines if the ball will bounce off the \
                             top/bottom of the Pitch before reaching x-position, and adjust for this.
 
-        Returns:
-            None if the robot is facing the wrong direction for the given x-position, or the predicted
+        :returns: None if the robot is facing the wrong direction for the given x-position, or the predicted \
             y position of the ball if successful.
         '''
 
@@ -173,16 +163,14 @@ def has_matched(robot, x=None, y=None, angle=None,
     '''Convenience function; checks if the given Robot is at the provided x,y position and/or angle
     to within the defined thresholds.
 
-    Attributes:
-        robot               The Robot to check accuracy of
-        x                   The x-position to test, None if testing angle only
-        y                   The y-position to test, None if testing angle only
-        angle               The angle to test, None if testing position only
-        angle_threshold     Threshold under which angle will be considered equal, [Default: ANGLE_MATCH_THRESHOLD]
-        distance_threshold  Threshold under which distance will be considered equal, [Default: DISTANCE_MATCH_THRESHOLD]
+    :param robot: The Robot to check accuracy of
+    :param x: The x-position to test, None if testing angle only
+    :param y: The y-position to test, None if testing angle only
+    :param angle: The angle to test, None if testing position only
+    :param angle_threshold: Threshold under which angle will be considered equal, [Default: ANGLE_MATCH_THRESHOLD]
+    :param distance_threshold: Threshold under which distance will be considered equal, [Default: DISTANCE_MATCH_THRESHOLD]
 
-    Returns:
-        True if the Robot has matched the desired thresholds to angle and distance.
+    :returns: True if the Robot has matched the desired thresholds to angle and distance.
     '''
     dist_matched = True
     angle_matched = True

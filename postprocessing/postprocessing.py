@@ -26,11 +26,8 @@ class Postprocessing(object):
         This method analyzes current positions and collects them into a dictionary
         before returning them.
 
-        Attributes:
-            vector_dict     An old dictionary containing vectors for each PitchObject
-
-        Returns:
-            A new vector dictionary containing analysed data for this frame.
+        :param vector_dict: An old dictionary containing vectors for each PitchObject
+        :returns: A new vector dictionary containing analysed data for this frame.
         '''
 
         # Increase our time for each analyze call
@@ -49,11 +46,8 @@ class Postprocessing(object):
         Calculates the new angle and velocity of the ball using a simple time calculation and
         change in direction from the previous info dictionary.
 
-        Attributes:
-            info    The previous postprocessing dictionary for the ball
-
-        Returns:
-            A new vector dictionary containing x,y,angle,velocity for the ball.
+        :param info: The previous postprocessing dictionary for the ball
+        :returns: A new vector dictionary containing x,y,angle,velocity for the ball.
         '''
         if not(info['x'] is None) and not (info['y'] is None):
             
@@ -77,9 +71,8 @@ class Postprocessing(object):
         '''
         Calculates the angle and velocity of a robot given the new frame and the change in time.
 
-        Attributes:
-            key     A robot key: ['our_attacker', 'their_attacker', 'our_defender', 'their_defender']
-            info    The previous vector dictionary for this robot.
+        :param key: A robot key: ['our_attacker', 'their_attacker', 'our_defender', 'their_defender']
+        :param info: The previous vector dictionary for this robot.
         '''
         if not(info['x'] is None) and not(info['y'] is None) and not(info['angle'] is None):
 

@@ -5,18 +5,14 @@ def get_boundary_path(robot, (x, y, displacement, theta), zone):
     '''Finds the first point inside the given zone that the movement pattern
     specified would result in.
 
-    Attributes:
-        robot   The Robot model to extend movement from
-        vector  A tuple containing:
-            x               Starting x-position of movement
-            y               Starting y-position of movement
-            displacement    Distance to travel each iteration
-            theta           The direction to move in
-        zone    The zone to stop movement in
-
-    Returns:
-        A tuple containing x,y positions of new point, distance between original
-        and destination point, and the angle of movement.
+    :param robot: Robot model to extend movement from
+    :param x: Starting x-position of movement
+    :param y: Starting y-position of movement
+    :param displacement: Distance to travel each iteration
+    :param theta: The direction to move in
+    :param zone: The zone to stop movement in
+    :returns: Tuple containing (x,y) positions of new point, distance between original
+            and destination point, and angle of movement.
     '''
     while not zone.isInside(x, y):
         # Simulate a movement 'step' of displacement magnitude
@@ -33,14 +29,10 @@ def get_path_to_point(robot, x, y):
     '''Retrieves a tuple indicating distance and angle between the robot and
     the given x,y point.
 
-    Attributes:
-        robot   The Robot model as the origin point
-        x       The destination x-position
-        y       The destination y-position
-
-    Returns:
-        A 'path' point including target x,y, distance to point, and direction to
-        travel. 
+    :param robot: The Robot model as the origin point
+    :param x: The destination x-position
+    :param y: The destination y-position
+    :returns: A 'path' point including target x,y, distance to point, and direction to travel. 
     '''
     delta_x = x - robot.x
     delta_y = y - robot.y
@@ -56,16 +48,10 @@ def get_interception(path, robot):
     '''Retrieves the travel direction and distance for the robot to intercept 
     the given path of the ball.
 
-    Attributes:
-        path    A path object for the ball, returned from models.py, in
-                Robot:get_pass_path function
-        robot   The Robot model
-
-    Returns:
-        A path tuple containing distance and direction to travel to intercept
-        the ball path.
+    :param path: A path object for the ball, returned from models.py, in :func:`planning.models.Robot.get_pass_path` function
+    :param robot: The Robot model
+    :returns: A path tuple containing distance and direction to travel to intercept the ball path.
     '''
-
     center_path = path.center()
     return get_path_to_point(robot, center_path[0], center_path[1])
 
@@ -74,19 +60,12 @@ def get_avoidance(path, robot, obstacle):
     '''Detects if the proposed path intersects with the obstacle and calculates
     a nearby non-colliding position if it does.
 
-    Attributes:
-        path        A path object for the proposed movement, returned from 
-                    models.py, in Robot:get_pass_path function
-        robot       The robot model moving to the ball
-        obstacle    Another PitchObject to avoid
+    :param path: A path object for the proposed movement, returned from models.py, in Robot:get_pass_path function
+    :param robot: The robot model moving to the ball
+    :param obstacle: Another PitchObject to avoid
 
-    Returns:
-        None        If the given obstacle doesn't interfere with the path
-
-        or
-
-        Path tuple containing new position, distance, and direction to travel
-        to to avoid the obstacle.
+    :returns: None, if the given obstacle doesn't interfere with the path, or Path tuple containing new position, \
+        distance, and direction to travel to avoid the obstacle.
     '''
     if path.overlaps(obstacle):
 
