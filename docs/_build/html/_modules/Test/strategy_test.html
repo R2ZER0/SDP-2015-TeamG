@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Test.strategy_test &mdash; SDP  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SDP  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> SDP</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SDP</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>Test.strategy_test</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for Test.strategy_test</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">planning.models</span> <span class="kn">import</span> <span class="n">World</span><span class="p">,</span> <span class="n">Robot</span>
+<span class="kn">from</span> <span class="nn">planning.strategies</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">planning</span> <span class="kn">import</span> <span class="n">utilities</span>
+
+
+<div class="viewcode-block" id="StrategyTestCase"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.StrategyTestCase">[docs]</a><span class="k">class</span> <span class="nc">StrategyTestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StrategyTestCase.place_robot"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.StrategyTestCase.place_robot">[docs]</a>    <span class="k">def</span> <span class="nf">place_robot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">robot</span><span class="p">):</span>
+        <span class="n">world</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="n">robot</span>
+</div>
+<div class="viewcode-block" id="StrategyTestCase.get_aimed_robot"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.StrategyTestCase.get_aimed_robot">[docs]</a>    <span class="k">def</span> <span class="nf">get_aimed_robot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle_x</span><span class="p">,</span> <span class="n">angle_y</span><span class="p">,</span> <span class="n">zone</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a new Robot object pointing to x, y</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">get_rotation_to_point</span><span class="p">(</span><span class="n">angle_x</span><span class="p">,</span> <span class="n">angle_y</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="k">if</span> <span class="n">theta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="n">theta</span>
+        <span class="k">return</span> <span class="n">Robot</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span>
+
+
+</div></div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase">[docs]</a><span class="k">class</span> <span class="nc">AttackerScoreDynamicTestCase</span><span class="p">(</span><span class="n">StrategyTestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.setUp"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span> <span class="o">=</span> <span class="n">AttackerScoreDynamic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">world_right</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="s">&#39;right&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strategy_right</span> <span class="o">=</span> <span class="n">AttackerScoreDynamic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_right</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_strategy_initializes"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_strategy_initializes">[docs]</a>    <span class="k">def</span> <span class="nf">test_strategy_initializes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="p">)</span>
+
+    <span class="c"># Test getting the position to which we need to move before we start confusing them</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_getting_shooting_coordinates_left"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_getting_shooting_coordinates_left">[docs]</a>    <span class="k">def</span> <span class="nf">test_getting_shooting_coordinates_left</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_shooting_coordinates</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">expected_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">zones</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">expected_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">SHOOTING_X_OFFSET</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_y</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_getting_shooting_coordinates_right"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_getting_shooting_coordinates_right">[docs]</a>    <span class="k">def</span> <span class="nf">test_getting_shooting_coordinates_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_right</span><span class="o">.</span><span class="n">our_attacker</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_right</span><span class="o">.</span><span class="n">_get_shooting_coordinates</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">expected_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_right</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">zones</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">expected_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_right</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_right</span><span class="o">.</span><span class="n">SHOOTING_X_OFFSET</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_y</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="c"># Test finding corners of the goal.</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_get_goal_corner_y_UP"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_get_goal_corner_y_UP">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_goal_corner_y_UP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_goal_corner_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">UP</span><span class="p">)</span>
+        <span class="n">expected_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_goal</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_goal</span><span class="o">.</span><span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_y</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_get_goal_corner_y_DOWN"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_get_goal_corner_y_DOWN">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_goal_corner_y_DOWN</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_goal_corner_y</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">DOWN</span><span class="p">)</span>
+        <span class="n">expected_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_goal</span><span class="o">.</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_y</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="c"># Test selecting which side to confuse to</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_get_fake_shoot_side_DOWN"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_get_fake_shoot_side_DOWN">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_fake_shoot_side_DOWN</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_fake_shoot_side</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+        <span class="n">expected_side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">DOWN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_side</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_get_fake_shoot_side_UP"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_get_fake_shoot_side_UP">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_fake_shoot_side_UP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_fake_shoot_side</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+        <span class="n">expected_side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">UP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_side</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_get_fake_shoot_side_middle"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_get_fake_shoot_side_middle">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_fake_shoot_side_middle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">middle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">middle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_fake_shoot_side</span><span class="p">(</span><span class="n">robot</span><span class="p">)</span>
+        <span class="n">expected_side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">UP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_side</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+
+    <span class="c"># Test getting the other side to aim to in CONFUSE 2</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_getting_other_side_up"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_getting_other_side_up">[docs]</a>    <span class="k">def</span> <span class="nf">test_getting_other_side_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_other_side</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">UP</span><span class="p">)</span>
+        <span class="n">expected_side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">DOWN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_side</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_getting_other_side_down"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_getting_other_side_down">[docs]</a>    <span class="k">def</span> <span class="nf">test_getting_other_side_down</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_other_side</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">DOWN</span><span class="p">)</span>
+        <span class="n">expected_side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">UP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_side</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
+
+    <span class="c"># Test states</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_initially_moving_to_middle"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_initially_moving_to_middle">[docs]</a>    <span class="k">def</span> <span class="nf">test_initially_moving_to_middle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">zone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">zones</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_shooting_coordinates</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">zone</span><span class="p">:</span>
+            <span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_aimed_robot</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">)</span>
+            <span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">place_robot</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">robot</span><span class="p">)</span>
+
+            <span class="n">strategy</span> <span class="o">=</span> <span class="n">AttackerScoreDynamic</span><span class="p">(</span><span class="n">world</span><span class="p">)</span>
+
+            <span class="n">actions</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+            <span class="n">left_motor</span> <span class="o">=</span> <span class="n">actions</span><span class="p">[</span><span class="s">&#39;left_motor&#39;</span><span class="p">]</span>
+            <span class="n">right_motor</span> <span class="o">=</span> <span class="n">actions</span><span class="p">[</span><span class="s">&#39;right_motor&#39;</span><span class="p">]</span>
+
+            <span class="c"># Both left motor and right motor should be positive or negative.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">left_motor</span> <span class="o">*</span> <span class="n">right_motor</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_reach_middle"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_reach_middle">[docs]</a>    <span class="k">def</span> <span class="nf">test_reach_middle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_shooting_coordinates</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">)</span>
+
+        <span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_aimed_robot</span><span class="p">(</span>
+            <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span><span class="p">,</span> <span class="n">target_x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">target_y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">place_robot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">AttackerScoreDynamic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">)</span>
+
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">strategy</span><span class="o">.</span><span class="n">POSITION</span><span class="p">,</span> <span class="n">strategy</span><span class="o">.</span><span class="n">current_state</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_reach_middle_within_threshold"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_reach_middle_within_threshold">[docs]</a>    <span class="k">def</span> <span class="nf">test_reach_middle_within_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_shooting_coordinates</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">)</span>
+
+        <span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_aimed_robot</span><span class="p">(</span>
+            <span class="n">target_x</span> <span class="o">-</span> <span class="n">utilities</span><span class="o">.</span><span class="n">DISTANCE_MATCH_THRESHOLD</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">target_y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">place_robot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">robot</span><span class="p">)</span>
+
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">AttackerScoreDynamic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">)</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">strategy</span><span class="o">.</span><span class="n">POSITION</span><span class="p">,</span> <span class="n">strategy</span><span class="o">.</span><span class="n">current_state</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_progress_to_target"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_progress_to_target">[docs]</a>    <span class="k">def</span> <span class="nf">test_progress_to_target</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Approach the target in steps of 10 and verify that the state changes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">_get_shooting_coordinates</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">)</span>
+
+        <span class="n">expected_iterations</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">target_x</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">60</span>
+
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
+            <span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_aimed_robot</span><span class="p">(</span>
+                <span class="n">x</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="n">target_y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">place_robot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">robot</span><span class="p">)</span>
+
+            <span class="n">strategy</span> <span class="o">=</span> <span class="n">AttackerScoreDynamic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">)</span>
+            <span class="n">actions</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">strategy</span><span class="o">.</span><span class="n">current_state</span> <span class="o">==</span> <span class="n">strategy</span><span class="o">.</span><span class="n">POSITION</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected_iterations</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AttackerScoreDynamicTestCase.test_confuse1_rotation_up"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_confuse1_rotation_up">[docs]</a>    <span class="k">def</span> <span class="nf">test_confuse1_rotation_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">shooting_pos</span>
+
+        <span class="n">aim_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_goal</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">aim_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_goal</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_goal</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">GOAL_CORNER_OFFSET</span>
+
+        <span class="n">attacker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_aimed_robot</span><span class="p">(</span>
+            <span class="n">target_x</span><span class="p">,</span> <span class="n">target_y</span><span class="p">,</span> <span class="n">aim_x</span><span class="p">,</span> <span class="n">aim_y</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">)</span>
+
+        <span class="n">defender</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_aimed_robot</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_goal</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_goal</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">aim_x</span><span class="p">,</span> <span class="n">aim_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="o">.</span><span class="n">their_defender</span><span class="o">.</span><span class="n">zone</span><span class="p">)</span>
+
+        <span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">place_robot</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">attacker</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">attacker</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">place_robot</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">defender</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">defender</span><span class="p">)</span>
+
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">AttackerScoreDynamic</span><span class="p">(</span><span class="n">world</span><span class="p">)</span>
+
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">actions</span><span class="p">[</span><span class="s">&#39;left_motor&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">actions</span><span class="p">[</span><span class="s">&#39;right_motor&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="DefaultDefenderDefenceTestCase"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.DefaultDefenderDefenceTestCase">[docs]</a><span class="k">class</span> <span class="nc">DefaultDefenderDefenceTestCase</span><span class="p">(</span><span class="n">StrategyTestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DefaultDefenderDefenceTestCase.setUp"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.DefaultDefenderDefenceTestCase.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">world_left</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="s">&#39;left&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span> <span class="o">=</span> <span class="n">DefaultDefenderDefence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DefaultDefenderDefenceTestCase.test_initializes_properly"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.DefaultDefenderDefenceTestCase.test_initializes_properly">[docs]</a>    <span class="k">def</span> <span class="nf">test_initializes_properly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DefaultDefenderDefenceTestCase.test_default_action_generated"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.DefaultDefenderDefenceTestCase.test_default_action_generated">[docs]</a>    <span class="k">def</span> <span class="nf">test_default_action_generated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strategy_left</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">actions</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DefaultDefenderDefenceTestCase.test_defend_goal_action_generated"><a class="viewcode-back" href="../../Test.html#Test.strategy_test.DefaultDefenderDefenceTestCase.test_defend_goal_action_generated">[docs]</a>    <span class="k">def</span> <span class="nf">test_defend_goal_action_generated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">DefaultDefenderDefence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world_left</span><span class="p">)</span>
+        <span class="n">strategy</span><span class="o">.</span><span class="n">current_state</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">ALIGNED</span>
+
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">actions</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div></div></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

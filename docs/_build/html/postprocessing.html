@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Postprocessing &mdash; SDP  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SDP  documentation" href="index.html"/>
+        <link rel="next" title="Preprocessing" href="preprocessing.html"/>
+        <link rel="prev" title="Planning" href="planning.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> SDP</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="controller.html">Controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vision.html">Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.calibrate">Calibrate Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.colors">Colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.findHSV">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tracker">Trackers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.vision">Vision GUI</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">SDP</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Postprocessing</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/postprocessing.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="module-postprocessing.postprocessing">
+<span id="postprocessing"></span><h1>Postprocessing<a class="headerlink" href="#module-postprocessing.postprocessing" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="postprocessing.postprocessing.Postprocessing">
+<em class="property">class </em><tt class="descclassname">postprocessing.postprocessing.</tt><tt class="descname">Postprocessing</tt><a class="reference internal" href="_modules/postprocessing/postprocessing.html#Postprocessing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#postprocessing.postprocessing.Postprocessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Postprocessing performs analysis of the PitchObjects after the vision module
+has performed it&#8217;s locating. This generally calculates angle and velocity
+measurements.</p>
+<dl class="method">
+<dt id="postprocessing.postprocessing.Postprocessing.analyze">
+<tt class="descname">analyze</tt><big>(</big><em>vector_dict</em><big>)</big><a class="reference internal" href="_modules/postprocessing/postprocessing.html#Postprocessing.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#postprocessing.postprocessing.Postprocessing.analyze" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method analyzes current positions and collects them into a dictionary
+before returning them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vector_dict</strong> &#8211; An old dictionary containing vectors for each PitchObject</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A new vector dictionary containing analysed data for this frame.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="postprocessing.postprocessing.Postprocessing.analyze_ball">
+<tt class="descname">analyze_ball</tt><big>(</big><em>info</em><big>)</big><a class="reference internal" href="_modules/postprocessing/postprocessing.html#Postprocessing.analyze_ball"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#postprocessing.postprocessing.Postprocessing.analyze_ball" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the new angle and velocity of the ball using a simple time calculation and
+change in direction from the previous info dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>info</strong> &#8211; The previous postprocessing dictionary for the ball</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A new vector dictionary containing x,y,angle,velocity for the ball.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="postprocessing.postprocessing.Postprocessing.analyze_robot">
+<tt class="descname">analyze_robot</tt><big>(</big><em>key</em>, <em>info</em><big>)</big><a class="reference internal" href="_modules/postprocessing/postprocessing.html#Postprocessing.analyze_robot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#postprocessing.postprocessing.Postprocessing.analyze_robot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the angle and velocity of a robot given the new frame and the change in time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> &#8211; A robot key: [&#8216;our_attacker&#8217;, &#8216;their_attacker&#8217;, &#8216;our_defender&#8217;, &#8216;their_defender&#8217;]</li>
+<li><strong>info</strong> &#8211; The previous vector dictionary for this robot.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="preprocessing.html" class="btn btn-neutral float-right" title="Preprocessing"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="planning.html" class="btn btn-neutral" title="Planning"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

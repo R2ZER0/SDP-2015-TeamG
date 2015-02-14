@@ -1,0 +1,696 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vision.vision &mdash; SDP  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SDP  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> SDP</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SDP</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>vision.vision</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for vision.vision</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">tools</span>
+<span class="kn">from</span> <span class="nn">tracker</span> <span class="kn">import</span> <span class="n">BallTracker</span><span class="p">,</span> <span class="n">RobotTracker</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Queue</span>
+<span class="kn">from</span> <span class="nn">colors</span> <span class="kn">import</span> <span class="n">BGR_COMMON</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">findHSV</span> <span class="kn">import</span> <span class="n">CalibrationGUI</span>
+
+
+<span class="n">TEAM_COLORS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;yellow&#39;</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">])</span>
+<span class="n">SIDES</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;right&#39;</span><span class="p">]</span>
+<span class="n">PITCHES</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">PROCESSING_DEBUG</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="n">Center</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Center&#39;</span><span class="p">,</span> <span class="s">&#39;x y&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Vision"><a class="viewcode-back" href="../../vision.html#vision.vision.Vision">[docs]</a><span class="k">class</span> <span class="nc">Vision</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Locate objects on the pitch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">our_side</span><span class="p">,</span> <span class="n">frame_shape</span><span class="p">,</span> <span class="n">frame_center</span><span class="p">,</span> <span class="n">calibration</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the vision system.</span>
+
+<span class="sd">        Params:</span>
+<span class="sd">            [int] pitch         pitch number (0 or 1)</span>
+<span class="sd">            [string] color      color of our robot</span>
+<span class="sd">            [string] our_side   our side</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="n">pitch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">our_side</span> <span class="o">=</span> <span class="n">our_side</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_center</span> <span class="o">=</span> <span class="n">frame_center</span>
+
+        <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">channels</span> <span class="o">=</span> <span class="n">frame_shape</span>
+
+        <span class="c"># Find the zone division</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zones</span> <span class="o">=</span> <span class="n">zones</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_zones</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="n">opponent_color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_opponent_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">our_side</span> <span class="o">==</span> <span class="s">&#39;left&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">us</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">RobotTracker</span><span class="p">(</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">offset</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Our Defender&#39;</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span><span class="p">),</span>   <span class="c"># defender</span>
+                <span class="n">RobotTracker</span><span class="p">(</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">offset</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Our Attacker&#39;</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span><span class="p">)</span>   <span class="c"># attacker</span>
+            <span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">opponents</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">RobotTracker</span><span class="p">(</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">opponent_color</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">offset</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Their Defender&#39;</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span><span class="p">),</span>
+                <span class="n">RobotTracker</span><span class="p">(</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">opponent_color</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">offset</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Their Attacker&#39;</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span><span class="p">)</span>
+
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">us</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">RobotTracker</span><span class="p">(</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">offset</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Our Defender&#39;</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span><span class="p">),</span>
+                <span class="n">RobotTracker</span><span class="p">(</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">offset</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Our Attacker&#39;</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span><span class="p">)</span>
+            <span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">opponents</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">RobotTracker</span><span class="p">(</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">opponent_color</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">offset</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Their Defender&#39;</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span><span class="p">),</span>   <span class="c"># defender</span>
+                <span class="n">RobotTracker</span><span class="p">(</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">opponent_color</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">offset</span><span class="o">=</span><span class="n">zones</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Their Attacker&#39;</span><span class="p">,</span> <span class="n">calibration</span><span class="o">=</span><span class="n">calibration</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="c"># Set up trackers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball_tracker</span> <span class="o">=</span> <span class="n">BallTracker</span><span class="p">(</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">calibration</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_zones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_zones</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pitch</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">_get_opponent_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">our_color</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">TEAM_COLORS</span> <span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="n">our_color</span><span class="p">]))</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Vision.locate"><a class="viewcode-back" href="../../vision.html#vision.vision.Vision.locate">[docs]</a>    <span class="k">def</span> <span class="nf">locate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find objects on the pitch using multiprocessing.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [5-tuple] Location of the robots and the ball</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Run trackers as processes</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_trackers</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="c"># Correct for perspective</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adjusted_positions</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
+
+        <span class="c"># Wrap list of positions into a dictionary</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;our_defender&#39;</span><span class="p">,</span> <span class="s">&#39;our_attacker&#39;</span><span class="p">,</span> <span class="s">&#39;their_defender&#39;</span><span class="p">,</span> <span class="s">&#39;their_attacker&#39;</span><span class="p">,</span> <span class="s">&#39;ball&#39;</span><span class="p">]</span>
+        <span class="n">regular_positions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+            <span class="n">regular_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c"># Error check we got a frame</span>
+        <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">channels</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span> <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">model_positions</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;our_attacker&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_info</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">height</span><span class="p">),</span>
+            <span class="s">&#39;their_attacker&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_info</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">height</span><span class="p">),</span>
+            <span class="s">&#39;our_defender&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_info</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">height</span><span class="p">),</span>
+            <span class="s">&#39;their_defender&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_info</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">height</span><span class="p">),</span>
+            <span class="s">&#39;ball&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_info</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">height</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">model_positions</span><span class="p">,</span> <span class="n">regular_positions</span>
+</div>
+<div class="viewcode-block" id="Vision.get_adjusted_point"><a class="viewcode-back" href="../../vision.html#vision.vision.Vision.get_adjusted_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_adjusted_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a point on the plane, calculate the adjusted point, by taking into account</span>
+<span class="sd">        the height of the robot, the height of the camera and the distance of the point</span>
+<span class="sd">        from the center of the lens.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plane_height</span> <span class="o">=</span> <span class="mf">250.0</span>
+        <span class="n">robot_height</span> <span class="o">=</span> <span class="mf">20.0</span>
+        <span class="n">coefficient</span> <span class="o">=</span> <span class="n">robot_height</span><span class="o">/</span><span class="n">plane_height</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">dist_x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_center</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">dist_y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">delta_x</span> <span class="o">=</span> <span class="n">dist_x</span> <span class="o">*</span> <span class="n">coefficient</span>
+        <span class="n">delta_y</span> <span class="o">=</span> <span class="n">dist_y</span> <span class="o">*</span> <span class="n">coefficient</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">delta_x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">delta_y</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Vision.get_adjusted_positions"><a class="viewcode-back" href="../../vision.html#vision.vision.Vision.get_adjusted_positions">[docs]</a>    <span class="k">def</span> <span class="nf">get_adjusted_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">robot</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                <span class="c"># Adjust each corner of the plate</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;box&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;box&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;box&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adjusted_point</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+                <span class="n">new_direction</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                    <span class="c"># Adjust front line</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adjusted_point</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+                    <span class="c"># Adjust direction line</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;direction&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;direction&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">adj_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adjusted_point</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+                    <span class="n">new_direction</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adj_point</span><span class="p">)</span>
+
+                <span class="c"># Change the namedtuples used for storing direction points</span>
+                <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">Center</span><span class="p">(</span><span class="n">new_direction</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">new_direction</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span>
+                    <span class="n">Center</span><span class="p">(</span><span class="n">new_direction</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">new_direction</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+
+                <span class="c"># Adjust the center point of the plate</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;x&#39;</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;y&#39;</span><span class="p">]</span>
+                <span class="n">new_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_adjusted_point</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+                <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">positions</span><span class="p">[</span><span class="n">robot</span><span class="p">][</span><span class="s">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c"># At least one robot has not been found</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">positions</span>
+</div>
+    <span class="k">def</span> <span class="nf">_run_trackers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run trackers as separate processes</span>
+
+<span class="sd">        Params:</span>
+<span class="sd">            [np.frame] frame        - frame to run trackers on</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [5-tuple] positions     - locations of the robots and the ball</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">queues</span> <span class="o">=</span> <span class="p">[</span><span class="n">Queue</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+        <span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">us</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">us</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">opponents</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">opponents</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_tracker</span><span class="p">]</span>
+
+        <span class="c"># Define processes</span>
+        <span class="n">processes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">find</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">((</span><span class="n">frame</span><span class="p">,</span> <span class="n">queues</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">objects</span><span class="p">)]</span>
+
+        <span class="c"># Start processes</span>
+        <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="c"># Find robots and ball, use queue to</span>
+        <span class="c"># avoid deadlock and share resources</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queues</span><span class="p">]</span>
+
+        <span class="c"># terminate processes</span>
+        <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">positions</span>
+
+<div class="viewcode-block" id="Vision.to_info"><a class="viewcode-back" href="../../vision.html#vision.vision.Vision.to_info">[docs]</a>    <span class="k">def</span> <span class="nf">to_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary with object position information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;x&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="s">&#39;y&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">height</span> <span class="o">-</span> <span class="n">y</span>
+
+            <span class="k">if</span> <span class="s">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">angle</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;angle&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s">&#39;velocity&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">velocity</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;velocity&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s">&#39;angle&#39;</span><span class="p">:</span> <span class="n">angle</span><span class="p">,</span> <span class="s">&#39;velocity&#39;</span><span class="p">:</span> <span class="n">velocity</span><span class="p">}</span>
+
+</div></div>
+<div class="viewcode-block" id="Camera"><a class="viewcode-back" href="../../vision.html#vision.vision.Camera">[docs]</a><span class="k">class</span> <span class="nc">Camera</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Camera access wrapper.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="n">calibration</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_croppings</span><span class="p">(</span><span class="n">pitch</span><span class="o">=</span><span class="n">pitch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crop_values</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">find_extremes</span><span class="p">(</span><span class="n">calibration</span><span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">])</span>
+
+        <span class="c"># Parameters used to fix radial distortion</span>
+        <span class="n">radial_data</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_radial_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nc_matrix</span> <span class="o">=</span> <span class="n">radial_data</span><span class="p">[</span><span class="s">&#39;new_camera_matrix&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_matrix</span> <span class="o">=</span> <span class="n">radial_data</span><span class="p">[</span><span class="s">&#39;camera_matrix&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dist</span> <span class="o">=</span> <span class="n">radial_data</span><span class="p">[</span><span class="s">&#39;dist&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Camera.get_frame"><a class="viewcode-back" href="../../vision.html#vision.vision.Camera.get_frame">[docs]</a>    <span class="k">def</span> <span class="nf">get_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a frame from the camera.</span>
+
+<span class="sd">        Returns the frame if available, otherwise returns None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># status, frame = True, cv2.imread(&#39;img/i_all/00000003.jpg&#39;)</span>
+        <span class="n">status</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fix_radial_distortion</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">status</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">frame</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">crop_values</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">crop_values</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">crop_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">crop_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Camera.fix_radial_distortion"><a class="viewcode-back" href="../../vision.html#vision.vision.Camera.fix_radial_distortion">[docs]</a>    <span class="k">def</span> <span class="nf">fix_radial_distortion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">undistort</span><span class="p">(</span>
+            <span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_matrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_matrix</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Camera.get_adjusted_center"><a class="viewcode-back" href="../../vision.html#vision.vision.Camera.get_adjusted_center">[docs]</a>    <span class="k">def</span> <span class="nf">get_adjusted_center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">320</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">crop_values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">240</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">crop_values</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+</div></div>
+<div class="viewcode-block" id="GUI"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI">[docs]</a><span class="k">class</span> <span class="nc">GUI</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">VISION</span> <span class="o">=</span> <span class="s">&#39;SUCH VISION&#39;</span>
+    <span class="n">BG_SUB</span> <span class="o">=</span> <span class="s">&#39;BG Subtract&#39;</span>
+    <span class="n">NORMALIZE</span> <span class="o">=</span> <span class="s">&#39;Normalize  &#39;</span>
+    <span class="n">COMMS</span> <span class="o">=</span> <span class="s">&#39;Communications on/off &#39;</span>
+
+<div class="viewcode-block" id="GUI.nothing"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.nothing">[docs]</a>    <span class="k">def</span> <span class="nf">nothing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">arduino</span><span class="p">,</span> <span class="n">pitch</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zones</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibration_gui</span> <span class="o">=</span> <span class="n">CalibrationGUI</span><span class="p">(</span><span class="n">calibration</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arduino</span> <span class="o">=</span> <span class="n">arduino</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="n">pitch</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">namedWindow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">)</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">createTrackbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BG_SUB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nothing</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">createTrackbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NORMALIZE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nothing</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">createTrackbar</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">COMMS</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arduino</span><span class="o">.</span><span class="n">comms</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">arduino</span><span class="o">.</span><span class="n">setComms</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+<div class="viewcode-block" id="GUI.to_info"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.to_info">[docs]</a>    <span class="k">def</span> <span class="nf">to_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a tuple into a vector</span>
+
+<span class="sd">        Return a Vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;location&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span>
+
+            <span class="k">elif</span> <span class="s">&#39;x&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">and</span> <span class="s">&#39;y&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s">&#39;angle&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">angle</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;angle&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s">&#39;velocity&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="n">velocity</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;velocity&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s">&#39;angle&#39;</span><span class="p">:</span> <span class="n">angle</span><span class="p">,</span> <span class="s">&#39;velocity&#39;</span><span class="p">:</span> <span class="n">velocity</span><span class="p">}</span>
+</div>
+<div class="viewcode-block" id="GUI.cast_binary"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.cast_binary">[docs]</a>    <span class="k">def</span> <span class="nf">cast_binary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="GUI.draw"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw">[docs]</a>    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">model_positions</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">regular_positions</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span>
+             <span class="n">aState</span><span class="p">,</span> <span class="n">dState</span><span class="p">,</span> <span class="n">a_action</span><span class="p">,</span> <span class="n">d_action</span><span class="p">,</span> <span class="n">grabbers</span><span class="p">,</span> <span class="n">our_color</span><span class="p">,</span> <span class="n">our_side</span><span class="p">,</span>
+             <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">preprocess</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draw information onto the GUI given positions from the vision and post processing.</span>
+
+<span class="sd">        NOTE: model_positions contains coordinates with y coordinate reversed!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Get general information about the frame</span>
+        <span class="n">frame_height</span><span class="p">,</span> <span class="n">frame_width</span><span class="p">,</span> <span class="n">channels</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c"># Draw the calibration gui</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calibration_gui</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="c"># Draw dividors for the zones</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_zones</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">frame_width</span><span class="p">,</span> <span class="n">frame_height</span><span class="p">)</span>
+
+        <span class="n">their_color</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">TEAM_COLORS</span> <span class="o">-</span> <span class="nb">set</span><span class="p">([</span><span class="n">our_color</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">key_color_pairs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="p">[</span><span class="s">&#39;our_defender&#39;</span><span class="p">,</span> <span class="s">&#39;their_defender&#39;</span><span class="p">,</span> <span class="s">&#39;our_attacker&#39;</span><span class="p">,</span> <span class="s">&#39;their_attacker&#39;</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">our_color</span><span class="p">,</span> <span class="n">their_color</span><span class="p">]</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_ball</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">regular_positions</span><span class="p">[</span><span class="s">&#39;ball&#39;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">key_color_pairs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_robot</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">regular_positions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">color</span><span class="p">)</span>
+
+        <span class="c"># Draw fps on the canvas</span>
+        <span class="k">if</span> <span class="n">fps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&#39;FPS: </span><span class="si">%.1f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">fps</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;green&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">preprocess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">preprocess</span><span class="p">[</span><span class="s">&#39;normalize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cast_binary</span><span class="p">(</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">getTrackbarPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NORMALIZE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">))</span>
+            <span class="n">preprocess</span><span class="p">[</span><span class="s">&#39;background_sub&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cast_binary</span><span class="p">(</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">getTrackbarPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BG_SUB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">grabbers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_grabbers</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">grabbers</span><span class="p">,</span> <span class="n">frame_height</span><span class="p">)</span>
+
+        <span class="c"># Extend image downwards and draw states.</span>
+        <span class="n">blank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">frame</span><span class="p">)[:</span><span class="mi">200</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="n">frame_with_blank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">frame</span><span class="p">,</span> <span class="n">blank</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_states</span><span class="p">(</span><span class="n">frame_with_blank</span><span class="p">,</span> <span class="n">aState</span><span class="p">,</span> <span class="n">dState</span><span class="p">,</span> <span class="p">(</span><span class="n">frame_width</span><span class="p">,</span> <span class="n">frame_height</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">model_positions</span> <span class="ow">and</span> <span class="n">regular_positions</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;ball&#39;</span><span class="p">,</span> <span class="s">&#39;our_defender&#39;</span><span class="p">,</span> <span class="s">&#39;our_attacker&#39;</span><span class="p">,</span> <span class="s">&#39;their_defender&#39;</span><span class="p">,</span> <span class="s">&#39;their_attacker&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">and</span> <span class="n">regular_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data_text</span><span class="p">(</span>
+                        <span class="n">frame_with_blank</span><span class="p">,</span> <span class="p">(</span><span class="n">frame_width</span><span class="p">,</span> <span class="n">frame_height</span><span class="p">),</span> <span class="n">our_side</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span>
+                        <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                        <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="n">a_action</span><span class="p">,</span> <span class="n">d_action</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">draw_velocity</span><span class="p">(</span>
+                        <span class="n">frame_with_blank</span><span class="p">,</span> <span class="p">(</span><span class="n">frame_width</span><span class="p">,</span> <span class="n">frame_height</span><span class="p">),</span>
+                        <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                        <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="n">model_positions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span>
+
+        <span class="c"># Draw center of uncroppped frame (test code)</span>
+        <span class="c"># cv2.circle(frame_with_blank, (266,147), 1, BGR_COMMON[&#39;black&#39;], 1)</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">,</span> <span class="n">frame_with_blank</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_zones"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_zones">[docs]</a>    <span class="k">def</span> <span class="nf">draw_zones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="c"># Re-initialize zones in case they have not been initalized</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zones</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zones</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_zones</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pitch</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">zone</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">zones</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="p">(</span><span class="n">zone</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="n">zone</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">height</span><span class="p">),</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;orange&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_ball"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_ball">[docs]</a>    <span class="k">def</span> <span class="nf">draw_ball</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">position_dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">position_dict</span> <span class="ow">and</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]:</span>
+            <span class="n">frame_height</span><span class="p">,</span> <span class="n">frame_width</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_line</span><span class="p">(</span>
+                <span class="n">frame</span><span class="p">,</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]),</span> <span class="n">frame_height</span><span class="p">)),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_line</span><span class="p">(</span>
+                <span class="n">frame</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">])),</span> <span class="p">(</span><span class="n">frame_width</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]))),</span> <span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_dot"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_dot">[docs]</a>    <span class="k">def</span> <span class="nf">draw_dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;white&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_robot"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_robot">[docs]</a>    <span class="k">def</span> <span class="nf">draw_robot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">position_dict</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;box&#39;</span><span class="p">]:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">polylines</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;box&#39;</span><span class="p">])],</span> <span class="bp">True</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="n">color</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">]:</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;white&#39;</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;white&#39;</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;red&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;dot&#39;</span><span class="p">]:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span>
+                <span class="n">frame</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;dot&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;dot&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])),</span>
+                <span class="mi">4</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;black&#39;</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;direction&#39;</span><span class="p">]:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+                <span class="n">frame</span><span class="p">,</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;direction&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">position_dict</span><span class="p">[</span><span class="s">&#39;direction&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;orange&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_line"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_line">[docs]</a>    <span class="k">def</span> <span class="nf">draw_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;red&#39;</span><span class="p">],</span> <span class="n">thickness</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.data_text"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.data_text">[docs]</a>    <span class="k">def</span> <span class="nf">data_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">our_side</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">a_action</span><span class="p">,</span> <span class="n">d_action</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">frame_width</span><span class="p">,</span> <span class="n">frame_height</span> <span class="o">=</span> <span class="n">frame_offset</span>
+            <span class="k">if</span> <span class="n">text</span> <span class="o">==</span> <span class="s">&quot;ball&quot;</span><span class="p">:</span>
+                <span class="n">y_offset</span> <span class="o">=</span> <span class="n">frame_height</span> <span class="o">+</span> <span class="mi">130</span>
+                <span class="n">draw_x</span> <span class="o">=</span> <span class="mi">30</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x_main</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">zz</span><span class="p">:</span> <span class="p">(</span><span class="n">frame_width</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">zz</span>
+                <span class="n">x_offset</span> <span class="o">=</span> <span class="mi">30</span>
+                <span class="n">y_offset</span> <span class="o">=</span> <span class="n">frame_height</span><span class="o">+</span><span class="mi">20</span>
+
+                <span class="k">if</span> <span class="n">text</span> <span class="o">==</span> <span class="s">&quot;our_defender&quot;</span><span class="p">:</span>
+                    <span class="n">draw_x</span> <span class="o">=</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">x_offset</span>
+                <span class="k">elif</span> <span class="n">text</span> <span class="o">==</span> <span class="s">&quot;our_attacker&quot;</span><span class="p">:</span>
+                    <span class="n">draw_x</span> <span class="o">=</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">x_offset</span>
+                <span class="k">elif</span> <span class="n">text</span> <span class="o">==</span> <span class="s">&quot;their_defender&quot;</span><span class="p">:</span>
+                    <span class="n">draw_x</span> <span class="o">=</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">x_offset</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">draw_x</span> <span class="o">=</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">x_offset</span>
+
+                <span class="k">if</span> <span class="n">our_side</span> <span class="o">==</span> <span class="s">&quot;right&quot;</span><span class="p">:</span>
+                    <span class="n">draw_x</span> <span class="o">=</span> <span class="n">frame_width</span><span class="o">-</span><span class="n">draw_x</span> <span class="o">-</span> <span class="mi">80</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">draw_x</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&#39;x: </span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">,</span> <span class="n">draw_x</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&#39;y: </span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">y</span><span class="p">,</span> <span class="n">draw_x</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="mi">20</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">angle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&#39;angle: </span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">angle</span><span class="p">,</span> <span class="n">draw_x</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="mi">30</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">velocity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&#39;velocity: </span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">draw_x</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="mi">40</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">text</span> <span class="o">==</span> <span class="s">&#39;our_attacker&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_actions</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">a_action</span><span class="p">,</span> <span class="n">draw_x</span><span class="p">,</span> <span class="n">y_offset</span><span class="o">+</span><span class="mi">50</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">text</span> <span class="o">==</span> <span class="s">&#39;our_defender&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_actions</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">d_action</span><span class="p">,</span> <span class="n">draw_x</span><span class="p">,</span> <span class="n">y_offset</span><span class="o">+</span><span class="mi">50</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_text"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_text">[docs]</a>    <span class="k">def</span> <span class="nf">draw_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;green&#39;</span><span class="p">],</span> <span class="n">thickness</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+                <span class="n">frame</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span> <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_grabbers"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_grabbers">[docs]</a>    <span class="k">def</span> <span class="nf">draw_grabbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">grabbers</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="n">def_grabber</span> <span class="o">=</span> <span class="n">grabbers</span><span class="p">[</span><span class="s">&#39;our_defender&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">att_grabber</span> <span class="o">=</span> <span class="n">grabbers</span><span class="p">[</span><span class="s">&#39;our_attacker&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">def_grabber</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">height</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">def_grabber</span><span class="p">]</span>
+        <span class="n">att_grabber</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">height</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">att_grabber</span><span class="p">]</span>
+
+        <span class="n">def_grabber</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">def_grabber</span><span class="p">]</span>
+        <span class="n">att_grabber</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">att_grabber</span><span class="p">]</span>
+
+        <span class="n">def_grabber</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">def_grabber</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">def_grabber</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">def_grabber</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">att_grabber</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">att_grabber</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">att_grabber</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">att_grabber</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">cv2</span><span class="o">.</span><span class="n">polylines</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">def_grabber</span><span class="p">)],</span> <span class="bp">True</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;red&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">polylines</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">att_grabber</span><span class="p">)],</span> <span class="bp">True</span><span class="p">,</span> <span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;red&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_velocity"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">draw_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">vel</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="bp">None</span> <span class="ow">in</span> <span class="p">[</span><span class="n">frame</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">vel</span><span class="p">])</span> <span class="ow">and</span> <span class="n">vel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">frame_width</span><span class="p">,</span> <span class="n">frame_height</span> <span class="o">=</span> <span class="n">frame_offset</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">vel</span><span class="o">*</span><span class="n">scale</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">frame_height</span> <span class="o">-</span> <span class="n">y</span>
+            <span class="n">start_point</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">end_point</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="n">y</span> <span class="o">-</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_line</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="p">(</span><span class="n">start_point</span><span class="p">,</span> <span class="n">end_point</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_states"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_states">[docs]</a>    <span class="k">def</span> <span class="nf">draw_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">aState</span><span class="p">,</span> <span class="n">dState</span><span class="p">,</span> <span class="n">frame_offset</span><span class="p">):</span>
+        <span class="n">frame_width</span><span class="p">,</span> <span class="n">frame_height</span> <span class="o">=</span> <span class="n">frame_offset</span>
+        <span class="n">x_main</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">zz</span><span class="p">:</span> <span class="p">(</span><span class="n">frame_width</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">zz</span>
+        <span class="n">x_offset</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">y_offset</span> <span class="o">=</span> <span class="n">frame_height</span><span class="o">+</span><span class="mi">140</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&quot;Attacker State:&quot;</span><span class="p">,</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">aState</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="mi">15</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">aState</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="mi">30</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&quot;Defender State:&quot;</span><span class="p">,</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">dState</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="mi">15</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">dState</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x_main</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="mi">30</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GUI.draw_actions"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.draw_actions">[docs]</a>    <span class="k">def</span> <span class="nf">draw_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span>
+            <span class="n">frame</span><span class="p">,</span> <span class="s">&quot;Left Motor: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s">&#39;left_motor&#39;</span><span class="p">]),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="mi">5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;white&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span>
+            <span class="n">frame</span><span class="p">,</span> <span class="s">&quot;Right Motor: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s">&#39;right_motor&#39;</span><span class="p">]),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="mi">15</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;white&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span>
+            <span class="n">frame</span><span class="p">,</span> <span class="s">&quot;Speed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s">&#39;speed&#39;</span><span class="p">]),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">25</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;white&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&quot;Kicker: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s">&#39;kicker&#39;</span><span class="p">]),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">35</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;white&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_text</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="s">&quot;Catcher: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s">&#39;catcher&#39;</span><span class="p">]),</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">45</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">BGR_COMMON</span><span class="p">[</span><span class="s">&#39;white&#39;</span><span class="p">])</span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

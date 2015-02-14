@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vision.tools &mdash; SDP  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SDP  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> SDP</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SDP</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>vision.tools</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for vision.tools</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">cPickle</span>
+
+<span class="n">PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+<span class="n">BLACK</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c"># HSV Colors</span>
+<span class="n">WHITE_LOWER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+<span class="n">WHITE_HIGHER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">36</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">])</span>
+
+<span class="n">BLUE_LOWER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">95.</span><span class="p">,</span> <span class="mf">50.</span><span class="p">,</span> <span class="mf">50.</span><span class="p">])</span>
+<span class="n">BLUE_HIGHER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">110.</span><span class="p">,</span> <span class="mf">255.</span><span class="p">,</span> <span class="mf">255.</span><span class="p">])</span>
+
+<span class="n">RED_LOWER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">140</span><span class="p">])</span>
+<span class="n">RED_HIGHER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">9</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">])</span>
+
+<span class="n">YELLOW_LOWER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">9</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">])</span>
+<span class="n">YELLOW_HIGHER</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">11</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">])</span>
+
+<span class="n">PITCHES</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Pitch_0&#39;</span><span class="p">,</span> <span class="s">&#39;Pitch_1&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_zones"><a class="viewcode-back" href="../../vision.html#vision.tools.get_zones">[docs]</a><span class="k">def</span> <span class="nf">get_zones</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">PATH</span><span class="o">+</span><span class="s">&#39;/calibrations/croppings.json&#39;</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">calibration</span> <span class="o">=</span> <span class="n">get_croppings</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">pitch</span><span class="p">)</span>
+    <span class="n">zones_poly</span> <span class="o">=</span> <span class="p">[</span><span class="n">calibration</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;Zone_0&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_1&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_2&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_3&#39;</span><span class="p">]]</span>
+
+    <span class="n">maxes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="nb">max</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">zone</span> <span class="ow">in</span> <span class="n">zones_poly</span><span class="p">[:</span><span class="mi">3</span><span class="p">]])</span>
+    <span class="n">mins</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">zone</span> <span class="ow">in</span> <span class="n">zones_poly</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
+    <span class="n">mids</span> <span class="o">=</span> <span class="p">[(</span><span class="n">maxes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">mins</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+    <span class="n">mids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">mids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+    <span class="n">mids</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="n">mids</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">mids</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+
+</div>
+<div class="viewcode-block" id="get_croppings"><a class="viewcode-back" href="../../vision.html#vision.tools.get_croppings">[docs]</a><span class="k">def</span> <span class="nf">get_croppings</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">PATH</span><span class="o">+</span><span class="s">&#39;/calibrations/croppings.json&#39;</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">croppings</span> <span class="o">=</span> <span class="n">get_json</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">croppings</span><span class="p">[</span><span class="n">PITCHES</span><span class="p">[</span><span class="n">pitch</span><span class="p">]]</span>
+
+</div>
+<div class="viewcode-block" id="get_json"><a class="viewcode-back" href="../../vision.html#vision.tools.get_json">[docs]</a><span class="k">def</span> <span class="nf">get_json</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">PATH</span><span class="o">+</span><span class="s">&#39;/calibrations/calibrations.json&#39;</span><span class="p">):</span>
+    <span class="n">_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">content</span>
+
+</div>
+<div class="viewcode-block" id="get_radial_data"><a class="viewcode-back" href="../../vision.html#vision.tools.get_radial_data">[docs]</a><span class="k">def</span> <span class="nf">get_radial_data</span><span class="p">(</span><span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">PATH</span><span class="o">+</span><span class="s">&#39;/calibrations/undistort.txt&#39;</span><span class="p">):</span>
+    <span class="n">_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">cPickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">_file</span><span class="p">)</span>
+    <span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">pitch</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="get_colors"><a class="viewcode-back" href="../../vision.html#vision.tools.get_colors">[docs]</a><span class="k">def</span> <span class="nf">get_colors</span><span class="p">(</span><span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">PATH</span><span class="o">+</span><span class="s">&#39;/calibrations/calibrations.json&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get colros from the JSON calibration file.</span>
+<span class="sd">    Converts all</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">json_content</span> <span class="o">=</span> <span class="n">get_json</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">machine_name</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">pitch_name</span> <span class="o">=</span> <span class="s">&#39;PITCH0&#39;</span> <span class="k">if</span> <span class="n">pitch</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s">&#39;PITCH1&#39;</span>
+
+    <span class="k">if</span> <span class="n">machine_name</span> <span class="ow">in</span> <span class="n">json_content</span><span class="p">:</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">json_content</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">pitch_name</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">json_content</span><span class="p">[</span><span class="s">&#39;default&#39;</span><span class="p">][</span><span class="n">pitch_name</span><span class="p">]</span>
+
+    <span class="c"># convert mins and maxes into np.array</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">current</span><span class="p">:</span>
+        <span class="n">key_dict</span> <span class="o">=</span> <span class="n">current</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s">&#39;min&#39;</span> <span class="ow">in</span> <span class="n">key_dict</span><span class="p">:</span>
+            <span class="n">key_dict</span><span class="p">[</span><span class="s">&#39;min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">key_dict</span><span class="p">[</span><span class="s">&#39;min&#39;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="s">&#39;max&#39;</span> <span class="ow">in</span> <span class="n">key_dict</span><span class="p">:</span>
+            <span class="n">key_dict</span><span class="p">[</span><span class="s">&#39;max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">key_dict</span><span class="p">[</span><span class="s">&#39;max&#39;</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">current</span>
+
+</div>
+<div class="viewcode-block" id="save_colors"><a class="viewcode-back" href="../../vision.html#vision.tools.save_colors">[docs]</a><span class="k">def</span> <span class="nf">save_colors</span><span class="p">(</span><span class="n">pitch</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">PATH</span><span class="o">+</span><span class="s">&#39;/calibrations/calibrations.json&#39;</span><span class="p">):</span>
+    <span class="n">json_content</span> <span class="o">=</span> <span class="n">get_json</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">machine_name</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">pitch_name</span> <span class="o">=</span> <span class="s">&#39;PITCH0&#39;</span> <span class="k">if</span> <span class="n">pitch</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s">&#39;PITCH1&#39;</span>
+
+    <span class="c"># convert np.arrays into lists</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">:</span>
+        <span class="n">key_dict</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s">&#39;min&#39;</span> <span class="ow">in</span> <span class="n">key_dict</span><span class="p">:</span>
+            <span class="n">key_dict</span><span class="p">[</span><span class="s">&#39;min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">key_dict</span><span class="p">[</span><span class="s">&#39;min&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s">&#39;max&#39;</span> <span class="ow">in</span> <span class="n">key_dict</span><span class="p">:</span>
+            <span class="n">key_dict</span><span class="p">[</span><span class="s">&#39;max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">key_dict</span><span class="p">[</span><span class="s">&#39;max&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">machine_name</span> <span class="ow">in</span> <span class="n">json_content</span><span class="p">:</span>
+        <span class="n">json_content</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">pitch_name</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">json_content</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">json_content</span><span class="p">[</span><span class="s">&#39;default&#39;</span><span class="p">]</span>
+        <span class="n">json_content</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">pitch_name</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+
+    <span class="n">write_json</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">json_content</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="save_croppings"><a class="viewcode-back" href="../../vision.html#vision.tools.save_croppings">[docs]</a><span class="k">def</span> <span class="nf">save_croppings</span><span class="p">(</span><span class="n">pitch</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">PATH</span><span class="o">+</span><span class="s">&#39;/calibrations/croppings.json&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Open the current croppings file and only change the croppings</span>
+<span class="sd">    for the relevant pitch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">croppings</span> <span class="o">=</span> <span class="n">get_json</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">croppings</span><span class="p">[</span><span class="n">PITCHES</span><span class="p">[</span><span class="n">pitch</span><span class="p">]]</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="n">write_json</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">croppings</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="write_json"><a class="viewcode-back" href="../../vision.html#vision.tools.write_json">[docs]</a><span class="k">def</span> <span class="nf">write_json</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">PATH</span><span class="o">+</span><span class="s">&#39;/calibrations/calibrations.json&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="n">_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="mask_pitch"><a class="viewcode-back" href="../../vision.html#vision.tools.mask_pitch">[docs]</a><span class="k">def</span> <span class="nf">mask_pitch</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">BLACK</span><span class="p">)</span>
+    <span class="n">hsv_mask</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2HSV</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">inRange</span><span class="p">(</span><span class="n">hsv_mask</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="find_extremes"><a class="viewcode-back" href="../../vision.html#vision.tools.find_extremes">[docs]</a><span class="k">def</span> <span class="nf">find_extremes</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">bottom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="find_crop_coordinates"><a class="viewcode-back" href="../../vision.html#vision.tools.find_crop_coordinates">[docs]</a><span class="k">def</span> <span class="nf">find_crop_coordinates</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">keypoints</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">520</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">285</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get crop coordinated for the actual image based on masked version.</span>
+
+<span class="sd">    Params:</span>
+<span class="sd">        [int] width     fixed width of the image to crop to</span>
+<span class="sd">        [int[ height    fixed height of the image to crop to</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A 4-tuple with crop values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">frame_height</span><span class="p">,</span> <span class="n">frame_width</span><span class="p">,</span> <span class="n">channels</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">frame_width</span> <span class="o">&lt;</span> <span class="n">width</span> <span class="ow">or</span> <span class="n">frame_height</span> <span class="o">&lt;</span> <span class="n">height</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;get_crop_coordinates:&#39;</span><span class="p">,</span> <span class="s">&#39;Requested size of the frame is smaller than the original frame&#39;</span>
+        <span class="k">return</span> <span class="n">frame</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">keypoints</span><span class="p">:</span>
+        <span class="c"># Smoothen and apply white mask</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask_field</span><span class="p">(</span><span class="n">normalize</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span>
+
+        <span class="c"># Get FAST detection of features</span>
+        <span class="n">fast</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">FastFeatureDetector</span><span class="p">()</span>
+
+        <span class="c"># get keypoints - list of Keypoints with x/y coordinates</span>
+        <span class="n">kp</span> <span class="o">=</span> <span class="n">fast</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">x_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">kp</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">kp</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">x_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">kp</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">kp</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">keypoints</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">keypoints</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">x_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">keypoints</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">keypoints</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">x_delta</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span>
+    <span class="n">y_delta</span> <span class="o">=</span> <span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span>
+
+    <span class="c"># x_remaining = max(0, (width - x_delta) / 2)</span>
+    <span class="c"># y_remaining = max(0, (height - y_delta) / 2)</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span>
+        <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="crop"><a class="viewcode-back" href="../../vision.html#vision.tools.crop">[docs]</a><span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Crop a frame given the size.</span>
+<span class="sd">    If size not provided, attempt to extract the field and crop.</span>
+
+<span class="sd">    Params:</span>
+<span class="sd">        [OpenCV Frame] frame    frame to crop</span>
+<span class="sd">        [(x1,x2,y1,y2)] size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># if not size or not len(size):</span>
+    <span class="c">#     x_min, x_max, y_min, y_max = get_crop_coordinates(frame)</span>
+    <span class="c"># else:</span>
+    <span class="c"># print &#39;SIZE:&#39;, size</span>
+    <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">size</span>
+    <span class="k">return</span> <span class="n">frame</span><span class="p">[</span><span class="n">y_min</span><span class="p">:</span><span class="n">y_max</span><span class="p">,</span> <span class="n">x_min</span><span class="p">:</span><span class="n">x_max</span><span class="p">]</span></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

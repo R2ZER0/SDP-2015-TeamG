@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Action Class &mdash; SDP  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SDP  documentation" href="index.html"/>
+        <link rel="next" title="Controller" href="controller.html"/>
+        <link rel="prev" title="Welcome to SDP’s documentation!" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> SDP</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="controller.html">Controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vision.html">Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.calibrate">Calibrate Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.colors">Colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.findHSV">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tracker">Trackers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.vision">Vision GUI</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">SDP</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Action Class</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/action.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="action-class">
+<h1>Action Class<a class="headerlink" href="#action-class" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="action.Action">
+<em class="property">class </em><tt class="descclassname">action.</tt><tt class="descname">Action</tt><big>(</big><em>comm</em><big>)</big><a class="reference internal" href="_modules/action.html#Action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#action.Action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an interface between desired movement and the Robot. Accepts
+a communication object to write to.</p>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd><p class="first">Debug           Setting True enables verbose output of commands.
+MOTOR_ANGLES    The angles of our wheels relative to the x-axis.</p>
+<blockquote>
+<div>These begin from front-left and move anticlockwise.</div></blockquote>
+<dl class="last docutils">
+<dt>MOTORS          Trigonometric calculations for each motor, used for </dt>
+<dd>holonomic movement</dd>
+</dl>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="action.Action.Debug">
+<tt class="descname">Debug</tt><em class="property"> = False</em><a class="headerlink" href="#action.Action.Debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="action.Action.MOTORS">
+<tt class="descname">MOTORS</tt><em class="property"> = [(-0.8660254037844387, 0.49999999999999994), (-1.8369701987210297e-16, -1.0), (0.8660254037844387, 0.49999999999999994)]</em><a class="headerlink" href="#action.Action.MOTORS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="action.Action.MOTOR_ANGLES">
+<tt class="descname">MOTOR_ANGLES</tt><em class="property"> = [2.6179938779914944, 4.71238898038469, 0.5235987755982988]</em><a class="headerlink" href="#action.Action.MOTOR_ANGLES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="action.Action.angle">
+<tt class="descname">angle</tt><em class="property"> = 0.5235987755982988</em><a class="headerlink" href="#action.Action.angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="action.Action.catch">
+<tt class="descname">catch</tt><big>(</big><em>scale=100</em><big>)</big><a class="reference internal" href="_modules/action.html#Action.catch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#action.Action.catch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends the catch command to the robot. Performns no checking of the 
+catcher&#8217;s position prior to catching.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scale</strong> &#8211; Power scale for this catch. Range [0,100]. Default 100.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="action.Action.kick">
+<tt class="descname">kick</tt><big>(</big><em>scale=100</em><big>)</big><a class="reference internal" href="_modules/action.html#Action.kick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#action.Action.kick" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends the kick command to the robot. Performs no checking of the 
+kicker&#8217;s state prior to kicking.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scale</strong> &#8211; Power scale for this kick. Range [0,100]. Default 100.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="action.Action.move">
+<tt class="descname">move</tt><big>(</big><em>angle</em>, <em>scale</em><big>)</big><a class="reference internal" href="_modules/action.html#Action.move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#action.Action.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the robot in the given angle with given scale as power value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>angle</strong> &#8211; The direction of movement, in radians, relative to x-axis                 of robot</li>
+<li><strong>scale</strong> &#8211; Power-scale for this movement, range: -1 to 1</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="action.Action.open_catcher">
+<tt class="descname">open_catcher</tt><big>(</big><em>scale=100</em><big>)</big><a class="reference internal" href="_modules/action.html#Action.open_catcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#action.Action.open_catcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends the command to open the catcher to the robot. Currently 
+implemented simply as a kick.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scale</strong> &#8211; Power scale for the catch. Range [0,100]. Default 100.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="action.Action.ping">
+<tt class="descname">ping</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/action.html#Action.ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#action.Action.ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends the PING command to the Robot. Robot should return &#8220;PONG&#8221; via
+the serial connection if correctly functioning.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="action.Action.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/action.html#Action.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#action.Action.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the robot&#8217;s movement by setting all motors to zero.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="action.Action.turn">
+<tt class="descname">turn</tt><big>(</big><em>speed</em><big>)</big><a class="reference internal" href="_modules/action.html#Action.turn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#action.Action.turn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn the robot with the given power.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>speed</strong> &#8211; The speed of the turn, range is [-100,100]. Positive values                     result in clockwise rotation, negative in anticlockwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="controller.html" class="btn btn-neutral float-right" title="Controller"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to SDP’s documentation!"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>planning.utilities &mdash; SDP  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SDP  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> SDP</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SDP</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>planning.utilities</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for planning.utilities</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">tan</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">hypot</span><span class="p">,</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">planning.models</span> <span class="kn">import</span> <span class="n">Robot</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Utilities contains various convenience functions utilised throughout the</span>
+<span class="sd">planning module.</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    DISTANCE_MATCH_THRESHOLD    Generic distance threshold allowance for considering an object</span>
+<span class="sd">                                being equal to a position.</span>
+<span class="sd">    ANGLE_MATCH_THRESHOLD       Generic angle threshold allowance before we consider the object</span>
+<span class="sd">                                matching an angle.</span>
+<span class="sd">    BALL_ANGLE_THRESHOLD        Angle threshold for more careful tasks; e.g catching a ball</span>
+
+<span class="sd">    MAX_DISPLACEMENT_SPEED      Our maximum power to move at</span>
+<span class="sd">    MAX_ANGLE_SPEED             Our maximum turning speed</span>
+
+<span class="sd">    BALL_VELOCITY               Used by strategies as a lower threshold on when to consider the</span>
+<span class="sd">                                ball moving.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="n">DISTANCE_MATCH_THRESHOLD</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">ANGLE_MATCH_THRESHOLD</span> <span class="o">=</span> <span class="n">pi</span><span class="o">/</span><span class="mi">10</span>
+<span class="n">BALL_ANGLE_THRESHOLD</span> <span class="o">=</span> <span class="n">pi</span><span class="o">/</span><span class="mi">20</span>
+<span class="n">MAX_DISPLACEMENT_SPEED</span> <span class="o">=</span> <span class="mi">690</span>
+<span class="n">MAX_ANGLE_SPEED</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">BALL_VELOCITY</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<div class="viewcode-block" id="is_shot_blocked"><a class="viewcode-back" href="../../planning.html#planning.utilities.is_shot_blocked">[docs]</a><span class="k">def</span> <span class="nf">is_shot_blocked</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">our_robot</span><span class="p">,</span> <span class="n">their_robot</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convenience function for checking if one robot&#39;s shot is blocked</span>
+<span class="sd">    by another.</span>
+
+<span class="sd">    :param world: The world state to retrieve positions from</span>
+<span class="sd">    :param our_robot: The Robot model representing our robot</span>
+<span class="sd">    :param their_robot: The Robot model we wish to check is blocking</span>
+<span class="sd">    :returns: True, if the shot is blocked by their Robot, False otherwise.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c"># Check for the ball being intersected by their robot</span>
+    <span class="n">predicted_y</span> <span class="o">=</span> <span class="n">predict_y_intersection</span><span class="p">(</span>
+        <span class="n">world</span><span class="p">,</span> <span class="n">their_robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">our_robot</span><span class="p">,</span> <span class="n">full_width</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bounce</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    
+    <span class="c"># If direct intersection, return True</span>
+    <span class="k">if</span> <span class="n">predicted_y</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    
+    <span class="k">print</span> <span class="s">&#39;##########&#39;</span><span class="p">,</span> <span class="n">predicted_y</span><span class="p">,</span> <span class="n">their_robot</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">their_robot</span><span class="o">.</span><span class="n">length</span>
+    <span class="k">print</span> <span class="nb">abs</span><span class="p">(</span><span class="n">predicted_y</span> <span class="o">-</span> <span class="n">their_robot</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">their_robot</span><span class="o">.</span><span class="n">length</span>
+    
+    <span class="c"># Check if their robot is wide enough to overlap with the predicted</span>
+    <span class="c"># y intersection</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">predicted_y</span> <span class="o">-</span> <span class="n">their_robot</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">their_robot</span><span class="o">.</span><span class="n">length</span>
+</div>
+<div class="viewcode-block" id="is_attacker_shot_blocked"><a class="viewcode-back" href="../../planning.html#planning.utilities.is_attacker_shot_blocked">[docs]</a><span class="k">def</span> <span class="nf">is_attacker_shot_blocked</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">our_attacker</span><span class="p">,</span> <span class="n">their_defender</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Check if our is blocked by the other robot by considering if </span>
+<span class="sd">    the given robot is parallel to us within some threshold.</span>
+
+<span class="sd">    :param world: The world state to retrieve positions from</span>
+<span class="sd">    :param our_attacker: Our robot to check</span>
+<span class="sd">    :param their_defender: Their robot to check parallel state.</span>
+<span class="sd">    :returns: True if the other robot is parallel to us within 40px threshold.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c"># Acceptable distance that the opponent defender can be relative to our</span>
+    <span class="c"># shooting position in order for us to have a clear shot.</span>
+    <span class="n">distance_threshold</span> <span class="o">=</span> <span class="mi">40</span>
+
+    <span class="c"># Return True if attacker and defender ar close to each other on</span>
+    <span class="c"># the y dimension</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">their_defender</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">distance_threshold</span>
+
+</div>
+<div class="viewcode-block" id="can_score"><a class="viewcode-back" href="../../planning.html#planning.utilities.can_score">[docs]</a><span class="k">def</span> <span class="nf">can_score</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">our_robot</span><span class="p">,</span> <span class="n">their_goal</span><span class="p">,</span> <span class="n">turn</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Determines if our robot is facing, or would be if it turned the given</span>
+<span class="sd">    amount, the opponent&#39;s goal ready to score.</span>
+
+<span class="sd">    :param world: The world state</span>
+<span class="sd">    :param our_robot: The robot we&#39;re checking facing direction for</span>
+<span class="sd">    :param their_goal: The goal we wish to shoot into</span>
+<span class="sd">    :param turn: [Default: 0], an optional turning offset that allows checking if we \</span>
+<span class="sd">                    could score if we turned the given amount.</span>
+
+<span class="sd">    :returns: True if the ball kicked from our facing direction, with turn offset if given,</span>
+<span class="sd">        would result in the ball reaching the goal.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c"># Offset the robot angle if need be</span>
+    <span class="n">robot_angle</span> <span class="o">=</span> <span class="n">our_robot</span><span class="o">.</span><span class="n">angle</span> <span class="o">+</span> <span class="n">turn</span>
+    <span class="n">goal_zone_poly</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">pitch</span><span class="o">.</span><span class="n">zones</span><span class="p">[</span><span class="n">their_goal</span><span class="o">.</span><span class="n">zone</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">reverse</span> <span class="o">=</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">their_goal</span><span class="o">.</span><span class="n">zone</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="bp">False</span>
+    <span class="n">goal_posts</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">goal_zone_poly</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="n">reverse</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="c"># Makes goal be sorted from smaller to bigger</span>
+    <span class="n">goal_posts</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">goal_posts</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">goal_x</span> <span class="o">=</span> <span class="n">goal_posts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">robot</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span>
+        <span class="n">our_robot</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">our_robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">our_robot</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">robot_angle</span> <span class="o">%</span> <span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span> <span class="n">our_robot</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span>
+
+    <span class="n">predicted_y</span> <span class="o">=</span> <span class="n">predict_y_intersection</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">goal_x</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">full_width</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">goal_posts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">predicted_y</span> <span class="o">&lt;</span> <span class="n">goal_posts</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="predict_y_intersection"><a class="viewcode-back" href="../../planning.html#planning.utilities.predict_y_intersection">[docs]</a><span class="k">def</span> <span class="nf">predict_y_intersection</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">predict_for_x</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">full_width</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">bounce</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Calculates where the ball will be placed once it reaches the given x-coordinate</span>
+<span class="sd">        if it were to be kicked by the robot passed in. Supports calculating the ball</span>
+<span class="sd">        position even if it were bounced off the wall of the pitch.</span>
+
+<span class="sd">        :param world: The world model</span>
+<span class="sd">        :param predict_for_x: Which x-coordinate to extrapolate the ball&#39;s y value for</span>
+<span class="sd">        :param robot: The robot to judge the kicking angle from</span>
+<span class="sd">        :param full_width: [Default: False]. If True, uses the full width of the pitch as \</span>
+<span class="sd">                            the upper and lower y-values for bounce tests, calculated based on \</span>
+<span class="sd">                            croppings of the pitch.</span>
+<span class="sd">        :param bounce: [Default: False]. If True, determines if the ball will bounce off the \</span>
+<span class="sd">                            top/bottom of the Pitch before reaching x-position, and adjust for this.</span>
+
+<span class="sd">        :returns: None if the robot is facing the wrong direction for the given x-position, or the predicted \</span>
+<span class="sd">            y position of the ball if successful.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">angle</span>
+
+        <span class="c"># Calculate extremes of the pitch using fixed offset if full_width is True, otherwise, use our goal</span>
+        <span class="c"># coordinates as a relative point</span>
+        <span class="n">top_y</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">_pitch</span><span class="o">.</span><span class="n">height</span> <span class="o">-</span> <span class="mi">60</span> <span class="k">if</span> <span class="n">full_width</span> <span class="k">else</span> <span class="n">world</span><span class="o">.</span><span class="n">our_goal</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">our_goal</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">30</span>
+        <span class="n">bottom_y</span> <span class="o">=</span> <span class="mi">60</span> <span class="k">if</span> <span class="n">ful_width</span> <span class="k">else</span> <span class="n">world</span><span class="o">.</span><span class="n">our_goal</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">our_goal</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">30</span>
+
+        <span class="c"># Only predict if the robot is facing the correct location to the predicted x position</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">predict_for_x</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span> <span class="o">&lt;</span> <span class="n">angle</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">predict_for_x</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="n">angle</span> <span class="o">&gt;</span> <span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)):</span>
+
+            <span class="k">if</span> <span class="n">bounce</span><span class="p">:</span>
+
+                <span class="c"># Check if the change in y given the x displacement would bring us outside of the pitch, indicating</span>
+                <span class="c"># a bounce</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">predict_for_x</span> <span class="o">-</span> <span class="n">x</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">world</span><span class="o">.</span><span class="n">_pitch</span><span class="o">.</span><span class="n">height</span><span class="p">):</span>
+
+                    <span class="n">bounce_pos</span> <span class="o">=</span> <span class="s">&#39;top&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">predict_for_x</span> <span class="o">-</span> <span class="n">x</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">world</span><span class="o">.</span><span class="n">_pitch</span><span class="o">.</span><span class="n">height</span> <span class="k">else</span> <span class="s">&#39;bottom&#39;</span>
+                    
+                    <span class="n">x</span> <span class="o">+=</span> <span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">_pitch</span><span class="o">.</span><span class="n">height</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="k">if</span> <span class="n">bounce_pos</span> <span class="o">==</span> <span class="s">&#39;top&#39;</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">_pitch</span><span class="o">.</span><span class="n">height</span> <span class="k">if</span> <span class="n">bounce_pos</span> <span class="o">==</span> <span class="s">&#39;top&#39;</span> <span class="k">else</span> <span class="mi">0</span>
+                    
+                    <span class="n">angle</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">angle</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+
+            <span class="n">predicted_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">tan</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">predict_for_x</span> <span class="o">-</span> <span class="n">x</span><span class="p">))</span>
+            <span class="c"># Correcting the y coordinate to the closest y coordinate on the goal line:</span>
+            <span class="k">if</span> <span class="n">predicted_y</span> <span class="o">&gt;</span> <span class="n">top_y</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">top_y</span>
+            <span class="k">elif</span> <span class="n">predicted_y</span> <span class="o">&lt;</span> <span class="n">bottom_y</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">bottom_y</span>
+            <span class="k">return</span> <span class="n">predicted_y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="has_matched"><a class="viewcode-back" href="../../planning.html#planning.utilities.has_matched">[docs]</a><span class="k">def</span> <span class="nf">has_matched</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                <span class="n">angle_threshold</span><span class="o">=</span><span class="n">ANGLE_MATCH_THRESHOLD</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="n">DISTANCE_MATCH_THRESHOLD</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convenience function; checks if the given Robot is at the provided x,y position and/or angle</span>
+<span class="sd">    to within the defined thresholds.</span>
+
+<span class="sd">    :param robot: The Robot to check accuracy of</span>
+<span class="sd">    :param x: The x-position to test, None if testing angle only</span>
+<span class="sd">    :param y: The y-position to test, None if testing angle only</span>
+<span class="sd">    :param angle: The angle to test, None if testing position only</span>
+<span class="sd">    :param angle_threshold: Threshold under which angle will be considered equal, [Default: ANGLE_MATCH_THRESHOLD]</span>
+<span class="sd">    :param distance_threshold: Threshold under which distance will be considered equal, [Default: DISTANCE_MATCH_THRESHOLD]</span>
+
+<span class="sd">    :returns: True if the Robot has matched the desired thresholds to angle and distance.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">dist_matched</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">angle_matched</span> <span class="o">=</span> <span class="bp">True</span>
+    
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">dist_matched</span> <span class="o">=</span> <span class="n">hypot</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">x</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">distance_threshold</span>
+    
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">angle</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">angle_matched</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">angle_threshold</span>
+    
+    <span class="k">return</span> <span class="n">dist_matched</span> <span class="ow">and</span> <span class="n">angle_matched</span>
+</div>
+<div class="viewcode-block" id="calculate_motor_speed"><a class="viewcode-back" href="../../planning.html#planning.utilities.calculate_motor_speed">[docs]</a><span class="k">def</span> <span class="nf">calculate_motor_speed</span><span class="p">(</span><span class="n">displacement</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">backwards_ok</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">careful</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Simplistic view of calculating the speed: no modes or trying to be careful</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">moving_backwards</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">general_speed</span> <span class="o">=</span> <span class="mi">95</span> <span class="k">if</span> <span class="n">careful</span> <span class="k">else</span> <span class="mi">300</span>
+    <span class="n">angle_thresh</span> <span class="o">=</span> <span class="n">BALL_ANGLE_THRESHOLD</span> <span class="k">if</span> <span class="n">careful</span> <span class="k">else</span> <span class="n">ANGLE_MATCH_THRESHOLD</span>
+
+    <span class="k">if</span> <span class="n">backwards_ok</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">pi</span> <span class="o">+</span> <span class="n">angle</span><span class="p">)</span> <span class="k">if</span> <span class="n">angle</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">pi</span> <span class="o">+</span> <span class="n">angle</span><span class="p">)</span>
+        <span class="n">moving_backwards</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">displacement</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">displacement</span> <span class="o">&lt;</span> <span class="n">DISTANCE_MATCH_THRESHOLD</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;left_motor&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;right_motor&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;kicker&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;catcher&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;speed&#39;</span><span class="p">:</span> <span class="n">general_speed</span><span class="p">}</span>
+
+        <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">angle_thresh</span><span class="p">:</span>
+            <span class="n">speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">MAX_ANGLE_SPEED</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;left_motor&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">speed</span><span class="p">,</span> <span class="s">&#39;right_motor&#39;</span><span class="p">:</span> <span class="n">speed</span><span class="p">,</span> <span class="s">&#39;kicker&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;catcher&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;speed&#39;</span><span class="p">:</span> <span class="n">general_speed</span><span class="p">}</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">speed</span> <span class="o">=</span> <span class="n">log</span><span class="p">(</span><span class="n">displacement</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="n">MAX_DISPLACEMENT_SPEED</span>
+            <span class="n">speed</span> <span class="o">=</span> <span class="o">-</span><span class="n">speed</span> <span class="k">if</span> <span class="n">moving_backwards</span> <span class="k">else</span> <span class="n">speed</span>
+            <span class="c"># print &#39;DISP:&#39;, displacement</span>
+            <span class="k">if</span> <span class="n">careful</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s">&#39;left_motor&#39;</span><span class="p">:</span> <span class="n">speed</span><span class="p">,</span> <span class="s">&#39;right_motor&#39;</span><span class="p">:</span> <span class="n">speed</span><span class="p">,</span> <span class="s">&#39;kicker&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;catcher&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;speed&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="o">*</span><span class="p">(</span><span class="n">displacement</span><span class="o">-</span><span class="mi">85</span><span class="p">)))}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;left_motor&#39;</span><span class="p">:</span> <span class="n">speed</span><span class="p">,</span> <span class="s">&#39;right_motor&#39;</span><span class="p">:</span> <span class="n">speed</span><span class="p">,</span> <span class="s">&#39;kicker&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;catcher&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;speed&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="o">*</span><span class="p">(</span><span class="n">displacement</span><span class="o">-</span><span class="mi">30</span><span class="p">)))}</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">angle_thresh</span><span class="p">:</span>
+            <span class="n">speed</span> <span class="o">=</span> <span class="p">(</span><span class="n">angle</span><span class="o">/</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">MAX_ANGLE_SPEED</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;left_motor&#39;</span><span class="p">:</span> <span class="o">-</span><span class="n">speed</span><span class="p">,</span> <span class="s">&#39;right_motor&#39;</span><span class="p">:</span> <span class="n">speed</span><span class="p">,</span> <span class="s">&#39;kicker&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;catcher&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;speed&#39;</span><span class="p">:</span> <span class="n">general_speed</span><span class="p">}</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;left_motor&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;right_motor&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;kicker&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;catcher&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;speed&#39;</span><span class="p">:</span> <span class="n">general_speed</span><span class="p">}</span></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
