@@ -57,25 +57,40 @@
         
         
             <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -161,7 +176,8 @@
                 <span class="n">cv2</span><span class="o">.</span><span class="n">RETR_TREE</span><span class="p">,</span>
                 <span class="n">cv2</span><span class="o">.</span><span class="n">CHAIN_APPROX_SIMPLE</span>
             <span class="p">)</span>
-            <span class="c"># print contours</span>
+
+            <span class="c">#print contours</span>
             <span class="k">return</span> <span class="n">contours</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">None</span>
@@ -301,7 +317,7 @@
         <span class="n">contours</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_contours</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">adjustments</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_contour_corners</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">join_contours</span><span class="p">(</span><span class="n">contours</span><span class="p">))</span>
 </div>
-<div class="viewcode-block" id="RobotTracker.get_dot"><a class="viewcode-back" href="../../vision.html#vision.tracker.RobotTracker.get_dot">[docs]</a>    <span class="k">def</span> <span class="nf">get_dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">):</span>
+<div class="viewcode-block" id="RobotTracker.get_dot"><a class="viewcode-back" href="../../vision.html#vision.tracker.RobotTracker.get_dot">[docs]</a>    <span class="k">def</span> <span class="nf">get_dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">plate_corners</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find center point of the black dot on the plate.</span>
 
@@ -367,6 +383,7 @@
 
         <span class="c"># (1) Find the plates</span>
         <span class="n">plate_corners</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plate</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">plate_corners</span>
 
         <span class="k">if</span> <span class="n">plate_corners</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="c"># Find the bounding box</span>
@@ -384,14 +401,15 @@
                 <span class="p">]</span>
 
                 <span class="c"># (3) Search for the dot</span>
-                <span class="n">dot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dot</span><span class="p">(</span><span class="n">plate_frame</span><span class="p">,</span> <span class="n">plate_bound_box</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">plate_bound_box</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+                <span class="c"># </span>
+                <span class="c"># Pass in corners of the plate for dot estimation</span>
+                <span class="n">dot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dot</span><span class="p">(</span><span class="n">plate_frame</span><span class="p">,</span> <span class="n">plate_bound_box</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">plate_bound_box</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">plate_corners</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">dot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="c"># Since get_dot adds offset, we need to remove it</span>
                     <span class="n">dot_temp</span> <span class="o">=</span> <span class="n">Center</span><span class="p">(</span><span class="n">dot</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">dot</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
                     <span class="c"># Find two points from plate_corners that are the furthest from the dot</span>
-
                     <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span>
                         <span class="p">(</span>
                             <span class="p">(</span><span class="n">dot_temp</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">dot_temp</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>  <span class="c"># distance</span>
@@ -409,7 +427,7 @@
                     <span class="n">first</span> <span class="o">=</span> <span class="n">front</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">front_rear_distances</span> <span class="o">=</span> <span class="p">[</span>
                         <span class="p">(</span>
-                            <span class="p">(</span><span class="n">first</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">first</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                            <span class="p">(</span><span class="n">first</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">first</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
                             <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                             <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
                         <span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">rear</span><span class="p">]</span>

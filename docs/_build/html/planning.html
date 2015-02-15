@@ -58,25 +58,40 @@
         
         
             <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controller.html">Controller</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="vision.html">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -116,7 +131,7 @@
   <div class="section" id="planning">
 <h1>Planning<a class="headerlink" href="#planning" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-planning.collisions">
-<span id="collisions-utility"></span><h2>Collisions Utility<a class="headerlink" href="#module-planning.collisions" title="Permalink to this headline">¶</a></h2>
+<span id="collisions"></span><h2>Collisions<a class="headerlink" href="#module-planning.collisions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="planning.collisions.get_avoidance">
 <tt class="descclassname">planning.collisions.</tt><tt class="descname">get_avoidance</tt><big>(</big><em>path</em>, <em>robot</em>, <em>obstacle</em><big>)</big><a class="reference internal" href="_modules/planning/collisions.html#get_avoidance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.collisions.get_avoidance" title="Permalink to this definition">¶</a></dt>
@@ -227,7 +242,6 @@ our ball on the Pitch.</p>
 <dt id="planning.models.Coordinate">
 <em class="property">class </em><tt class="descclassname">planning.models.</tt><tt class="descname">Coordinate</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/planning/models.html#Coordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.Coordinate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Simple coordinate class that provides x,y property access.</p>
 <dl class="attribute">
 <dt id="planning.models.Coordinate.x">
 <tt class="descname">x</tt><a class="reference internal" href="_modules/planning/models.html#Coordinate.x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.Coordinate.x" title="Permalink to this definition">¶</a></dt>
@@ -335,8 +349,9 @@ zone.</p>
 <dt id="planning.models.PitchObject">
 <em class="property">class </em><tt class="descclassname">planning.models.</tt><tt class="descname">PitchObject</tt><big>(</big><em>x</em>, <em>y</em>, <em>angle</em>, <em>velocity</em>, <em>width</em>, <em>length</em>, <em>height</em>, <em>angle_offset=0</em><big>)</big><a class="reference internal" href="_modules/planning/models.html#PitchObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.PitchObject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>A class that describes an abstract pitch object, representing dimensions,
-position, and movement attributes.</p>
+<p>A class that describes an abstract pitch object
+Width measures the front and back of an object
+Length measures along the sides of an object</p>
 <dl class="attribute">
 <dt id="planning.models.PitchObject.angle">
 <tt class="descname">angle</tt><a class="reference internal" href="_modules/planning/models.html#PitchObject.angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.PitchObject.angle" title="Permalink to this definition">¶</a></dt>
@@ -345,11 +360,7 @@ position, and movement attributes.</p>
 <dl class="attribute">
 <dt id="planning.models.PitchObject.angle_offset">
 <tt class="descname">angle_offset</tt><a class="reference internal" href="_modules/planning/models.html#PitchObject.angle_offset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.PitchObject.angle_offset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Angle offset serves as a convenience for modifying any angle assigned
-to a PitchObject by the given amount.</p>
-<p>Useful if the robot is at somewhat of an angle compared to a common
-reference object (i.e robot aligned differently to top-plate)</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.models.PitchObject.get_generic_polygon">
@@ -373,8 +384,8 @@ rotated to correspond to our angle.</p>
 <dl class="method">
 <dt id="planning.models.PitchObject.get_polygon">
 <tt class="descname">get_polygon</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/models.html#PitchObject.get_polygon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.PitchObject.get_polygon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a polygon describing the four corners of the object rotated
-around the center to our angle.</p>
+<dd><p>Returns 4 edges of a rectangle bounding the current object in the
+following order: front left, front right, bottom left and bottom right.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -442,8 +453,6 @@ around the center to our angle.</p>
 <dt id="planning.models.Robot">
 <em class="property">class </em><tt class="descclassname">planning.models.</tt><tt class="descname">Robot</tt><big>(</big><em>zone</em>, <em>x</em>, <em>y</em>, <em>angle</em>, <em>velocity</em>, <em>width=30</em>, <em>length=45</em>, <em>height=10</em>, <em>angle_offset=0</em><big>)</big><a class="reference internal" href="_modules/planning/models.html#Robot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.Robot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.models.PitchObject" title="planning.models.PitchObject"><tt class="xref py py-class docutils literal"><span class="pre">planning.models.PitchObject</span></tt></a></p>
-<p>Robot class contains a model representing a Robot on the Pitch. Contains
-utility functions for using the Robot in the world.</p>
 <dl class="method">
 <dt id="planning.models.Robot.can_catch_ball">
 <tt class="descname">can_catch_ball</tt><big>(</big><em>ball</em><big>)</big><a class="reference internal" href="_modules/planning/models.html#Robot.can_catch_ball"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.Robot.can_catch_ball" title="Permalink to this definition">¶</a></dt>
@@ -574,8 +583,6 @@ of our robot and the front of the target object.</p>
 <dt id="planning.models.Vector">
 <em class="property">class </em><tt class="descclassname">planning.models.</tt><tt class="descname">Vector</tt><big>(</big><em>x</em>, <em>y</em>, <em>angle</em>, <em>velocity</em><big>)</big><a class="reference internal" href="_modules/planning/models.html#Vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.Vector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.models.Coordinate" title="planning.models.Coordinate"><tt class="xref py py-class docutils literal"><span class="pre">planning.models.Coordinate</span></tt></a></p>
-<p>A standard vector representation (non-position). Contains a reference point
-x,y, an angle and velocity.</p>
 <dl class="attribute">
 <dt id="planning.models.Vector.angle">
 <tt class="descname">angle</tt><a class="reference internal" href="_modules/planning/models.html#Vector.angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.models.Vector.angle" title="Permalink to this definition">¶</a></dt>
@@ -733,54 +740,14 @@ in the scene and updates the models with the new positionings.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-planning.planner">
-<span id="planner"></span><h2>Planner<a class="headerlink" href="#module-planning.planner" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="planning.planner.Planner">
-<em class="property">class </em><tt class="descclassname">planning.planner.</tt><tt class="descname">Planner</tt><big>(</big><em>our_side</em>, <em>pitch_num</em>, <em>world</em><big>)</big><a class="reference internal" href="_modules/planning/planner.html#Planner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.planner.Planner" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="planning.planner.Planner.attacker_state">
-<tt class="descname">attacker_state</tt><a class="reference internal" href="_modules/planning/planner.html#Planner.attacker_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.planner.Planner.attacker_state" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="planning.planner.Planner.attacker_strat_state">
-<tt class="descname">attacker_strat_state</tt><a class="reference internal" href="_modules/planning/planner.html#Planner.attacker_strat_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.planner.Planner.attacker_strat_state" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="planning.planner.Planner.choose_attacker_strategy">
-<tt class="descname">choose_attacker_strategy</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/planner.html#Planner.choose_attacker_strategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.planner.Planner.choose_attacker_strategy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="planning.planner.Planner.choose_defender_strategy">
-<tt class="descname">choose_defender_strategy</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/planner.html#Planner.choose_defender_strategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.planner.Planner.choose_defender_strategy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="planning.planner.Planner.defender_state">
-<tt class="descname">defender_state</tt><a class="reference internal" href="_modules/planning/planner.html#Planner.defender_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.planner.Planner.defender_state" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="planning.planner.Planner.defender_strat_state">
-<tt class="descname">defender_strat_state</tt><a class="reference internal" href="_modules/planning/planner.html#Planner.defender_strat_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.planner.Planner.defender_strat_state" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="planning.planner.Planner.plan">
-<tt class="descname">plan</tt><big>(</big><em>world</em>, <em>robot='attacker'</em><big>)</big><a class="reference internal" href="_modules/planning/planner.html#Planner.plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.planner.Planner.plan" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="planner">
+<h2>Planner<a class="headerlink" href="#planner" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-planning.strategies">
-<span id="strategies"></span><h2>Strategies<a class="headerlink" href="#module-planning.strategies" title="Permalink to this headline">¶</a></h2>
+<span id="tasks"></span><h2>Tasks<a class="headerlink" href="#module-planning.strategies" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="planning.strategies.AttackerCatch">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerCatch</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerCatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerCatch" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerCatch</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerCatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <dl class="attribute">
 <dt id="planning.strategies.AttackerCatch.CATCH">
@@ -799,19 +766,19 @@ in the scene and updates the models with the new positionings.</p>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerCatch.catch">
-<tt class="descname">catch</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerCatch.catch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerCatch.catch" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">catch</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerCatch.catch" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerCatch.prepare">
-<tt class="descname">prepare</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerCatch.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerCatch.prepare" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">prepare</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerCatch.prepare" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="planning.strategies.AttackerDefend">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerDefend</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDefend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDefend" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerDefend</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDefend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <dl class="attribute">
 <dt id="planning.strategies.AttackerDefend.BLOCK_PASS">
@@ -830,20 +797,20 @@ in the scene and updates the models with the new positionings.</p>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDefend.align">
-<tt class="descname">align</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDefend.align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDefend.align" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">align</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDefend.align" title="Permalink to this definition">¶</a></dt>
 <dd><p>Align yourself with the middle of our zone.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDefend.block_pass">
-<tt class="descname">block_pass</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDefend.block_pass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDefend.block_pass" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">block_pass</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDefend.block_pass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="planning.strategies.AttackerDriveBy">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerDriveBy</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveBy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveBy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerDriveBy</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveBy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <p>Strategy where we drive forward and backwards, rotate and shoot.</p>
 <dl class="docutils">
@@ -904,42 +871,42 @@ the location of the opposite defender</li>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveBy.align_to_goal">
-<tt class="descname">align_to_goal</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveBy.align_to_goal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveBy.align_to_goal" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">align_to_goal</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveBy.align_to_goal" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveBy.drive">
-<tt class="descname">drive</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveBy.drive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveBy.drive" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">drive</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveBy.drive" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveBy.get_zone_attack_x">
-<tt class="descname">get_zone_attack_x</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveBy.get_zone_attack_x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveBy.get_zone_attack_x" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_zone_attack_x</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveBy.get_zone_attack_x" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the border coordinate for our attacker zone and their defender.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveBy.get_zone_attack_x_offset">
-<tt class="descname">get_zone_attack_x_offset</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveBy.get_zone_attack_x_offset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveBy.get_zone_attack_x_offset" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_zone_attack_x_offset</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveBy.get_zone_attack_x_offset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the x coordinate already offset</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveBy.pick_side">
-<tt class="descname">pick_side</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveBy.pick_side"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveBy.pick_side" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pick_side</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveBy.pick_side" title="Permalink to this definition">¶</a></dt>
 <dd><p>At first, choose side opposite to their defender.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveBy.shoot">
-<tt class="descname">shoot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveBy.shoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveBy.shoot" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">shoot</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveBy.shoot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="planning.strategies.AttackerDriveByTurn">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerDriveByTurn</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveByTurn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerDriveByTurn</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <dl class="attribute">
 <dt id="planning.strategies.AttackerDriveByTurn.CENTER">
@@ -988,35 +955,35 @@ the location of the opposite defender</li>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveByTurn.center">
-<tt class="descname">center</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveByTurn.center"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.center" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">center</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.center" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveByTurn.drive">
-<tt class="descname">drive</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveByTurn.drive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.drive" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">drive</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.drive" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveByTurn.pick_side">
-<tt class="descname">pick_side</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveByTurn.pick_side"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.pick_side" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">pick_side</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.pick_side" title="Permalink to this definition">¶</a></dt>
 <dd><p>At first, choose side opposite to their defender.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveByTurn.rotate">
-<tt class="descname">rotate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveByTurn.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.rotate" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rotate</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.rotate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerDriveByTurn.shoot">
-<tt class="descname">shoot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerDriveByTurn.shoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.shoot" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">shoot</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerDriveByTurn.shoot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="planning.strategies.AttackerGrab">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerGrab</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerGrab</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <dl class="attribute">
 <dt id="planning.strategies.AttackerGrab.GO_TO_BALL">
@@ -1045,24 +1012,24 @@ the location of the opposite defender</li>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerGrab.grab">
-<tt class="descname">grab</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrab.grab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrab.grab" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">grab</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrab.grab" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerGrab.position">
-<tt class="descname">position</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrab.position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrab.position" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">position</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrab.position" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerGrab.prepare">
-<tt class="descname">prepare</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrab.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrab.prepare" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">prepare</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrab.prepare" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="planning.strategies.AttackerGrabCareful">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerGrabCareful</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrabCareful"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrabCareful" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerGrabCareful</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrabCareful" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <p>Carefully grabbing the ball when it is located by the wall.</p>
 <dl class="docutils">
@@ -1101,34 +1068,34 @@ the location of the opposite defender</li>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerGrabCareful.align">
-<tt class="descname">align</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrabCareful.align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.align" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">align</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.align" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerGrabCareful.finish">
-<tt class="descname">finish</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrabCareful.finish"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.finish" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">finish</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.finish" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerGrabCareful.get_ball_side">
-<tt class="descname">get_ball_side</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrabCareful.get_ball_side"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.get_ball_side" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_ball_side</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.get_ball_side" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerGrabCareful.grab">
-<tt class="descname">grab</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrabCareful.grab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.grab" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">grab</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.grab" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerGrabCareful.position">
-<tt class="descname">position</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerGrabCareful.position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.position" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">position</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerGrabCareful.position" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="planning.strategies.AttackerPositionCatch">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerPositionCatch</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerPositionCatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerPositionCatch" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerPositionCatch</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerPositionCatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <p>This catching strategy positions the robot in the middle of the zone
 so that (ideally) it does not need to do anything</p>
@@ -1154,17 +1121,17 @@ so that (ideally) it does not need to do anything</p>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerPositionCatch.align">
-<tt class="descname">align</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerPositionCatch.align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerPositionCatch.align" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">align</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerPositionCatch.align" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerPositionCatch.prepare">
-<tt class="descname">prepare</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerPositionCatch.prepare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerPositionCatch.prepare" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">prepare</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerPositionCatch.prepare" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerPositionCatch.rotate">
-<tt class="descname">rotate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerPositionCatch.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerPositionCatch.rotate" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rotate</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerPositionCatch.rotate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotate in the center of the zone in order to intercept the pass of the defender.
 Tries to match the correct angle given the angle of the defender.</p>
 </dd></dl>
@@ -1173,7 +1140,7 @@ Tries to match the correct angle given the angle of the defender.</p>
 
 <dl class="class">
 <dt id="planning.strategies.AttackerScoreDynamic">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerScoreDynamic</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerScoreDynamic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerScoreDynamic</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <p>Goal scoring tactic. Assumes it will be executed when the robot has grabbed the ball.</p>
 <dl class="docutils">
@@ -1304,32 +1271,32 @@ either UP or DOWN, based on their position.</li>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerScoreDynamic.confuse_one">
-<tt class="descname">confuse_one</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerScoreDynamic.confuse_one"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.confuse_one" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">confuse_one</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.confuse_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pick a side and aim at it. Executed when we&#8217;ve reached the POSITION state.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerScoreDynamic.confuse_two">
-<tt class="descname">confuse_two</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerScoreDynamic.confuse_two"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.confuse_two" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">confuse_two</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.confuse_two" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotate to the other side and make them go &#8216;Wow, much rotate&#8217;.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerScoreDynamic.generate">
-<tt class="descname">generate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerScoreDynamic.generate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.generate" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">generate</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.generate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pick an action based on current state.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerScoreDynamic.position">
-<tt class="descname">position</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerScoreDynamic.position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.position" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">position</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Position the robot in the middle close to the goal. Angle does not matter.
 Executed initially when we&#8217;ve grabbed the ball and want to move.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerScoreDynamic.shoot">
-<tt class="descname">shoot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerScoreDynamic.shoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.shoot" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">shoot</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerScoreDynamic.shoot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kick.</p>
 </dd></dl>
 
@@ -1337,7 +1304,7 @@ Executed initially when we&#8217;ve grabbed the ball and want to move.</p>
 
 <dl class="class">
 <dt id="planning.strategies.AttackerTurnScore">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerTurnScore</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerTurnScore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerTurnScore" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">AttackerTurnScore</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.AttackerTurnScore" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <p>Move up and down the opponent&#8217;s goal line and suddenly turn 90 degrees and kick if the
 path is clear.</p>
@@ -1368,19 +1335,19 @@ path is clear.</p>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerTurnScore.align">
-<tt class="descname">align</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerTurnScore.align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerTurnScore.align" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">align</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerTurnScore.align" title="Permalink to this definition">¶</a></dt>
 <dd><p>Go to the boundary of the attacker&#8217;s zone and align with the center
 of the goal line.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerTurnScore.kick">
-<tt class="descname">kick</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerTurnScore.kick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerTurnScore.kick" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">kick</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerTurnScore.kick" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.AttackerTurnScore.position">
-<tt class="descname">position</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#AttackerTurnScore.position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.AttackerTurnScore.position" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">position</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.AttackerTurnScore.position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Go up an down the goal line waiting for the first opportunity to shoot.</p>
 </dd></dl>
 
@@ -1388,7 +1355,7 @@ of the goal line.</p>
 
 <dl class="class">
 <dt id="planning.strategies.DefenderBouncePass">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">DefenderBouncePass</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderBouncePass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderBouncePass" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">DefenderBouncePass</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.DefenderBouncePass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <p>Once the defender grabs the ball, move to the center of the zone and shoot towards
 the wall of the center of the opposite attacker zone, in order to reach our_attacker
@@ -1430,14 +1397,14 @@ attacker zone.</p>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderBouncePass.position">
-<tt class="descname">position</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderBouncePass.position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderBouncePass.position" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">position</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderBouncePass.position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Position the robot in the middle close to the goal. Angle does not matter.
 Executed initially when we&#8217;ve grabbed the ball and want to move.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderBouncePass.rotate">
-<tt class="descname">rotate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderBouncePass.rotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderBouncePass.rotate" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rotate</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderBouncePass.rotate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Once the robot is in position, rotate to one side or the other in order
 to bounce the ball into the attacker zone. If one side is blocked by their
 attacker, turn 90 degrees and shoot to the other side.</p>
@@ -1445,7 +1412,7 @@ attacker, turn 90 degrees and shoot to the other side.</p>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderBouncePass.shoot">
-<tt class="descname">shoot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderBouncePass.shoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderBouncePass.shoot" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">shoot</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderBouncePass.shoot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kick.</p>
 </dd></dl>
 
@@ -1453,7 +1420,7 @@ attacker, turn 90 degrees and shoot to the other side.</p>
 
 <dl class="class">
 <dt id="planning.strategies.DefenderDefence">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">DefenderDefence</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderDefence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderDefence" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">DefenderDefence</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.DefenderDefence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <dl class="attribute">
 <dt id="planning.strategies.DefenderDefence.DEFEND_GOAL">
@@ -1492,19 +1459,19 @@ attacker, turn 90 degrees and shoot to the other side.</p>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderDefence.align">
-<tt class="descname">align</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderDefence.align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderDefence.align" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">align</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderDefence.align" title="Permalink to this definition">¶</a></dt>
 <dd><p>Align yourself with the center of our goal.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderDefence.defend_goal">
-<tt class="descname">defend_goal</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderDefence.defend_goal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderDefence.defend_goal" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">defend_goal</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderDefence.defend_goal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run around, blocking shots.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderDefence.get_alignment_position">
-<tt class="descname">get_alignment_position</tt><big>(</big><em>side</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderDefence.get_alignment_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderDefence.get_alignment_position" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_alignment_position</tt><big>(</big><em>side</em><big>)</big><a class="headerlink" href="#planning.strategies.DefenderDefence.get_alignment_position" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the side, find the x coordinate of where we need to align to initially.</p>
 </dd></dl>
 
@@ -1512,7 +1479,7 @@ attacker, turn 90 degrees and shoot to the other side.</p>
 
 <dl class="class">
 <dt id="planning.strategies.DefenderGrab">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">DefenderGrab</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderGrab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderGrab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">DefenderGrab</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.DefenderGrab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <dl class="attribute">
 <dt id="planning.strategies.DefenderGrab.DEFEND">
@@ -1541,26 +1508,26 @@ attacker, turn 90 degrees and shoot to the other side.</p>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderGrab.defend">
-<tt class="descname">defend</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderGrab.defend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderGrab.defend" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">defend</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderGrab.defend" title="Permalink to this definition">¶</a></dt>
 <dd><p>If the ball is heading towards our goal at high velocity then don&#8217;t go directly into
 grabbing mode once the ball enters our zone. Try to match it&#8217;s y-coordinate as fast as possible.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderGrab.grab">
-<tt class="descname">grab</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderGrab.grab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderGrab.grab" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">grab</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderGrab.grab" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.DefenderGrab.position">
-<tt class="descname">position</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderGrab.position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderGrab.position" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">position</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderGrab.position" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="planning.strategies.DefenderPenalty">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">DefenderPenalty</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderPenalty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderPenalty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">DefenderPenalty</tt><big>(</big><em>world</em><big>)</big><a class="headerlink" href="#planning.strategies.DefenderPenalty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#planning.strategies.Strategy" title="planning.strategies.Strategy"><tt class="xref py py-class docutils literal"><span class="pre">planning.strategies.Strategy</span></tt></a></p>
 <dl class="attribute">
 <dt id="planning.strategies.DefenderPenalty.DEFEND_GOAL">
@@ -1589,7 +1556,7 @@ grabbing mode once the ball enters our zone. Try to match it&#8217;s y-coordinat
 
 <dl class="method">
 <dt id="planning.strategies.DefenderPenalty.defend_goal">
-<tt class="descname">defend_goal</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#DefenderPenalty.defend_goal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.DefenderPenalty.defend_goal" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">defend_goal</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.DefenderPenalty.defend_goal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run around, blocking shots.</p>
 </dd></dl>
 
@@ -1597,7 +1564,7 @@ grabbing mode once the ball enters our zone. Try to match it&#8217;s y-coordinat
 
 <dl class="class">
 <dt id="planning.strategies.Strategy">
-<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">Strategy</tt><big>(</big><em>world</em>, <em>states</em><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#Strategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.Strategy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">planning.strategies.</tt><tt class="descname">Strategy</tt><big>(</big><em>world</em>, <em>states</em><big>)</big><a class="headerlink" href="#planning.strategies.Strategy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <dl class="attribute">
 <dt id="planning.strategies.Strategy.DOWN">
@@ -1616,22 +1583,22 @@ grabbing mode once the ball enters our zone. Try to match it&#8217;s y-coordinat
 
 <dl class="attribute">
 <dt id="planning.strategies.Strategy.current_state">
-<tt class="descname">current_state</tt><a class="reference internal" href="_modules/planning/strategies.html#Strategy.current_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.Strategy.current_state" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">current_state</tt><a class="headerlink" href="#planning.strategies.Strategy.current_state" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.Strategy.generate">
-<tt class="descname">generate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#Strategy.generate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.Strategy.generate" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">generate</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.Strategy.generate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.Strategy.is_last_state">
-<tt class="descname">is_last_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#Strategy.is_last_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.Strategy.is_last_state" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">is_last_state</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.Strategy.is_last_state" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="planning.strategies.Strategy.reset_current_state">
-<tt class="descname">reset_current_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/planning/strategies.html#Strategy.reset_current_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.strategies.Strategy.reset_current_state" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">reset_current_state</tt><big>(</big><big>)</big><a class="headerlink" href="#planning.strategies.Strategy.reset_current_state" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1668,6 +1635,27 @@ would result in the ball reaching the goal.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="planning.utilities.choose_attacker_destination">
+<tt class="descclassname">planning.utilities.</tt><tt class="descname">choose_attacker_destination</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/utilities.html#choose_attacker_destination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.utilities.choose_attacker_destination" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the attacker isn&#8217;t already at a point where it could try to score,
+try each point in it&#8217;s zone to see if we could if we moved there instead.
+If we find such a point, return it. 
+Returns False if we can&#8217;t find a clear point anywhere (shouldn&#8217;t really happen),
+and the current position if we can already shoot from there</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="planning.utilities.current_ball_controller">
+<tt class="descclassname">planning.utilities.</tt><tt class="descname">current_ball_controller</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/utilities.html#current_ball_controller"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.utilities.current_ball_controller" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="planning.utilities.enemy_possess_ball">
+<tt class="descclassname">planning.utilities.</tt><tt class="descname">enemy_possess_ball</tt><big>(</big><em>world</em><big>)</big><a class="reference internal" href="_modules/planning/utilities.html#enemy_possess_ball"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.utilities.enemy_possess_ball" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true when a robot on the opposing team has possession of the ball</p>
 </dd></dl>
 
 <dl class="function">
@@ -1767,6 +1755,11 @@ position even if it were bounced off the wall of the pitch.</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="function">
+<dt id="planning.utilities.robot_ball_distance">
+<tt class="descclassname">planning.utilities.</tt><tt class="descname">robot_ball_distance</tt><big>(</big><em>robot</em>, <em>ball</em><big>)</big><a class="reference internal" href="_modules/planning/utilities.html#robot_ball_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#planning.utilities.robot_ball_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 </div>

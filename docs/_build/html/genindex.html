@@ -57,25 +57,40 @@
         
         
             <ul>
-<li class="toctree-l1"><a class="reference internal" href="action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controller.html">Controller</a></li>
 <li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="vision.html">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -118,6 +133,7 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
@@ -143,10 +159,6 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="action.html#action.Action">Action (class in action)</a>
-  </dt>
-
       
   <dt><a href="planning.html#planning.strategies.AttackerPositionCatch.ALIGN">ALIGN (planning.strategies.AttackerPositionCatch attribute)</a>
   </dt>
@@ -198,16 +210,16 @@
   </dt>
 
       
-  <dt><a href="action.html#action.Action.angle">angle (action.Action attribute)</a>
+  <dt><a href="planning.html#planning.models.PitchObject.angle">angle (planning.models.PitchObject attribute)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="planning.html#planning.models.PitchObject.angle">(planning.models.PitchObject attribute)</a>
+  <dt><a href="planning.html#planning.models.Vector.angle">(planning.models.Vector attribute)</a>
   </dt>
 
         
-  <dt><a href="planning.html#planning.models.Vector.angle">(planning.models.Vector attribute)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.angle">(simulator.simulator.SimulatedAction attribute)</a>
   </dt>
 
       </dl></dd>
@@ -215,16 +227,8 @@
   <dt><a href="planning.html#planning.models.PitchObject.angle_offset">angle_offset (planning.models.PitchObject attribute)</a>
   </dt>
 
-      
-  <dt><a href="planning.html#planning.planner.Planner.attacker_state">attacker_state (planning.planner.Planner attribute)</a>
-  </dt>
-
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="planning.html#planning.planner.Planner.attacker_strat_state">attacker_strat_state (planning.planner.Planner attribute)</a>
-  </dt>
-
       
   <dt><a href="planning.html#planning.strategies.AttackerCatch">AttackerCatch (class in planning.strategies)</a>
   </dt>
@@ -272,6 +276,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="prediction.html#prediction.Prediction.NN.backPropagate">backPropagate() (prediction.Prediction.NN method)</a>
+  </dt>
+
+      
   <dt><a href="planning.html#planning.models.Ball">Ball (class in planning.models)</a>
   </dt>
 
@@ -280,15 +288,23 @@
   </dt>
 
       
-  <dt><a href="planning.html#planning.strategies.AttackerGrabCareful.BALL_Y_OFFSET">BALL_Y_OFFSET (planning.strategies.AttackerGrabCareful attribute)</a>
+  <dt><a href="simulator.html#simulator.simulator.Simulator.ball_body">ball_body (simulator.simulator.Simulator attribute)</a>
   </dt>
 
       
-  <dt><a href="vision.html#vision.tracker.BallTracker">BallTracker (class in vision.tracker)</a>
+  <dt><a href="simulator.html#simulator.simulator.Simulator.ball_posssessed">ball_posssessed (simulator.simulator.Simulator attribute)</a>
+  </dt>
+
+      
+  <dt><a href="planning.html#planning.strategies.AttackerGrabCareful.BALL_Y_OFFSET">BALL_Y_OFFSET (planning.strategies.AttackerGrabCareful attribute)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="vision.html#vision.tracker.BallTracker">BallTracker (class in vision.tracker)</a>
+  </dt>
+
       
   <dt><a href="vision.html#vision.vision.GUI.BG_SUB">BG_SUB (vision.vision.GUI attribute)</a>
   </dt>
@@ -340,12 +356,12 @@
   </dt>
 
       
-  <dt><a href="action.html#action.Action.catch">catch() (action.Action method)</a>
+  <dt><a href="planning.html#planning.strategies.AttackerCatch.catch">catch() (planning.strategies.AttackerCatch method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="planning.html#planning.strategies.AttackerCatch.catch">(planning.strategies.AttackerCatch method)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.catch">(simulator.simulator.SimulatedAction method)</a>
   </dt>
 
       </dl></dd>
@@ -382,11 +398,7 @@
   </dt>
 
       
-  <dt><a href="planning.html#planning.planner.Planner.choose_attacker_strategy">choose_attacker_strategy() (planning.planner.Planner method)</a>
-  </dt>
-
-      
-  <dt><a href="planning.html#planning.planner.Planner.choose_defender_strategy">choose_defender_strategy() (planning.planner.Planner method)</a>
+  <dt><a href="planning.html#planning.utilities.choose_attacker_destination">choose_attacker_destination() (in module planning.utilities)</a>
   </dt>
 
       
@@ -414,15 +426,15 @@
   </dt>
 
       
-  <dt><a href="controller.html#controller.Controller">Controller (class in controller)</a>
-  </dt>
-
-      
   <dt><a href="planning.html#planning.models.Coordinate">Coordinate (class in planning.models)</a>
   </dt>
 
       
   <dt><a href="vision.html#vision.tools.crop">crop() (in module vision.tools)</a>
+  </dt>
+
+      
+  <dt><a href="planning.html#planning.utilities.current_ball_controller">current_ball_controller() (in module planning.utilities)</a>
   </dt>
 
       
@@ -440,7 +452,7 @@
   </dt>
 
       
-  <dt><a href="action.html#action.Action.Debug">Debug (action.Action attribute)</a>
+  <dt><a href="prediction.html#prediction.DataScraperBall.DataScraper">DataScraper (class in prediction.DataScraperBall)</a>
   </dt>
 
       
@@ -476,14 +488,6 @@
 
       </dl></dd>
       
-  <dt><a href="planning.html#planning.planner.Planner.defender_state">defender_state (planning.planner.Planner attribute)</a>
-  </dt>
-
-      
-  <dt><a href="planning.html#planning.planner.Planner.defender_strat_state">defender_strat_state (planning.planner.Planner attribute)</a>
-  </dt>
-
-      
   <dt><a href="planning.html#planning.strategies.DefenderBouncePass">DefenderBouncePass (class in planning.strategies)</a>
   </dt>
 
@@ -497,6 +501,10 @@
 
       
   <dt><a href="planning.html#planning.strategies.DefenderPenalty">DefenderPenalty (class in planning.strategies)</a>
+  </dt>
+
+      
+  <dt><a href="prediction.html#prediction.Prediction.dist">dist() (in module prediction.Prediction)</a>
   </dt>
 
       
@@ -521,18 +529,22 @@
   </dt>
 
       </dl></dd>
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="vision.html#vision.calibrate.Configure.draw">draw() (vision.calibrate.Configure method)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedCamera.draw">draw() (simulator.simulator.SimulatedCamera method)</a>
   </dt>
 
       <dd><dl>
+        
+  <dt><a href="vision.html#vision.calibrate.Configure.draw">(vision.calibrate.Configure method)</a>
+  </dt>
+
         
   <dt><a href="vision.html#vision.vision.GUI.draw">(vision.vision.GUI method)</a>
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="vision.html#vision.vision.GUI.draw_actions">draw_actions() (vision.vision.GUI method)</a>
   </dt>
@@ -600,6 +612,16 @@
   </dl></td>
 </tr></table>
 
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="planning.html#planning.utilities.enemy_possess_ball">enemy_possess_ball() (in module planning.utilities)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
@@ -621,12 +643,12 @@
   <dt><a href="vision.html#vision.tools.find_extremes">find_extremes() (in module vision.tools)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="planning.html#planning.strategies.AttackerGrabCareful.finish">finish() (planning.strategies.AttackerGrabCareful method)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="planning.html#planning.strategies.AttackerDriveBy.FINISHED">FINISHED (planning.strategies.AttackerDriveBy attribute)</a>
   </dt>
@@ -646,7 +668,17 @@
 
       </dl></dd>
       
-  <dt><a href="vision.html#vision.vision.Camera.fix_radial_distortion">fix_radial_distortion() (vision.vision.Camera method)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedCamera.fix_radial_distortion">fix_radial_distortion() (simulator.simulator.SimulatedCamera method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="vision.html#vision.vision.Camera.fix_radial_distortion">(vision.vision.Camera method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="simulator.html#simulator.simulator.SimulatedCamera.frame">frame (simulator.simulator.SimulatedCamera attribute)</a>
   </dt>
 
   </dl></td>
@@ -666,9 +698,15 @@
 
       </dl></dd>
       
-  <dt><a href="vision.html#vision.vision.Camera.get_adjusted_center">get_adjusted_center() (vision.vision.Camera method)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedCamera.get_adjusted_center">get_adjusted_center() (simulator.simulator.SimulatedCamera method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="vision.html#vision.vision.Camera.get_adjusted_center">(vision.vision.Camera method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="vision.html#vision.vision.Vision.get_adjusted_point">get_adjusted_point() (vision.vision.Vision method)</a>
   </dt>
@@ -742,9 +780,15 @@
   </dt>
 
       
-  <dt><a href="vision.html#vision.vision.Camera.get_frame">get_frame() (vision.vision.Camera method)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedCamera.get_frame">get_frame() (simulator.simulator.SimulatedCamera method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="vision.html#vision.vision.Camera.get_frame">(vision.vision.Camera method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="planning.html#planning.models.PitchObject.get_generic_polygon">get_generic_polygon() (planning.models.PitchObject method)</a>
   </dt>
@@ -769,10 +813,6 @@
 
       
   <dt><a href="vision.html#vision.findHSV.CalibrationGUI.get_mask">get_mask() (vision.findHSV.CalibrationGUI method)</a>
-  </dt>
-
-      
-  <dt><a href="preprocessing.html#preprocessing.preprocessing.Preprocessing.get_options">get_options() (preprocessing.preprocessing.Preprocessing method)</a>
   </dt>
 
       
@@ -966,12 +1006,12 @@
   </dt>
 
       
-  <dt><a href="action.html#action.Action.kick">kick() (action.Action method)</a>
+  <dt><a href="planning.html#planning.strategies.AttackerTurnScore.kick">kick() (planning.strategies.AttackerTurnScore method)</a>
   </dt>
 
       <dd><dl>
         
-  <dt><a href="planning.html#planning.strategies.AttackerTurnScore.kick">(planning.strategies.AttackerTurnScore method)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.kick">(simulator.simulator.SimulatedAction method)</a>
   </dt>
 
       </dl></dd>
@@ -1018,17 +1058,21 @@
   </dt>
 
       
-  <dt><a href="action.html#action.Action.MOTOR_ANGLES">MOTOR_ANGLES (action.Action attribute)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.MOTOR_ANGLES">MOTOR_ANGLES (simulator.simulator.SimulatedAction attribute)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.MOTORS">MOTORS (simulator.simulator.SimulatedAction attribute)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="action.html#action.Action.MOTORS">MOTORS (action.Action attribute)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.move">move() (simulator.simulator.SimulatedAction method)</a>
   </dt>
 
       
-  <dt><a href="action.html#action.Action.move">move() (action.Action method)</a>
+  <dt><a href="simulator.html#simulator.simulator.Simulator.move_ball">move_ball() (simulator.simulator.Simulator method)</a>
   </dt>
 
   </dl></td>
@@ -1038,25 +1082,19 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="vision.html#vision.vision.GUI.NORMALIZE">NORMALIZE (vision.vision.GUI attribute)</a>
+  <dt><a href="prediction.html#prediction.Prediction.NN">NN (class in prediction.Prediction)</a>
   </dt>
 
       
-  <dt><a href="preprocessing.html#preprocessing.preprocessing.Preprocessing.normalize">normalize() (preprocessing.preprocessing.Preprocessing method)</a>
+  <dt><a href="vision.html#vision.vision.GUI.NORMALIZE">NORMALIZE (vision.vision.GUI attribute)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="vision.html#vision.findHSV.nothing">nothing() (in module vision.findHSV)</a>
+  <dt><a href="vision.html#vision.vision.GUI.nothing">nothing() (vision.vision.GUI method)</a>
   </dt>
 
-      <dd><dl>
-        
-  <dt><a href="vision.html#vision.vision.GUI.nothing">(vision.vision.GUI method)</a>
-  </dt>
-
-      </dl></dd>
   </dl></td>
 </tr></table>
 
@@ -1064,11 +1102,19 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="action.html#action.Action.open_catcher">open_catcher() (action.Action method)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.open_catcher">open_catcher() (simulator.simulator.SimulatedAction method)</a>
   </dt>
 
       
   <dt><a href="planning.html#planning.models.World.our_attacker">our_attacker (planning.models.World attribute)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.Simulator.our_attacker_body">our_attacker_body (simulator.simulator.Simulator attribute)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.Simulator.our_body">our_body (simulator.simulator.Simulator attribute)</a>
   </dt>
 
   </dl></td>
@@ -1078,7 +1124,15 @@
   </dt>
 
       
+  <dt><a href="simulator.html#simulator.simulator.Simulator.our_defender_body">our_defender_body (simulator.simulator.Simulator attribute)</a>
+  </dt>
+
+      
   <dt><a href="planning.html#planning.models.World.our_goal">our_goal (planning.models.World attribute)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.Simulator.our_robot">our_robot (simulator.simulator.Simulator attribute)</a>
   </dt>
 
   </dl></td>
@@ -1098,15 +1152,19 @@
 
       </dl></dd>
       
-  <dt><a href="action.html#action.Action.ping">ping() (action.Action method)</a>
-  </dt>
-
-      
   <dt><a href="planning.html#planning.models.Pitch">Pitch (class in planning.models)</a>
   </dt>
 
       
   <dt><a href="planning.html#planning.models.World.pitch">pitch (planning.models.World attribute)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.SimulatedCamera.PITCH_HEIGHT">PITCH_HEIGHT (simulator.simulator.SimulatedCamera attribute)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.SimulatedCamera.PITCH_WIDTH">PITCH_WIDTH (simulator.simulator.SimulatedCamera attribute)</a>
   </dt>
 
       
@@ -1118,23 +1176,11 @@
   </dt>
 
       
-  <dt><a href="planning.html#planning.planner.Planner.plan">plan() (planning.planner.Planner method)</a>
-  </dt>
-
-      
-  <dt><a href="planning.html#planning.planner.Planner">Planner (class in planning.planner)</a>
-  </dt>
-
-      
   <dt><a href="planning.html#module-planning.collisions">planning.collisions (module)</a>
   </dt>
 
       
   <dt><a href="planning.html#module-planning.models">planning.models (module)</a>
-  </dt>
-
-      
-  <dt><a href="planning.html#module-planning.planner">planning.planner (module)</a>
   </dt>
 
       
@@ -1145,8 +1191,6 @@
   <dt><a href="planning.html#module-planning.utilities">planning.utilities (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="planning.html#planning.strategies.AttackerScoreDynamic.POSITION">POSITION (planning.strategies.AttackerScoreDynamic attribute)</a>
   </dt>
@@ -1161,6 +1205,8 @@
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="planning.html#planning.strategies.AttackerGrab.position">position() (planning.strategies.AttackerGrab method)</a>
   </dt>
@@ -1196,15 +1242,23 @@
   </dt>
 
       
-  <dt><a href="postprocessing.html#module-postprocessing.postprocessing">postprocessing.postprocessing (module)</a>
-  </dt>
-
-      
   <dt><a href="planning.html#planning.strategies.Strategy.PRECISE_BALL_ANGLE_THRESHOLD">PRECISE_BALL_ANGLE_THRESHOLD (planning.strategies.Strategy attribute)</a>
   </dt>
 
       
+  <dt><a href="prediction.html#prediction.Prediction.Predictor.predict">predict() (prediction.Prediction.Predictor method)</a>
+  </dt>
+
+      
   <dt><a href="planning.html#planning.utilities.predict_y_intersection">predict_y_intersection() (in module planning.utilities)</a>
+  </dt>
+
+      
+  <dt><a href="prediction.html#module-prediction.Prediction">prediction.Prediction (module)</a>
+  </dt>
+
+      
+  <dt><a href="prediction.html#prediction.Prediction.Predictor">Predictor (class in prediction.Prediction)</a>
   </dt>
 
       
@@ -1236,17 +1290,15 @@
 
       </dl></dd>
       
-  <dt><a href="vision.html#vision.tracker.Tracker.preprocess">preprocess() (vision.tracker.Tracker method)</a>
+  <dt><a href="prediction.html#prediction.Prediction.preprocess">preprocess() (in module prediction.Prediction)</a>
   </dt>
 
-      
-  <dt><a href="preprocessing.html#preprocessing.preprocessing.Preprocessing">Preprocessing (class in preprocessing.preprocessing)</a>
+      <dd><dl>
+        
+  <dt><a href="vision.html#vision.tracker.Tracker.preprocess">(vision.tracker.Tracker method)</a>
   </dt>
 
-      
-  <dt><a href="preprocessing.html#module-preprocessing.preprocessing">preprocessing.preprocessing (module)</a>
-  </dt>
-
+      </dl></dd>
   </dl></td>
 </tr></table>
 
@@ -1276,11 +1328,19 @@
   </dt>
 
       
-  <dt><a href="vision.html#vision.tracker.RobotTracker">RobotTracker (class in vision.tracker)</a>
+  <dt><a href="planning.html#planning.utilities.robot_ball_distance">robot_ball_distance() (in module planning.utilities)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="vision.html#vision.tracker.RobotTracker">RobotTracker (class in vision.tracker)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.Simulator.role">role (simulator.simulator.Simulator attribute)</a>
+  </dt>
+
       
   <dt><a href="planning.html#planning.strategies.AttackerDriveByTurn.ROTATE">ROTATE (planning.strategies.AttackerDriveByTurn attribute)</a>
   </dt>
@@ -1310,7 +1370,7 @@
 
       </dl></dd>
       
-  <dt><a href="preprocessing.html#preprocessing.preprocessing.Preprocessing.run">run() (preprocessing.preprocessing.Preprocessing method)</a>
+  <dt><a href="prediction.html#prediction.DataScraperBall.DataScraper.run">run() (prediction.DataScraperBall.DataScraper method)</a>
   </dt>
 
       <dd><dl>
@@ -1319,10 +1379,6 @@
   </dt>
 
       </dl></dd>
-      
-  <dt><a href="run_tests.html#module-run_tests">run_tests (module)</a>
-  </dt>
-
   </dl></td>
 </tr></table>
 
@@ -1352,14 +1408,6 @@
 
         
   <dt><a href="Test.html#Test.models_test.TestVector.setUp">(Test.models_test.TestVector method)</a>
-  </dt>
-
-        
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionLeft.setUp">(Test.planner_test.TestYPredictionLeft method)</a>
-  </dt>
-
-        
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionRight.setUp">(Test.planner_test.TestYPredictionRight method)</a>
   </dt>
 
         
@@ -1419,8 +1467,6 @@
   <dt><a href="planning.html#planning.strategies.AttackerScoreDynamic.SHOOTING_X_OFFSET">SHOOTING_X_OFFSET (planning.strategies.AttackerScoreDynamic attribute)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="vision.html#vision.findHSV.CalibrationGUI.show">show() (vision.findHSV.CalibrationGUI method)</a>
   </dt>
@@ -1435,6 +1481,32 @@
   </dt>
 
       </dl></dd>
+      
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction">SimulatedAction (class in simulator.simulator)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="simulator.html#simulator.simulator.SimulatedCamera">SimulatedCamera (class in simulator.simulator)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.Simulator">Simulator (class in simulator.simulator)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.simulator">simulator (simulator.simulator.SimulatedAction attribute)</a>
+  </dt>
+
+      
+  <dt><a href="vision.html#vision.calibrate.Configure.sortPoly">sortPoly() (vision.calibrate.Configure method)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.Simulator.space">space (simulator.simulator.Simulator attribute)</a>
+  </dt>
+
       
   <dt><a href="planning.html#planning.strategies.AttackerCatch.STATES">STATES (planning.strategies.AttackerCatch attribute)</a>
   </dt>
@@ -1490,7 +1562,7 @@
 
       </dl></dd>
       
-  <dt><a href="action.html#action.Action.stop">stop() (action.Action method)</a>
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.stop">stop() (simulator.simulator.SimulatedAction method)</a>
   </dt>
 
       
@@ -1512,11 +1584,11 @@
   </dt>
 
       
-  <dt><a href="Test.html#module-Test.models_test">Test.models_test (module)</a>
+  <dt><a href="prediction.html#prediction.Prediction.NN.test">test() (prediction.Prediction.NN method)</a>
   </dt>
 
       
-  <dt><a href="Test.html#module-Test.planner_test">Test.planner_test (module)</a>
+  <dt><a href="Test.html#module-Test.models_test">Test.models_test (module)</a>
   </dt>
 
       
@@ -1535,26 +1607,6 @@
   <dt><a href="Test.html#Test.postprocessing_test.TestPostprocessing.test_analyze_robot">test_analyze_robot() (Test.postprocessing_test.TestPostprocessing method)</a>
   </dt>
 
-      
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionLeft.test_angle_shot">test_angle_shot() (Test.planner_test.TestYPredictionLeft method)</a>
-  </dt>
-
-      <dd><dl>
-        
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionRight.test_angle_shot">(Test.planner_test.TestYPredictionRight method)</a>
-  </dt>
-
-      </dl></dd>
-      
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionLeft.test_bounce_shot">test_bounce_shot() (Test.planner_test.TestYPredictionLeft method)</a>
-  </dt>
-
-      <dd><dl>
-        
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionRight.test_bounce_shot">(Test.planner_test.TestYPredictionRight method)</a>
-  </dt>
-
-      </dl></dd>
       
   <dt><a href="Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_confuse1_rotation_up">test_confuse1_rotation_up() (Test.strategy_test.AttackerScoreDynamicTestCase method)</a>
   </dt>
@@ -1626,16 +1678,6 @@
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionLeft.test_no_intersection">test_no_intersection() (Test.planner_test.TestYPredictionLeft method)</a>
-  </dt>
-
-      <dd><dl>
-        
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionRight.test_no_intersection">(Test.planner_test.TestYPredictionRight method)</a>
-  </dt>
-
-      </dl></dd>
-      
   <dt><a href="Test.html#Test.models_test.TestPitch.test_Pitch_initialisation">test_Pitch_initialisation() (Test.models_test.TestPitch method)</a>
   </dt>
 
@@ -1659,26 +1701,6 @@
   <dt><a href="Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_reach_middle_within_threshold">test_reach_middle_within_threshold() (Test.strategy_test.AttackerScoreDynamicTestCase method)</a>
   </dt>
 
-      
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionLeft.test_straight_corrected_shot">test_straight_corrected_shot() (Test.planner_test.TestYPredictionLeft method)</a>
-  </dt>
-
-      <dd><dl>
-        
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionRight.test_straight_corrected_shot">(Test.planner_test.TestYPredictionRight method)</a>
-  </dt>
-
-      </dl></dd>
-      
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionLeft.test_straight_shot">test_straight_shot() (Test.planner_test.TestYPredictionLeft method)</a>
-  </dt>
-
-      <dd><dl>
-        
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionRight.test_straight_shot">(Test.planner_test.TestYPredictionRight method)</a>
-  </dt>
-
-      </dl></dd>
       
   <dt><a href="Test.html#Test.strategy_test.AttackerScoreDynamicTestCase.test_strategy_initializes">test_strategy_initializes() (Test.strategy_test.AttackerScoreDynamicTestCase method)</a>
   </dt>
@@ -1728,19 +1750,19 @@
   </dt>
 
       
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionLeft">TestYPredictionLeft (class in Test.planner_test)</a>
-  </dt>
-
-      
-  <dt><a href="Test.html#Test.planner_test.TestYPredictionRight">TestYPredictionRight (class in Test.planner_test)</a>
-  </dt>
-
-      
   <dt><a href="planning.html#planning.models.World.their_attacker">their_attacker (planning.models.World attribute)</a>
   </dt>
 
       
+  <dt><a href="simulator.html#simulator.simulator.Simulator.their_attacker_body">their_attacker_body (simulator.simulator.Simulator attribute)</a>
+  </dt>
+
+      
   <dt><a href="planning.html#planning.models.World.their_defender">their_defender (planning.models.World attribute)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.Simulator.their_defender_body">their_defender_body (simulator.simulator.Simulator attribute)</a>
   </dt>
 
       
@@ -1762,7 +1784,11 @@
   </dt>
 
       
-  <dt><a href="action.html#action.Action.turn">turn() (action.Action method)</a>
+  <dt><a href="prediction.html#prediction.Prediction.NN.train">train() (prediction.Prediction.NN method)</a>
+  </dt>
+
+      
+  <dt><a href="simulator.html#simulator.simulator.SimulatedAction.turn">turn() (simulator.simulator.SimulatedAction method)</a>
   </dt>
 
   </dl></td>
@@ -1814,6 +1840,20 @@
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="prediction.html#prediction.Prediction.NN.update">update() (prediction.Prediction.NN method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="prediction.html#prediction.Prediction.Predictor.update">(prediction.Prediction.Predictor method)</a>
+  </dt>
+
+        
+  <dt><a href="simulator.html#simulator.simulator.Simulator.update">(simulator.simulator.Simulator method)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="planning.html#planning.models.World.update_positions">update_positions() (planning.models.World method)</a>
   </dt>
 
@@ -1849,18 +1889,14 @@
   <dt><a href="vision.html#vision.vision.GUI.VISION">VISION (vision.vision.GUI attribute)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="vision.html#module-vision.calibrate">vision.calibrate (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="vision.html#module-vision.colors">vision.colors (module)</a>
-  </dt>
-
-      
-  <dt><a href="vision.html#module-vision.findHSV">vision.findHSV (module)</a>
   </dt>
 
       
@@ -1882,6 +1918,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="prediction.html#prediction.Prediction.NN.weights">weights() (prediction.Prediction.NN method)</a>
+  </dt>
+
+      
   <dt><a href="planning.html#planning.models.Pitch.width">width (planning.models.Pitch attribute)</a>
   </dt>
 
@@ -1902,7 +1942,7 @@
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="controller.html#controller.Controller.wow">wow() (controller.Controller method)</a>
+  <dt><a href="simulator.html#simulator.simulator.Simulator.world">world (simulator.simulator.Simulator attribute)</a>
   </dt>
 
       

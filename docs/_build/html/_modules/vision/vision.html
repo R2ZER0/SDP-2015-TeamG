@@ -57,25 +57,40 @@
         
         
             <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -244,7 +259,7 @@
 <span class="sd">        from the center of the lens.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">plane_height</span> <span class="o">=</span> <span class="mf">250.0</span>
-        <span class="n">robot_height</span> <span class="o">=</span> <span class="mf">20.0</span>
+        <span class="n">robot_height</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">coefficient</span> <span class="o">=</span> <span class="n">robot_height</span><span class="o">/</span><span class="n">plane_height</span>
 
         <span class="n">x</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -398,18 +413,15 @@
 <div class="viewcode-block" id="GUI.nothing"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.nothing">[docs]</a>    <span class="k">def</span> <span class="nf">nothing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">pass</span>
 </div>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">arduino</span><span class="p">,</span> <span class="n">pitch</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calibration</span><span class="p">,</span> <span class="n">pitch</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zones</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">calibration_gui</span> <span class="o">=</span> <span class="n">CalibrationGUI</span><span class="p">(</span><span class="n">calibration</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">arduino</span> <span class="o">=</span> <span class="n">arduino</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pitch</span> <span class="o">=</span> <span class="n">pitch</span>
 
         <span class="n">cv2</span><span class="o">.</span><span class="n">namedWindow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">)</span>
 
         <span class="n">cv2</span><span class="o">.</span><span class="n">createTrackbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">BG_SUB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nothing</span><span class="p">)</span>
         <span class="n">cv2</span><span class="o">.</span><span class="n">createTrackbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NORMALIZE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nothing</span><span class="p">)</span>
-        <span class="n">cv2</span><span class="o">.</span><span class="n">createTrackbar</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">COMMS</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">VISION</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arduino</span><span class="o">.</span><span class="n">comms</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">arduino</span><span class="o">.</span><span class="n">setComms</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
 <div class="viewcode-block" id="GUI.to_info"><a class="viewcode-back" href="../../vision.html#vision.vision.GUI.to_info">[docs]</a>    <span class="k">def</span> <span class="nf">to_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

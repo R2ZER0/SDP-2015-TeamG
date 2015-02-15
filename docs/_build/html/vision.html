@@ -29,7 +29,7 @@
 
   
     <link rel="top" title="SDP  documentation" href="index.html"/>
-        <link rel="prev" title="Preprocessing" href="preprocessing.html"/> 
+        <link rel="prev" title="Testing" href="testing.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -57,25 +57,40 @@
         
         
             <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controller.html">Controller</a></li>
 <li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -115,7 +130,7 @@
   <div class="section" id="vision">
 <h1>Vision<a class="headerlink" href="#vision" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-vision.calibrate">
-<span id="calibrate-script"></span><h2>Calibrate Script<a class="headerlink" href="#module-vision.calibrate" title="Permalink to this headline">¶</a></h2>
+<span id="croppings-script"></span><h2>Croppings Script<a class="headerlink" href="#module-vision.calibrate" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="vision.calibrate.Configure">
 <em class="property">class </em><tt class="descclassname">vision.calibrate.</tt><tt class="descname">Configure</tt><big>(</big><em>pitch</em><big>)</big><a class="reference internal" href="_modules/vision/calibrate.html#Configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.calibrate.Configure" title="Permalink to this definition">¶</a></dt>
@@ -199,15 +214,20 @@ begins the routine of the program asking for user input.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="vision.calibrate.Configure.sortPoly">
+<tt class="descname">sortPoly</tt><big>(</big><em>points</em><big>)</big><a class="reference internal" href="_modules/vision/calibrate.html#Configure.sortPoly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.calibrate.Configure.sortPoly" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
 <div class="section" id="module-vision.colors">
-<span id="colors"></span><h2>Colors<a class="headerlink" href="#module-vision.colors" title="Permalink to this headline">¶</a></h2>
+<span id="color-properties"></span><h2>Color Properties<a class="headerlink" href="#module-vision.colors" title="Permalink to this headline">¶</a></h2>
 <p>Convenience setup colours values for GUI drawing.</p>
 </div>
-<div class="section" id="module-vision.findHSV">
-<span id="threshold-gui"></span><h2>Threshold GUI<a class="headerlink" href="#module-vision.findHSV" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="threshold-gui">
+<h2>Threshold GUI<a class="headerlink" href="#threshold-gui" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="vision.findHSV.CalibrationGUI">
 <em class="property">class </em><tt class="descclassname">vision.findHSV.</tt><tt class="descname">CalibrationGUI</tt><big>(</big><em>calibration</em><big>)</big><a class="reference internal" href="_modules/vision/findHSV.html#CalibrationGUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.findHSV.CalibrationGUI" title="Permalink to this definition">¶</a></dt>
@@ -266,14 +286,9 @@ the resultant masked image. Also attempts to perform any changes due on the give
 
 </dd></dl>
 
-<dl class="function">
-<dt id="vision.findHSV.nothing">
-<tt class="descclassname">vision.findHSV.</tt><tt class="descname">nothing</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="_modules/vision/findHSV.html#nothing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.findHSV.nothing" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 <div class="section" id="module-vision.tools">
-<span id="vision-tools"></span><h2>Vision tools<a class="headerlink" href="#module-vision.tools" title="Permalink to this headline">¶</a></h2>
+<span id="vision-tools"></span><h2>Vision Tools<a class="headerlink" href="#module-vision.tools" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="vision.tools.crop">
 <tt class="descclassname">vision.tools.</tt><tt class="descname">crop</tt><big>(</big><em>frame</em>, <em>size=None</em><big>)</big><a class="reference internal" href="_modules/vision/tools.html#crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.tools.crop" title="Permalink to this definition">¶</a></dt>
@@ -446,7 +461,7 @@ available.</p>
 
 <dl class="method">
 <dt id="vision.tracker.RobotTracker.get_dot">
-<tt class="descname">get_dot</tt><big>(</big><em>frame</em>, <em>x_offset</em>, <em>y_offset</em><big>)</big><a class="reference internal" href="_modules/vision/tracker.html#RobotTracker.get_dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.tracker.RobotTracker.get_dot" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_dot</tt><big>(</big><em>frame</em>, <em>x_offset</em>, <em>y_offset</em>, <em>plate_corners</em><big>)</big><a class="reference internal" href="_modules/vision/tracker.html#RobotTracker.get_dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.tracker.RobotTracker.get_dot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find center point of the black dot on the plate.</p>
 <dl class="docutils">
 <dt>Method:</dt>
@@ -543,9 +558,9 @@ keys in adjustments dictionary.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-vision.vision">
-<span id="vision-gui"></span><h2>Vision GUI<a class="headerlink" href="#module-vision.vision" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<div class="section" id="id1">
+<h2>Vision<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-vision.vision"></span><dl class="class">
 <dt id="vision.vision.Camera">
 <em class="property">class </em><tt class="descclassname">vision.vision.</tt><tt class="descname">Camera</tt><big>(</big><em>port=0</em>, <em>pitch=0</em><big>)</big><a class="reference internal" href="_modules/vision/vision.html#Camera"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.vision.Camera" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
@@ -590,7 +605,7 @@ keys in adjustments dictionary.</p>
 
 <dl class="class">
 <dt id="vision.vision.GUI">
-<em class="property">class </em><tt class="descclassname">vision.vision.</tt><tt class="descname">GUI</tt><big>(</big><em>calibration</em>, <em>arduino</em>, <em>pitch</em><big>)</big><a class="reference internal" href="_modules/vision/vision.html#GUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.vision.GUI" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">vision.vision.</tt><tt class="descname">GUI</tt><big>(</big><em>calibration</em>, <em>pitch</em><big>)</big><a class="reference internal" href="_modules/vision/vision.html#GUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vision.vision.GUI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <dl class="attribute">
 <dt id="vision.vision.GUI.BG_SUB">
@@ -738,7 +753,7 @@ from the center of the lens.</p>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="preprocessing.html" class="btn btn-neutral" title="Preprocessing"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="testing.html" class="btn btn-neutral" title="Testing"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

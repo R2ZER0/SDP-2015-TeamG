@@ -57,25 +57,40 @@
         
         
             <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -117,6 +132,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">tools</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">calibrate.py contains a simple utility for determining the correct coordinates for </span>
@@ -208,26 +224,39 @@
                 <span class="c"># Apply barrel distortion fix to the image</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">undistort</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">CMATRIX</span><span class="p">,</span> <span class="n">DIST</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">NCMATRIX</span><span class="p">)</span>
 
-                <span class="c"># Retrieve the outline of the pitch from the user; this should trail</span>
-                <span class="c"># the border of the pitch (goals + perimeter)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_pitch_outline</span><span class="p">()</span>
-
-                <span class="c"># Retrive the various zones for the robots in our pitch.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_zone</span><span class="p">(</span><span class="s">&#39;Zone_0&#39;</span><span class="p">,</span> <span class="s">&#39;draw LEFT Defender&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_zone</span><span class="p">(</span><span class="s">&#39;Zone_2&#39;</span><span class="p">,</span> <span class="s">&#39;draw LEFT Attacker&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_zone</span><span class="p">(</span><span class="s">&#39;Zone_1&#39;</span><span class="p">,</span> <span class="s">&#39;draw RIGHT Attacker&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_zone</span><span class="p">(</span><span class="s">&#39;Zone_3&#39;</span><span class="p">,</span> <span class="s">&#39;draw RIGHT Defender&#39;</span><span class="p">)</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;Zone_3&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;Zone_2&#39;</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;Zone_2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;Zone_1&#39;</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;Zone_1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;Zone_0&#39;</span><span class="p">],</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
+		<span class="n">minx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">],</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="n">miny</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">],</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>		
+		
+		<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;Zone_0&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_1&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_2&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_3&#39;</span><span class="p">]:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="o">-</span><span class="n">minx</span><span class="p">,</span> <span class="n">y</span><span class="o">-</span><span class="n">miny</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
+		<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_0&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_1&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_2&#39;</span><span class="p">,</span> <span class="s">&#39;Zone_3&#39;</span><span class="p">]:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sortPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
 
                 <span class="c"># Calculate the goal positions for each zone</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_goal</span><span class="p">(</span><span class="s">&#39;Zone_0&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_goal</span><span class="p">(</span><span class="s">&#39;Zone_3&#39;</span><span class="p">)</span>
 
+		<span class="bp">self</span><span class="o">.</span><span class="n">draw_poly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape</span><span class="p">())</span>
                 <span class="k">print</span> <span class="s">&#39;Press any key to finish.&#39;</span>
                 <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
 
-                <span class="c"># Write out the data to our croppings file</span>
+                <span class="c"># Write out the data</span>
                 <span class="n">tools</span><span class="o">.</span><span class="n">save_croppings</span><span class="p">(</span><span class="n">pitch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pitch</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+	</div>
+<div class="viewcode-block" id="Configure.sortPoly"><a class="viewcode-back" href="../../vision.html#vision.calibrate.Configure.sortPoly">[docs]</a>	<span class="k">def</span> <span class="nf">sortPoly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+		<span class="n">cent</span> <span class="o">=</span> <span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="nb">sum</span><span class="p">([</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">])</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">))</span>
+		<span class="c"># sort by polar angle</span>
+		<span class="n">points</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">cent</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">cent</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+		<span class="k">return</span> <span class="n">points</span>
 </div>
 <div class="viewcode-block" id="Configure.reshape"><a class="viewcode-back" href="../../vision.html#vision.calibrate.Configure.reshape">[docs]</a>        <span class="k">def</span> <span class="nf">reshape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">drawing</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
@@ -250,13 +279,14 @@
 <span class="sd">                :param message: The message to prompt the user</span>
 <span class="sd">                &#39;&#39;&#39;</span>
                 <span class="k">print</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">. </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="s">&quot;Continue by pressing q&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">drawing</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">key</span><span class="p">,</span> <span class="bp">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">drawing</span> <span class="o">=</span> <span class="n">key</span>
+		<span class="n">k</span> <span class="o">=</span> <span class="bp">True</span>
 
                 <span class="k">while</span> <span class="n">k</span> <span class="o">!=</span> <span class="nb">ord</span><span class="p">(</span><span class="s">&#39;q&#39;</span><span class="p">):</span>
                         <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">FRAME_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
                         <span class="n">k</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">draw_poly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reshape</span><span class="p">())</span>
+                
 </div>
 <div class="viewcode-block" id="Configure.get_pitch_outline"><a class="viewcode-back" href="../../vision.html#vision.calibrate.Configure.get_pitch_outline">[docs]</a>        <span class="k">def</span> <span class="nf">get_pitch_outline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="sd">&#39;&#39;&#39;</span>
@@ -285,6 +315,7 @@
                         <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span>
                         <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">drawing</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="Configure.get_goal"><a class="viewcode-back" href="../../vision.html#vision.calibrate.Configure.get_goal">[docs]</a>        <span class="k">def</span> <span class="nf">get_goal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">):</span>
                 <span class="sd">&#39;&#39;&#39;</span>

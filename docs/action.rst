@@ -1,4 +1,5 @@
-Action Class
+
+Action class
 ============
 
 .. autoclass:: action.Action

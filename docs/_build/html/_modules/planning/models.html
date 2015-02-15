@@ -57,25 +57,40 @@
         
         
             <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -147,8 +162,6 @@
 
 
 <div class="viewcode-block" id="Coordinate"><a class="viewcode-back" href="../../planning.html#planning.models.Coordinate">[docs]</a><span class="k">class</span> <span class="nc">Coordinate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Simple coordinate class that provides x,y property access.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -199,13 +212,10 @@
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Constructs a string representation of this coordinate.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-
         <span class="k">return</span> <span class="s">&#39;x: </span><span class="si">%s</span><span class="s">, y: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="Vector"><a class="viewcode-back" href="../../planning.html#planning.models.Vector">[docs]</a><span class="k">class</span> <span class="nc">Vector</span><span class="p">(</span><span class="n">Coordinate</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;A standard vector representation (non-position). Contains a reference point</span>
-<span class="sd">    x,y, an angle and velocity.&#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Assigns the given values and constructs a Vector.</span>
@@ -261,9 +271,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span> <span class="o">=</span> <span class="n">new_velocity</span>
 </div>
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Checks equality of this Vector with another by comparing instance</span>
-<span class="sd">        type and comparing equality of all the attributes.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__dict__</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -274,8 +281,9 @@
 </div>
 <div class="viewcode-block" id="PitchObject"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject">[docs]</a><span class="k">class</span> <span class="nc">PitchObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    A class that describes an abstract pitch object, representing dimensions,</span>
-<span class="sd">    position, and movement attributes.</span>
+<span class="sd">    A class that describes an abstract pitch object</span>
+<span class="sd">    Width measures the front and back of an object</span>
+<span class="sd">    Length measures along the sides of an object</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">angle_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -321,12 +329,6 @@
 </div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="PitchObject.angle_offset"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.angle_offset">[docs]</a>    <span class="k">def</span> <span class="nf">angle_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Angle offset serves as a convenience for modifying any angle assigned</span>
-<span class="sd">        to a PitchObject by the given amount.</span>
-
-<span class="sd">        Useful if the robot is at somewhat of an angle compared to a common</span>
-<span class="sd">        reference object (i.e robot aligned differently to top-plate)</span>
-<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angle_offset</span>
 </div>
     <span class="nd">@property</span>
@@ -351,9 +353,6 @@
 
     <span class="nd">@vector.setter</span>
 <div class="viewcode-block" id="PitchObject.vector"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.vector">[docs]</a>    <span class="k">def</span> <span class="nf">vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_vector</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Assigns a new vector to this PitchObject. The vector must be an instance</span>
-<span class="sd">        of the Vector class and contain x,y,angle,velocity attributes.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">new_vector</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_vector</span><span class="p">,</span> <span class="n">Vector</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;The new vector can not be None and must be an instance of a Vector&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -370,17 +369,14 @@
         <span class="n">front_right</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">back_left</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">back_right</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-
-        <span class="c"># Construct poly using our points and rotate around our center</span>
         <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">((</span><span class="n">front_left</span><span class="p">,</span> <span class="n">front_right</span><span class="p">,</span> <span class="n">back_left</span><span class="p">,</span> <span class="n">back_right</span><span class="p">))</span>
         <span class="n">poly</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-
-        <span class="c"># Return the first contour point list from the polygon</span>
         <span class="k">return</span> <span class="n">poly</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="PitchObject.get_polygon"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.get_polygon">[docs]</a>    <span class="k">def</span> <span class="nf">get_polygon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Returns a polygon describing the four corners of the object rotated</span>
-<span class="sd">        around the center to our angle.</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns 4 edges of a rectangle bounding the current object in the</span>
+<span class="sd">        following order: front left, front right, bottom left and bottom right.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_generic_polygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
 </div>
@@ -391,9 +387,6 @@
 
 </div>
 <div class="viewcode-block" id="Robot"><a class="viewcode-back" href="../../planning.html#planning.models.Robot">[docs]</a><span class="k">class</span> <span class="nc">Robot</span><span class="p">(</span><span class="n">PitchObject</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Robot class contains a model representing a Robot on the Pitch. Contains</span>
-<span class="sd">    utility functions for using the Robot in the world.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">ROBOT_WIDTH</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">ROBOT_LENGTH</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">ROBOT_HEIGHT</span><span class="p">,</span> <span class="n">angle_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Sets up a new Robot instance with the given parameters.</span>
@@ -403,7 +396,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Robot</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">angle_offset</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zone</span> <span class="o">=</span> <span class="n">zone</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_catcher</span> <span class="o">=</span> <span class="s">&#39;open&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_catcher</span> <span class="o">=</span> <span class="s">&#39;closed&#39;</span>
 
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Robot.zone"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.zone">[docs]</a>    <span class="k">def</span> <span class="nf">zone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -455,7 +448,8 @@
 <div class="viewcode-block" id="Robot.can_catch_ball"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.can_catch_ball">[docs]</a>    <span class="k">def</span> <span class="nf">can_catch_ball</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ball</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;:returns: True if the ball&#39;s center falls within the catcher area.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">catcher_area</span><span class="o">.</span><span class="n">isInside</span><span class="p">(</span><span class="n">ball</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ball</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catcher_area</span><span class="o">.</span><span class="n">boundingBox</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">ball</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">ball</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="Robot.has_ball"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.has_ball">[docs]</a>    <span class="k">def</span> <span class="nf">has_ball</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ball</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;:returns: True if the ball is within the catcher area and our catcher is closed.</span>
@@ -466,6 +460,7 @@
         <span class="sd">&#39;&#39;&#39;:returns: An angle to which this robot should rotate to be facing the given point, \</span>
 <span class="sd">            within the range [-pi,pi]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="n">delta_x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
         <span class="n">delta_y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
         <span class="n">displacement</span> <span class="o">=</span> <span class="n">hypot</span><span class="p">(</span><span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">)</span>
@@ -478,6 +473,7 @@
             <span class="k">elif</span> <span class="n">theta</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">pi</span><span class="p">:</span>
                 <span class="n">theta</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span>
         <span class="k">assert</span> <span class="o">-</span><span class="n">pi</span> <span class="o">&lt;=</span> <span class="n">theta</span> <span class="o">&lt;=</span> <span class="n">pi</span>
+        <span class="k">print</span> <span class="s">&#39;rotation to point: </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">theta</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">theta</span>
 </div>
 <div class="viewcode-block" id="Robot.get_displacement_to_point"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.get_displacement_to_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_displacement_to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -635,8 +631,8 @@
         <span class="c"># Define catchment areas for our robots. If the ball enters these areas then our robot</span>
         <span class="c"># believes it can catch the ball. Width is parallel to front/rear and height is parallel</span>
         <span class="c"># to the sides of our robot.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">our_defender</span><span class="o">.</span><span class="n">catcher_area</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;width&#39;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;height&#39;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;front_offset&#39;</span> <span class="p">:</span> <span class="mi">12</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">catcher_area</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;width&#39;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;height&#39;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;front_offset&#39;</span> <span class="p">:</span> <span class="mi">14</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">our_defender</span><span class="o">.</span><span class="n">catcher_area</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;width&#39;</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s">&#39;height&#39;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;front_offset&#39;</span> <span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">catcher_area</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;width&#39;</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s">&#39;height&#39;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;front_offset&#39;</span> <span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
 
         <span class="c"># Calculate the goals as being in fixes positions halfway up the pitch. The latter</span>
         <span class="c"># goal &#39;faces&#39; towards the left of the pitch.</span>
@@ -719,7 +715,8 @@
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;right&#39;</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">our_defender</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_attacker</span><span class="o">.</span><span class="n">x</span>
                 <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_defender</span><span class="o">.</span><span class="n">x</span><span class="p">)):</span>
                 <span class="k">print</span> <span class="s">&quot;WARNING: The sides are probably wrong!&quot;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_allowWarning</span> <span class="o">=</span> <span class="bp">False</span></div></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_allowWarning</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="c"># </span></div></div>
 </pre></div>
 
           </div>

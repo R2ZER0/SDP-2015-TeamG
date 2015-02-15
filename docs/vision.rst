@@ -1,7 +1,7 @@
 Vision
 ======
 
-Calibrate Script
+Croppings Script
 ----------------
 
 .. automodule:: vision.calibrate
@@ -9,8 +9,8 @@ Calibrate Script
     :undoc-members:
     :show-inheritance:
 
-Colors
-------
+Color Properties
+--------------------
 
 .. automodule:: vision.colors
     :members:
@@ -20,12 +20,12 @@ Colors
 Threshold GUI
 -------------
 
-.. automodule:: vision.findHSV
+.. autoclass:: vision.findHSV.CalibrationGUI
     :members:
     :undoc-members:
     :show-inheritance:
 
-Vision tools
+Vision Tools
 ------------
 
 .. automodule:: vision.tools
@@ -41,8 +41,8 @@ Trackers
     :undoc-members:
     :show-inheritance:
 
-Vision GUI
-----------
+Vision
+------
 
 .. automodule:: vision.vision
     :members:

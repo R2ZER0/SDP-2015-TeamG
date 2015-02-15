@@ -56,25 +56,40 @@
         
         
             <ul>
-<li class="toctree-l1"><a class="reference internal" href="action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="controller.html">Controller</a></li>
 <li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="planning.html#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="vision.html">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vision.html#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision.html#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -245,80 +260,8 @@ I&#8217;m just using a hack...</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-Test.planner_test">
-<span id="test-planner-test-module"></span><h2>Test.planner_test module<a class="headerlink" href="#module-Test.planner_test" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="Test.planner_test.TestYPredictionLeft">
-<em class="property">class </em><tt class="descclassname">Test.planner_test.</tt><tt class="descname">TestYPredictionLeft</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionLeft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionLeft" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionLeft.setUp">
-<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionLeft.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionLeft.setUp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionLeft.test_angle_shot">
-<tt class="descname">test_angle_shot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionLeft.test_angle_shot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionLeft.test_angle_shot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionLeft.test_bounce_shot">
-<tt class="descname">test_bounce_shot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionLeft.test_bounce_shot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionLeft.test_bounce_shot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionLeft.test_no_intersection">
-<tt class="descname">test_no_intersection</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionLeft.test_no_intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionLeft.test_no_intersection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionLeft.test_straight_corrected_shot">
-<tt class="descname">test_straight_corrected_shot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionLeft.test_straight_corrected_shot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionLeft.test_straight_corrected_shot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionLeft.test_straight_shot">
-<tt class="descname">test_straight_shot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionLeft.test_straight_shot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionLeft.test_straight_shot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="Test.planner_test.TestYPredictionRight">
-<em class="property">class </em><tt class="descclassname">Test.planner_test.</tt><tt class="descname">TestYPredictionRight</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionRight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionRight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionRight.setUp">
-<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionRight.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionRight.setUp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionRight.test_angle_shot">
-<tt class="descname">test_angle_shot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionRight.test_angle_shot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionRight.test_angle_shot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionRight.test_bounce_shot">
-<tt class="descname">test_bounce_shot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionRight.test_bounce_shot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionRight.test_bounce_shot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionRight.test_no_intersection">
-<tt class="descname">test_no_intersection</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionRight.test_no_intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionRight.test_no_intersection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionRight.test_straight_corrected_shot">
-<tt class="descname">test_straight_corrected_shot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionRight.test_straight_corrected_shot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionRight.test_straight_corrected_shot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="Test.planner_test.TestYPredictionRight.test_straight_shot">
-<tt class="descname">test_straight_shot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Test/planner_test.html#TestYPredictionRight.test_straight_shot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Test.planner_test.TestYPredictionRight.test_straight_shot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="test-planner-test-module">
+<h2>Test.planner_test module<a class="headerlink" href="#test-planner-test-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-Test.postprocessing_test">
 <span id="test-postprocessing-test-module"></span><h2>Test.postprocessing_test module<a class="headerlink" href="#module-Test.postprocessing_test" title="Permalink to this headline">¶</a></h2>

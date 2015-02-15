@@ -1,0 +1,638 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>simulator.simulator &mdash; SDP  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SDP  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> SDP</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Tasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#id1">Vision</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SDP</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>simulator.simulator</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for simulator.simulator</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Simulator is a simple simulation of the Pitch, Ball, and Robots. It allows control of</span>
+<span class="sd">one robot and simulates movement and collisions between the objects of the pitch.</span>
+
+<span class="sd">This file contains three classes, all of which are required for a Simulation. </span>
+
+<span class="sd">* Simulator</span>
+<span class="sd">	provides the core logic of the simulation </span>
+<span class="sd">* SimulatedAction </span>
+<span class="sd">	provides the responses to Action hooks and serves as in place replacement of Action class.</span>
+<span class="sd">* SimulatedCamera</span>
+<span class="sd">	provides the image frames of the simulation that feed directly into vision systme.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">planning.models</span> <span class="kn">import</span> <span class="n">Vector</span><span class="p">,</span> <span class="n">World</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">pymunk</span>
+<span class="kn">from</span> <span class="nn">pymunk.constraint</span> <span class="kn">import</span> <span class="n">PivotJoint</span><span class="p">,</span> <span class="n">GearJoint</span>
+<span class="kn">from</span> <span class="nn">pymunk</span> <span class="kn">import</span> <span class="n">Vec2d</span>
+
+<div class="viewcode-block" id="SimulatedCamera"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedCamera">[docs]</a><span class="k">class</span> <span class="nc">SimulatedCamera</span><span class="p">:</span>
+	<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	Simulates the camera above the Pitch. Gets fed robot positions and ball positions and draws</span>
+<span class="sd">	a frame that is retrievable via get_frame.</span>
+
+<span class="sd">	Colours are simulated in very simple manners such that thresholding is easy for the vision.</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+	<span class="n">PITCH_HEIGHT</span><span class="p">,</span> <span class="n">PITCH_WIDTH</span> <span class="o">=</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">480</span>
+
+	<span class="c"># Our reference frame, used as the drawing buffer</span>
+	<span class="n">frame</span> <span class="o">=</span> <span class="bp">None</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Initialises basic object positions and sets up our frame for grabbing.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="c"># Initialise our blank frame</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">PITCH_WIDTH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PITCH_HEIGHT</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SimulatedCamera.get_frame"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedCamera.get_frame">[docs]</a>	<span class="k">def</span> <span class="nf">get_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Similar to Camera, returns a frame containing the image of the Pitch in it&#39;s current state.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame</span>
+</div>
+<div class="viewcode-block" id="SimulatedCamera.fix_radial_distortion"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedCamera.fix_radial_distortion">[docs]</a>	<span class="k">def</span> <span class="nf">fix_radial_distortion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+		<span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="SimulatedCamera.get_adjusted_center"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedCamera.get_adjusted_center">[docs]</a>	<span class="k">def</span> <span class="nf">get_adjusted_center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+		<span class="k">return</span> <span class="p">(</span><span class="mi">320</span><span class="p">,</span> <span class="mi">240</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SimulatedCamera.draw"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedCamera.draw">[docs]</a>	<span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Top-level draw call. Draws the scene to the frame. Gets passed a World model</span>
+<span class="sd">		and retrieves robot / ball positions from this.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_draw_pitch</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">robot</span> <span class="ow">in</span> <span class="p">[</span><span class="n">world</span><span class="o">.</span><span class="n">our_defender</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">]:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_draw_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="s">&#39;yellow&#39;</span><span class="p">)</span>
+
+		<span class="k">for</span> <span class="n">robot</span> <span class="ow">in</span> <span class="p">[</span><span class="n">world</span><span class="o">.</span><span class="n">their_attacker</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="p">]:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_draw_robot</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">_draw_ball</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">ball</span><span class="p">)</span>
+</div>
+	<span class="k">def</span> <span class="nf">_draw_pitch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Draws the pitch background, zones, and borders to the image.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">640</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">640</span><span class="p">,</span><span class="mi">480</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">480</span><span class="p">]]),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">))</span>
+		<span class="c"># Draw white border</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">590</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">640</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">640</span><span class="p">,</span><span class="mi">380</span><span class="p">],</span> <span class="p">[</span><span class="mi">590</span><span class="p">,</span> <span class="mi">480</span><span class="p">],</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span><span class="mi">480</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">380</span><span class="p">]]),</span> <span class="p">(</span><span class="mi">230</span><span class="p">,</span><span class="mi">224</span><span class="p">,</span><span class="mi">226</span><span class="p">))</span>
+
+		<span class="c"># Draw inner green patch</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">570</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">630</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">630</span><span class="p">,</span><span class="mi">380</span><span class="p">],</span> <span class="p">[</span><span class="mi">570</span><span class="p">,</span> <span class="mi">470</span><span class="p">],</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span><span class="mi">470</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">380</span><span class="p">]]),</span> <span class="p">(</span><span class="mi">74</span><span class="p">,</span><span class="mi">93</span><span class="p">,</span><span class="mi">71</span><span class="p">))</span>
+
+		<span class="c"># Draw stripes</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">140</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">180</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">180</span><span class="p">,</span><span class="mi">480</span><span class="p">],</span> <span class="p">[</span><span class="mi">140</span><span class="p">,</span><span class="mi">480</span><span class="p">]]),</span> <span class="p">(</span><span class="mi">230</span><span class="p">,</span><span class="mi">224</span><span class="p">,</span><span class="mi">226</span><span class="p">))</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">300</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">340</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">340</span><span class="p">,</span><span class="mi">480</span><span class="p">],</span> <span class="p">[</span><span class="mi">300</span><span class="p">,</span><span class="mi">480</span><span class="p">]]),</span> <span class="p">(</span><span class="mi">230</span><span class="p">,</span><span class="mi">224</span><span class="p">,</span><span class="mi">226</span><span class="p">))</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">460</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">500</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">500</span><span class="p">,</span><span class="mi">480</span><span class="p">],</span> <span class="p">[</span><span class="mi">460</span><span class="p">,</span><span class="mi">480</span><span class="p">]]),</span> <span class="p">(</span><span class="mi">230</span><span class="p">,</span><span class="mi">224</span><span class="p">,</span><span class="mi">226</span><span class="p">))</span>
+
+	<span class="k">def</span> <span class="nf">_draw_robot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Draws this robot to the frame.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+
+		<span class="c"># Rotate our points </span>
+		<span class="n">points</span> <span class="o">=</span> <span class="p">[[</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="o">-</span><span class="n">robot</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">robot</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">],</span> <span class="c"># Upper left</span>
+				  <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">robot</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="n">robot</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">],</span> <span class="c"># Upper right</span>
+				  <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">robot</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="n">robot</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">],</span> <span class="c"># Lower right</span>
+				  <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="o">-</span><span class="n">robot</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="n">robot</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">]]</span> <span class="c"># Lower left</span>
+
+		<span class="n">points</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trans_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="p">),</span> <span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span> <span class="n">points</span><span class="p">)</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+		<span class="c"># draw dot</span>
+		<span class="n">dot_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trans_point</span><span class="p">((</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="mi">10</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="p">),</span> <span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">)</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="p">(</span><span class="n">dot_point</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dot_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+		<span class="c"># draw i</span>
+		<span class="n">i_points</span> <span class="o">=</span> <span class="p">[[</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="o">-</span><span class="mi">5</span><span class="p">],</span>
+					<span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="mi">5</span><span class="p">]]</span>
+
+		<span class="n">i_points</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trans_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="p">),</span> <span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span> <span class="n">i_points</span><span class="p">)</span>
+		<span class="n">i_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span> <span class="k">if</span> <span class="n">color</span> <span class="o">==</span> <span class="s">&#39;yellow&#39;</span> <span class="k">else</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> 
+		<span class="n">cv2</span><span class="o">.</span><span class="n">fillConvexPoly</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i_points</span><span class="p">),</span> <span class="n">i_color</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_trans_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Takes the given point and applies the given angle rotation, centred on</span>
+<span class="sd">		the center.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="c"># convert robot&#39;s angle to correct domain</span>
+		<span class="n">angle</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">angle</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+		<span class="n">sx</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="n">sy</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+		<span class="n">hyp</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">sx</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">sy</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+		<span class="n">src_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">sy</span><span class="p">,</span> <span class="n">sx</span><span class="p">)</span>
+		<span class="n">dst_angle</span> <span class="o">=</span> <span class="n">src_angle</span> <span class="o">+</span> <span class="n">angle</span>
+
+		<span class="n">dx</span> <span class="o">=</span> <span class="n">hyp</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dst_angle</span><span class="p">)</span>
+		<span class="n">dy</span> <span class="o">=</span> <span class="n">hyp</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">dst_angle</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dy</span><span class="p">)]</span>
+
+	<span class="k">def</span> <span class="nf">_draw_ball</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ball</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">		Draws the ball to the frame</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ball</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">ball</span><span class="o">.</span><span class="n">y</span><span class="p">)),</span> <span class="n">ball</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SimulatedAction"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedAction">[docs]</a><span class="k">class</span> <span class="nc">SimulatedAction</span><span class="p">:</span>
+	<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	SimulatedAction provides in-place replacement for the Action class. This replaces calls to communications by calls</span>
+<span class="sd">	to the Simulator instance updating Robot&#39;s actions.</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+
+	<span class="c"># A reference to our simulator instance for passing messages</span>
+	<span class="n">simulator</span> <span class="o">=</span> <span class="bp">None</span>
+
+	<span class="c"># Motor angles, starting from the front left, going anticlockwise</span>
+	<span class="c"># MOTOR_ANGLES = [ math.pi/3.0, math.pi, math.pi*5.0/3.0 ]</span>
+	<span class="n">MOTOR_ANGLES</span> <span class="o">=</span> <span class="p">[</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mf">5.0</span><span class="o">/</span><span class="mf">6.0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mf">3.0</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">6.0</span> <span class="p">]</span>
+	<span class="n">MOTORS</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span> <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">MOTOR_ANGLES</span> <span class="p">]</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulator</span><span class="p">):</span>
+		<span class="k">assert</span> <span class="n">simulator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">simulator</span> <span class="o">=</span> <span class="n">simulator</span>
+
+<div class="viewcode-block" id="SimulatedAction.move"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedAction.move">[docs]</a>	<span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;Move the robot in the angle (radians) from the front, with speed -1 to +1&quot;&quot;&quot;</span>
+
+		<span class="n">motor_speeds</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">1.5</span><span class="o">*</span><span class="n">scale</span> <span class="o">*</span> <span class="n">SimulatedAction</span><span class="o">.</span><span class="n">_calc_motor_speed</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="n">angle</span><span class="p">)</span> <span class="k">for</span> <span class="n">motor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOTORS</span> <span class="p">]</span>
+		<span class="c">#motor_speeds = SimulatedAction._normalise_speeds(motor_speeds)</span>
+		<span class="c">#motor_speeds = map(lambda x: x*scale, motor_speeds)</span>
+		<span class="c">#motor_speeds = map(SimulatedAction._percentage_speed, motor_speeds)	</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_send_run</span><span class="p">(</span><span class="n">motor_speeds</span><span class="p">)</span>
+  </div>
+<div class="viewcode-block" id="SimulatedAction.turn"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedAction.turn">[docs]</a>	<span class="k">def</span> <span class="nf">turn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
+		<span class="n">speed</span> <span class="o">=</span> <span class="n">speed</span> <span class="o">/</span> <span class="mi">3</span>
+		<span class="sd">&quot;&quot;&quot;Turn the robot in the given direction, clockwise/anticlockwise&quot;&quot;&quot;</span>      
+		<span class="n">speed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_send_run</span><span class="p">([</span><span class="n">speed</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">speed</span><span class="p">])</span>
+  </div>
+<div class="viewcode-block" id="SimulatedAction.stop"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedAction.stop">[docs]</a>	<span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">our_body</span><span class="o">.</span><span class="n">angular_velocity</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">our_body</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+  
+	<span class="c"># Kicking</span></div>
+<div class="viewcode-block" id="SimulatedAction.kick"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedAction.kick">[docs]</a>	<span class="k">def</span> <span class="nf">kick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+		<span class="n">world</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">world</span>
+		<span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">our_robot</span>
+
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">ball_posssessed</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">ball_posssessed</span> <span class="o">=</span> <span class="bp">False</span>
+
+			<span class="n">dx</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">)</span>
+			<span class="n">dy</span> <span class="o">=</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">)</span>
+
+			<span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">ball_body</span><span class="o">.</span><span class="n">apply_impulse</span><span class="p">((</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+	</div>
+<div class="viewcode-block" id="SimulatedAction.catch"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedAction.catch">[docs]</a>	<span class="k">def</span> <span class="nf">catch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+		<span class="n">world</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">world</span>
+		<span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">our_robot</span>
+
+		<span class="k">if</span> <span class="n">robot</span><span class="o">.</span><span class="n">can_catch_ball</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">ball</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">ball_posssessed</span> <span class="o">=</span> <span class="bp">True</span>
+			<span class="n">catcher_center</span> <span class="o">=</span> <span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="mi">30</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">)),</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="mi">30</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">)))</span>
+			<span class="n">world</span><span class="o">.</span><span class="n">ball</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="n">catcher_center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">catcher_center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">ball_body</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="n">catcher_center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">catcher_center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="SimulatedAction.open_catcher"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.SimulatedAction.open_catcher">[docs]</a>	<span class="k">def</span> <span class="nf">open_catcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">kick</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+
+	<span class="c"># Private</span>
+
+	<span class="c"># Utility</span></div>
+	<span class="nd">@staticmethod</span>
+	<span class="k">def</span> <span class="nf">_normalise_speeds</span><span class="p">(</span><span class="n">speeds</span><span class="p">):</span>
+		<span class="n">maxspeed</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">speeds</span><span class="p">)</span>
+		<span class="k">return</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">maxspeed</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">speeds</span> <span class="p">)</span>        
+	
+	<span class="nd">@staticmethod</span>
+	<span class="k">def</span> <span class="nf">_percentage_speed</span><span class="p">(</span><span class="n">speed</span><span class="p">):</span>
+		<span class="c"># We need the speed to be an integer between 100 and -100</span>
+		<span class="n">speed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mf">100.0</span> <span class="o">*</span> <span class="n">speed</span><span class="p">))</span>
+		<span class="n">speed</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">speed</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">speed</span>
+	
+	<span class="nd">@staticmethod</span>
+	<span class="k">def</span> <span class="nf">_calc_motor_speed</span><span class="p">(</span><span class="n">motor</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+		<span class="k">return</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="n">motor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">*</span> <span class="n">motor</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+	<span class="k">def</span> <span class="nf">_send_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">speeds</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+		<span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">our_body</span>
+
+		<span class="c"># calculate current angle of wheels around robot body</span>
+		<span class="n">wheel_angles</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOTOR_ANGLES</span> <span class="p">)</span>
+
+		<span class="c"># Calculate where the centre of our wheels are and their facing angle</span>
+		<span class="n">wheel_pos</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">15</span><span class="p">)</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="mi">15</span><span class="p">)</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">wheel_angles</span> <span class="p">)</span>
+
+		<span class="c"># Given wheel angle, calculate vector for the force</span>
+		<span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">motor</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">wheel_pos</span><span class="p">):</span>
+			<span class="n">robot</span><span class="o">.</span><span class="n">apply_impulse</span><span class="p">((</span><span class="n">speeds</span><span class="p">[</span><span class="n">num</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">motor</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">speeds</span><span class="p">[</span><span class="n">num</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">motor</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span>
+								<span class="p">(</span><span class="n">motor</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">motor</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+</div>
+<div class="viewcode-block" id="Simulator"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.Simulator">[docs]</a><span class="k">class</span> <span class="nc">Simulator</span><span class="p">:</span>
+	<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">	Our Simulator contains the logic for collisions, movement, and updating our internal</span>
+<span class="sd">	simulated world state. This provides the core logic of the simulation.</span>
+<span class="sd">	&#39;&#39;&#39;</span>
+
+	<span class="c"># Our internal World model. Stores positions of robots and ball and allows simple referencing</span>
+	<span class="n">world</span> <span class="o">=</span> <span class="bp">None</span>
+
+	<span class="c"># Pymunk Physics Objects</span>
+	<span class="n">space</span> <span class="o">=</span> <span class="bp">None</span>
+
+	<span class="c"># Bodies for each robot</span>
+	<span class="n">our_attacker_body</span> <span class="o">=</span> <span class="bp">None</span>
+	<span class="n">our_defender_body</span> <span class="o">=</span> <span class="bp">None</span>
+	<span class="n">their_attacker_body</span> <span class="o">=</span> <span class="bp">None</span>
+	<span class="n">their_defender_body</span> <span class="o">=</span> <span class="bp">None</span>
+
+	<span class="c"># Body for the ball</span>
+	<span class="n">ball_body</span> <span class="o">=</span> <span class="bp">None</span>
+
+	<span class="n">ball_posssessed</span> <span class="o">=</span> <span class="bp">False</span>
+
+	<span class="n">role</span> <span class="o">=</span> <span class="bp">None</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+
+		<span class="c"># Initialise the world</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">world</span> <span class="o">=</span> <span class="n">World</span><span class="p">(</span><span class="n">our_side</span><span class="o">=</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="n">pitch_num</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">role</span> <span class="o">=</span> <span class="n">role</span>
+
+		<span class="c"># Assign initial positions</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">our_defender</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">560</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">their_attacker</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">240</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">ball</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">_construct_world</span><span class="p">()</span>
+
+	<span class="nd">@property</span>
+<div class="viewcode-block" id="Simulator.our_body"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.Simulator.our_body">[docs]</a>	<span class="k">def</span> <span class="nf">our_body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s">&#39;attacker&#39;</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker_body</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_defender_body</span>
+</div>
+	<span class="nd">@property</span>
+<div class="viewcode-block" id="Simulator.our_robot"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.Simulator.our_robot">[docs]</a>	<span class="k">def</span> <span class="nf">our_robot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s">&#39;attacker&#39;</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">our_defender</span>
+</div>
+<div class="viewcode-block" id="Simulator.move_ball"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.Simulator.move_ball">[docs]</a>	<span class="k">def</span> <span class="nf">move_ball</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+
+		<span class="n">dx</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+		<span class="n">dy</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">ball_body</span><span class="o">.</span><span class="n">apply_impulse</span><span class="p">((</span><span class="n">dx</span><span class="p">,</span><span class="n">dy</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+</div>
+	<span class="k">def</span> <span class="nf">_construct_world</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Constructs the physical simulation of our pitch.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span> <span class="o">=</span> <span class="n">pymunk</span><span class="o">.</span><span class="n">Space</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">gravity</span> <span class="o">=</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">damping</span> <span class="o">=</span> <span class="mf">0.95</span>
+
+		<span class="c"># Construct the pitch boundaries</span>
+		<span class="n">static_body</span> <span class="o">=</span> <span class="n">pymunk</span><span class="o">.</span><span class="n">Body</span><span class="p">()</span>
+		<span class="n">static_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">pymunk</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">static_body</span><span class="p">,</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">10</span><span class="p">),</span>
+						<span class="n">pymunk</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">static_body</span><span class="p">,</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">590</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">10</span><span class="p">),</span>
+						<span class="n">pymunk</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">static_body</span><span class="p">,</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">590</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">640</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span> <span class="mi">10</span><span class="p">),</span>
+						<span class="n">pymunk</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">static_body</span><span class="p">,</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">640</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">640</span><span class="p">,</span><span class="mi">380</span><span class="p">),</span> <span class="mi">10</span><span class="p">),</span>
+						<span class="n">pymunk</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">static_body</span><span class="p">,</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">640</span><span class="p">,</span><span class="mi">380</span><span class="p">),</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">590</span><span class="p">,</span><span class="mi">480</span><span class="p">),</span> <span class="mi">10</span><span class="p">),</span>
+						<span class="n">pymunk</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">static_body</span><span class="p">,</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">590</span><span class="p">,</span><span class="mi">480</span><span class="p">),</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">480</span><span class="p">),</span> <span class="mi">10</span><span class="p">),</span>
+						<span class="n">pymunk</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">static_body</span><span class="p">,</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">480</span><span class="p">),</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">380</span><span class="p">),</span> <span class="mi">10</span><span class="p">),</span>
+						<span class="n">pymunk</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span><span class="n">static_body</span><span class="p">,</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">380</span><span class="p">),</span> <span class="n">Vec2d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span> <span class="mi">10</span><span class="p">)]</span>
+
+		<span class="c"># Increase friction of each border</span>
+		<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">static_lines</span><span class="p">:</span>
+			<span class="n">line</span><span class="o">.</span><span class="n">friction</span> <span class="o">=</span> <span class="mf">0.4</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">static_lines</span><span class="p">)</span>
+
+		<span class="n">robots</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">our_defender</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">their_attacker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="p">]</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">our_attacker_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_robot_body</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">our_defender_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_robot_body</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">our_defender</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">their_attacker_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_robot_body</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">their_attacker</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">their_defender_body</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_robot_body</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ball_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_ball</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">ball</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_construct_robot_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Constructs the robot&#39;s body at the appropriate position and returns the body and shape.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="n">points</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="n">robot</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="n">robot</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">],</span> <span class="c"># Upper left</span>
+				  <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="n">robot</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">],</span> <span class="c"># Upper right</span>
+				  <span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="o">+</span><span class="n">robot</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">],</span> <span class="c"># Lower right</span>
+				  <span class="p">[</span><span class="o">-</span><span class="n">robot</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="o">+</span><span class="n">robot</span><span class="o">.</span><span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">]]</span> <span class="c"># Lower left</span>
+
+		<span class="n">mass</span> <span class="o">=</span> <span class="mf">10.0</span>
+		<span class="n">moment</span> <span class="o">=</span> <span class="n">pymunk</span><span class="o">.</span><span class="n">moment_for_poly</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+		<span class="n">body</span> <span class="o">=</span> <span class="n">pymunk</span><span class="o">.</span><span class="n">Body</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+		<span class="n">body</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">Vec2d</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+		<span class="n">body</span><span class="o">.</span><span class="n">angle</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">angle</span>
+		<span class="n">shape</span> <span class="o">=</span> <span class="n">pymunk</span><span class="o">.</span><span class="n">Poly</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+
+		<span class="n">shape</span><span class="o">.</span><span class="n">elasticity</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">shape</span><span class="o">.</span><span class="n">friction</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="n">shape</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">body</span>
+
+	<span class="k">def</span> <span class="nf">_construct_ball</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ball</span><span class="p">):</span>
+		<span class="n">mass</span> <span class="o">=</span> <span class="mf">2.0</span>
+		<span class="n">moment</span> <span class="o">=</span> <span class="n">pymunk</span><span class="o">.</span><span class="n">moment_for_circle</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+		<span class="n">body</span> <span class="o">=</span> <span class="n">pymunk</span><span class="o">.</span><span class="n">Body</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">moment</span><span class="p">)</span>
+		<span class="n">body</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">Vec2d</span><span class="p">(</span><span class="n">ball</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ball</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+		<span class="n">shape</span> <span class="o">=</span> <span class="n">pymunk</span><span class="o">.</span><span class="n">Circle</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+		<span class="n">shape</span><span class="o">.</span><span class="n">friction</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">body</span><span class="p">,</span><span class="n">shape</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">body</span>
+
+	<span class="k">def</span> <span class="nf">_bodies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">our_attacker_body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_defender_body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_defender_body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_attacker_body</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Simulator.update"><a class="viewcode-back" href="../../simulator.html#simulator.simulator.Simulator.update">[docs]</a>	<span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+		<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">		Steps the simulatoin and updates the world state to that of the simulation, returns the world object.</span>
+<span class="sd">		&#39;&#39;&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+
+		<span class="c"># If we have the ball, continue moving it each update</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_posssessed</span><span class="p">:</span>
+			<span class="n">robot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_robot</span>
+			<span class="n">catcher_center</span> <span class="o">=</span> <span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="mi">30</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">)),</span> <span class="n">robot</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="p">(</span><span class="mi">30</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">robot</span><span class="o">.</span><span class="n">angle</span><span class="p">)))</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">ball</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="n">catcher_center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">catcher_center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">ball_body</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="n">catcher_center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">catcher_center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+		<span class="c"># Manual damping on robot&#39;s angular velocities</span>
+		<span class="k">for</span> <span class="n">body</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bodies</span><span class="p">():</span>
+			<span class="k">if</span> <span class="n">body</span><span class="o">.</span><span class="n">angular_velocity</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+				<span class="n">body</span><span class="o">.</span><span class="n">angular_velocity</span> <span class="o">-=</span> <span class="mf">0.005</span>
+			<span class="k">elif</span> <span class="n">body</span><span class="o">.</span><span class="n">angular_velocity</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">:</span>
+				<span class="n">body</span><span class="o">.</span><span class="n">angular_velocity</span> <span class="o">+=</span> <span class="mf">0.005</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">body</span><span class="o">.</span><span class="n">angular_velocity</span> <span class="o">=</span> <span class="mi">0</span>
+
+		<span class="c"># Retrieve positions of all bodies in the space</span>
+		<span class="n">our_attacker</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">our_attacker_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fix_angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">our_attacker_body</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">our_defender</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">our_defender_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_defender_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fix_angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">our_defender_body</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">their_defender</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">their_defender_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_defender_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fix_angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">their_defender_body</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">their_attacker</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">their_attacker_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_attacker_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fix_angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">their_attacker_body</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="n">ball</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ball_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ball_body</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">update_positions</span><span class="p">({</span><span class="s">&#39;our_attacker&#39;</span><span class="p">:</span> <span class="n">our_attacker</span><span class="p">,</span> <span class="s">&#39;our_defender&#39;</span><span class="p">:</span> <span class="n">our_defender</span><span class="p">,</span>
+									 <span class="s">&#39;their_attacker&#39;</span><span class="p">:</span> <span class="n">their_attacker</span><span class="p">,</span> <span class="s">&#39;their_defender&#39;</span><span class="p">:</span> <span class="n">their_defender</span><span class="p">,</span>
+									 <span class="s">&#39;ball&#39;</span><span class="p">:</span> <span class="n">ball</span><span class="p">})</span>
+
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">world</span>
+</div>
+	<span class="k">def</span> <span class="nf">_fix_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">angle</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+	<span class="n">sim</span> <span class="o">=</span> <span class="n">Simulator</span><span class="p">()</span>
+	<span class="n">act</span> <span class="o">=</span> <span class="n">SimulatedAction</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>
+	<span class="n">cam</span> <span class="o">=</span> <span class="n">SimulatedCamera</span><span class="p">()</span>
+
+	<span class="n">cv2</span><span class="o">.</span><span class="n">namedWindow</span><span class="p">(</span><span class="s">&#39;Simulator&#39;</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_WINDOW_AUTOSIZE</span><span class="p">)</span>
+
+	<span class="n">c</span> <span class="o">=</span> <span class="bp">True</span>
+	<span class="k">while</span> <span class="p">(</span><span class="n">c</span> <span class="o">!=</span> <span class="mi">27</span> <span class="ow">and</span> <span class="n">c</span> <span class="o">!=</span> <span class="mi">1048603</span><span class="p">):</span>  <span class="c"># the ESC key</span>
+		
+		<span class="c"># Retrieve updated world</span>
+		<span class="n">world</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+		<span class="c"># Draw frame</span>
+		<span class="n">cam</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">world</span><span class="p">)</span>
+
+		<span class="c"># Retrieve frame</span>
+		<span class="n">frame</span> <span class="o">=</span> <span class="n">cam</span><span class="o">.</span><span class="n">get_frame</span><span class="p">()</span>
+
+		<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s">&#39;Simulator&#39;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+
+		<span class="n">c</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+			<span class="k">continue</span>
+		
+		<span class="k">print</span> <span class="s">&#39;Pressed </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span>
+		
+		<span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="mi">2490368</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">1113938</span><span class="p">):</span>
+			<span class="n">act</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="mi">2621440</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">1113940</span><span class="p">):</span>
+			<span class="n">act</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="mi">1048689</span><span class="p">):</span>
+			<span class="n">act</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">3</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="mi">1048695</span><span class="p">):</span>
+			<span class="n">act</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mi">5</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="mi">2424832</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">1113937</span><span class="p">):</span>
+			<span class="n">act</span><span class="o">.</span><span class="n">turn</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="mi">2555904</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">1113939</span><span class="p">):</span>
+			<span class="n">act</span><span class="o">.</span><span class="n">turn</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="mi">32</span><span class="p">:</span>
+			<span class="n">act</span><span class="o">.</span><span class="n">kick</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

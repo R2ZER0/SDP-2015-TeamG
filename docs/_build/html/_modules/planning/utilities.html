@@ -57,25 +57,40 @@
         
         
             <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action Class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions Utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.planner">Planner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Tasks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Calibrate Script</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Colors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.findHSV">Threshold GUI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.vision">Vision GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#id1">Vision</a></li>
 </ul>
 </li>
 </ul>
@@ -115,6 +130,8 @@
   <h1>Source code for planning.utilities</h1><div class="highlight"><pre>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">tan</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">hypot</span><span class="p">,</span> <span class="n">log</span>
 <span class="kn">from</span> <span class="nn">planning.models</span> <span class="kn">import</span> <span class="n">Robot</span>
+<span class="kn">from</span> <span class="nn">Polygon</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Polygon.Utils</span> <span class="kn">import</span> <span class="n">pointList</span>
 
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Utilities contains various convenience functions utilised throughout the</span>
@@ -295,6 +312,67 @@
         <span class="n">angle_matched</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">angle_threshold</span>
     
     <span class="k">return</span> <span class="n">dist_matched</span> <span class="ow">and</span> <span class="n">angle_matched</span>
+
+<span class="c">#2015</span></div>
+<div class="viewcode-block" id="current_ball_controller"><a class="viewcode-back" href="../../planning.html#planning.utilities.current_ball_controller">[docs]</a><span class="k">def</span> <span class="nf">current_ball_controller</span><span class="p">(</span><span class="n">world</span><span class="p">):</span>
+    <span class="n">ball</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">ball</span>
+    <span class="k">if</span> <span class="n">robot_ball_distance</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="p">,</span> <span class="n">ball</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">world</span><span class="o">.</span><span class="n">their_defender</span>
+    <span class="k">elif</span> <span class="n">robot_ball_distance</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">their_attacker</span><span class="p">,</span> <span class="n">ball</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">world</span><span class="o">.</span><span class="n">their_attacker</span>
+    <span class="k">elif</span> <span class="n">robot_ball_distance</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">,</span> <span class="n">ball</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
+        <span class="k">return</span>  <span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span>
+    <span class="k">elif</span> <span class="n">robot_ball_distance</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">our_defender</span><span class="p">,</span> <span class="n">ball</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
+        <span class="k">return</span>  <span class="n">world</span><span class="o">.</span><span class="n">our_defender</span>
+
+<span class="c">#2015 </span></div>
+<div class="viewcode-block" id="enemy_possess_ball"><a class="viewcode-back" href="../../planning.html#planning.utilities.enemy_possess_ball">[docs]</a><span class="k">def</span> <span class="nf">enemy_possess_ball</span><span class="p">(</span><span class="n">world</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns true when a robot on the opposing team has possession of the ball&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">robot_ball_distance</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">ball</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">elif</span> <span class="n">robot_ball_distance</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">their_attacker</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">ball</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="robot_ball_distance"><a class="viewcode-back" href="../../planning.html#planning.utilities.robot_ball_distance">[docs]</a><span class="k">def</span> <span class="nf">robot_ball_distance</span><span class="p">(</span><span class="n">robot</span><span class="p">,</span> <span class="n">ball</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">robot</span><span class="o">.</span><span class="n">get_displacement_to_point</span><span class="p">(</span><span class="n">ball</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">ball</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+<span class="c">#2015</span></div>
+<div class="viewcode-block" id="choose_attacker_destination"><a class="viewcode-back" href="../../planning.html#planning.utilities.choose_attacker_destination">[docs]</a><span class="k">def</span> <span class="nf">choose_attacker_destination</span><span class="p">(</span><span class="n">world</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If the attacker isn&#39;t already at a point where it could try to score,</span>
+<span class="sd">    try each point in it&#39;s zone to see if we could if we moved there instead.</span>
+<span class="sd">    If we find such a point, return it. </span>
+<span class="sd">    Returns False if we can&#39;t find a clear point anywhere (shouldn&#39;t really happen),</span>
+<span class="sd">    and the current position if we can already shoot from there</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">OUR_ATTACKER_ZONE</span><span class="o">=</span><span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">zone</span>
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">is_attacker_shot_blocked</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">x</span>
+
+        <span class="c"># Iterate vertical positions checking if shot would be blocked</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">480</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+
+            <span class="n">ghostDefaultAngle</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">ghostDefaultVel</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">ghost</span><span class="o">=</span><span class="n">Robot</span><span class="p">(</span><span class="n">OUR_ATTACKER_ZONE</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ghostDefaultVel</span><span class="p">,</span> <span class="n">ghostDefaultAngle</span><span class="p">)</span>
+            <span class="c"># Ghost is us if we moved to (x,y)</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">is_attacker_shot_blocked</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">ghost</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c"># Iterate vertical positions decreasing to check</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+            <span class="n">ghostDefaultAngle</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">ghostDefaultVel</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">ghost</span><span class="o">=</span><span class="n">Robot</span><span class="p">(</span><span class="n">OUR_ATTACKER_ZONE</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ghostDefaultVel</span><span class="p">,</span> <span class="n">ghostDefaultAngle</span><span class="p">)</span>
+            <span class="c"># Ghost is us if we moved to (x,y)</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">is_attacker_shot_blocked</span><span class="p">(</span><span class="n">world</span><span class="p">,</span> <span class="n">ghost</span><span class="p">,</span> <span class="n">world</span><span class="o">.</span><span class="n">their_defender</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>            
+
+    <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="calculate_motor_speed"><a class="viewcode-back" href="../../planning.html#planning.utilities.calculate_motor_speed">[docs]</a><span class="k">def</span> <span class="nf">calculate_motor_speed</span><span class="p">(</span><span class="n">displacement</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">backwards_ok</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">careful</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>

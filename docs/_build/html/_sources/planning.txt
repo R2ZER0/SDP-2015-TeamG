@@ -1,8 +1,8 @@
 Planning
 ========
 
-Collisions Utility
-------------------
+Collisions
+----------
 
 .. automodule:: planning.collisions
     :members:
@@ -25,8 +25,8 @@ Planner
     :undoc-members:
     :show-inheritance:
 
-Strategies
-----------
+Tasks
+-----
 
 .. automodule:: planning.strategies
     :members:
