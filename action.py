@@ -3,21 +3,19 @@ import math
 import motor_calibration
 
 class Action():
-    '''Provides an interface between desired movement and the Robot. Accepts
-    a communication object to write to.
+    '''Provides an interface allowing the sending high-level movement commands
+    to the Robot.
+    '''
 
-    Attributes:
-        Debug           Setting True enables verbose output of commands.
-        MOTOR_ANGLES    The angles of our wheels relative to the x-axis.
-                        These begin from front-left and move anticlockwise.
-        MOTORS          Trigonometric calculations for each motor, used for 
-                        holonomic movement
-    ''' 
-
+    #: Setting True enables verbose output of commands
     Debug = False
+    
+    #: The angles of our wheels, relative to the x-axis. Begins \
+    #: from front-left and moves anticlockwise.
+    MOTOR_ANGLES = [ math.pi*5.0/3.0, math.pi/2.0, math.pi*4/3.0 ]
 
-    MOTOR_ANGLES = [ math.pi*5.0/6.0, math.pi*3.0/2.0, math.pi/6.0 ]
-    MOTORS = [ (math.cos(angle), math.sin(angle)) for angle in MOTOR_ANGLES ]
+    #: Trigonometric constants for each motor, used for holonomic movement.
+    MOTORS = list(map(lambda x: (math.cos(x), math.sin(x)), MOTOR_ANGLES))
     
     def __init__(self, comm):
         '''Initialises an Action instance with the given communication object.
@@ -26,10 +24,15 @@ class Action():
         '''
         self.comm = comm
     
+<<<<<<< HEAD
     # Public methods #
 
     def move(self, angle, scale):
         """Moves the robot in the given angle with given scale as power value.
+
+        .. warning::
+
+          Movement currently not functioning for angles other than 0 and pi.
 
         :param angle: The direction of movement, in radians, relative to x-axis \
                 of robot
@@ -55,31 +58,33 @@ class Action():
   
     def stop(self):
         """Stops the robot's movement by setting all motors to zero.
+
+        .. note::
+
+           This currently does not stop the Kicker/Catcher mechanisms.
         """
         motor_speeds = [ int(0), int(0), int(0) ]
         self._send_run(motor_speeds)
   
     def kick(self, scale=100):
-        """Sends the kick command to the robot. Performs no checking of the 
-        kicker's state prior to kicking.
+        '''Sends the kick command to the robot.
 
-        :param scale: Power scale for this kick. Range [0,100]. Default 100.
-        """
+        :param scale: Power scale for this kick. Range [0,100].
+        '''
         # Note, scale must be in list form
         self._send_command("KICK",[scale])
     
     def catch(self, scale=100):
-        """Sends the catch command to the robot. Performns no checking of the 
-        catcher's position prior to catching.
+        """Sends the catch command to the robot.
 
-        :param scale: Power scale for this catch. Range [0,100]. Default 100.
+        :param scale: Power scale for this catch. Range [0,100].
         """
         self._send_command("CATCH",[scale])
 
     def open_catcher(self, scale=100):
         """Sends the command to open the catcher to the robot.
 
-        :param scale: Power scale for the catch. Range [0,100]. Default 100.
+        :param scale: Power scale for the catch. Range [0,100].
         """
         self._send_command("RELEASE", [scale])
 
