@@ -39,12 +39,14 @@ class Controller:
 		# Pitch is 2 by default for Simulator
 		if not sim:
 			assert pitch in [0, 1]
+		else:
+			pitch = 2
 
 		assert color in ['yellow', 'blue']
 		assert our_side in ['left', 'right']
 		assert our_role in ['attacker', 'defender']
 
-		self.pitch = 2 if sim else pitch
+		self.pitch = pitch
 
 		# Set up camera for frames
 		if sim:
@@ -67,7 +69,7 @@ class Controller:
 		center_point = self.camera.get_adjusted_center(frame)
 
 		# Set up vision
-		self.calibration = tools.get_colors(pitch)
+		self.calibration = tools.get_colors(self.pitch)
 		self.vision = Vision(
 			pitch=pitch, color=color, our_side=our_side,
 			frame_shape=frame.shape, frame_center=center_point,
