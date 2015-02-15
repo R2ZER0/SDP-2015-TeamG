@@ -24,9 +24,6 @@ class Action():
         '''
         self.comm = comm
     
-<<<<<<< HEAD
-    # Public methods #
-
     def move(self, angle, scale):
         """Moves the robot in the given angle with given scale as power value.
 
@@ -41,11 +38,7 @@ class Action():
 
         motor_speeds = [ Action._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
         motor_speeds = Action._normalise_speeds(motor_speeds)
-        motor_speeds = map(lambda x: x*scale, motor_speeds)
-
-        # Scale motor speeds to be in the range [-100,100]
-        motor_speeds = map(Action._percentage_speed, motor_speeds)
-        
+        motor_speeds = map(lambda x: int(x*scale_max), motor_speeds)
         self._send_run(motor_speeds)
   
     def turn(self, speed):AD
@@ -108,6 +101,12 @@ class Action():
     # Utility
     @staticmethod
     def _normalise_speeds(speeds):
+        '''Normalises a list of motor speeds to be ratio of speed to 
+        maximum speed in the list.
+
+        :param speeds: A list of motor speeds
+        :returns: A new list of motor speeds, with speeds relative to maximum.
+        '''
         maxspeed = max([abs(s) for s in speeds])
         return map( lambda x: (x/maxspeed), speeds )        
     
@@ -122,7 +121,13 @@ class Action():
         return speed
     
     @staticmethod
-    def _calc_motor_speed( angle):
+    def _calc_motor_speed(angle):
+        '''Hardcoded motor speed calculations for wheels in current placement of robot.
+        Calculates wheel powers for each wheel to move in the given direction.
+
+        :param angle: The direction of travel.
+        :returns: A list of motor speeds, in the range [-1,1]
+        '''
         m = [0,0,0]
         m[0] = math.cos(angle) - math.sin(angle)/(2+math.sqrt(3))
         m[1] = 2*math.sin(angle)/(2+math.sqrt(3))
