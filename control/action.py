@@ -1,6 +1,8 @@
 # control.action
 # Functions to generate commands
 import math
+
+from control.command import Command, MpuCommand
     
 # Motor angles, starting from the front left, going anticlockwise
 MOTOR_ANGLES = [ math.pi*5.0/6.0, math.pi*3.0/2.0, math.pi/6.0 ]
