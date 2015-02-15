@@ -1,5 +1,7 @@
 import unittest2
-from action import Command, Commander, Action
+from control.command import Command
+from control.commander import Commander
+from control import action
 
 
 class TestCommand(unittest2.TestCase):
