@@ -2,6 +2,7 @@
 # Contains the Command class
 
 VALID_COMMANDS = ["RUN", "TURN", "KICK", "CATCH", "RELEASE", "MPU"]
+VALID_MPU_COMMANDS = ["INIT", "SETHOME", "GETYAW", "STABL", "CALIB"]
     
 # Don't create these directly, instead use action.xyz()
 class Command():
@@ -40,4 +41,4 @@ class MpuCommand(Command):
         
     def isValid(self):
         return ((super(MpuCommand, self).isValid()) and
-               (self.args[0] in ["INIT", "SETHOME", "GETYAW", "STABL", "CALIB"]))
+               (self.args[0] in VALID_MPU_COMMANDS))
