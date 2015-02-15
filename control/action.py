@@ -26,8 +26,8 @@ def move(angle, scale):
     """Move the robot in the angle (radians) from the front, with speed -1 to +1"""
     motor_speeds = [ _calc_motor_speed(motor, angle) for motor in MOTORS ]
     motor_speeds = _normalise_speeds(motor_speeds)
-    motor_speeds = map(lambda x: x*scale, motor_speeds)
-    motor_speeds = map(lambda x: _percentage_speed(x), motor_speeds)
+    motor_speeds = [ x*scale for x in motor_speeds ]
+    motor_speeds = map(_percentage_speed, motor_speeds)
     
     return [ Command("RUN", motor_speeds) ]
 
