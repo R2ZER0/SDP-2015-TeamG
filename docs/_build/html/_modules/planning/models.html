@@ -1,0 +1,777 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>planning.models &mdash; SDP  documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="SDP  documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> SDP</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../action.html">Action class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../controller.html">Controller</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../planning.html">Planning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.collisions">Collisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.models">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#planner">Planner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.strategies">Tasks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../planning.html#module-planning.utilities">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../postprocessing.html">Postprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prediction.html">Prediction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#datascraper-ball">DataScraper (Ball)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../prediction.html#module-prediction.Prediction">Prediction Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../preprocessing.html">Preprocessing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../simulator.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-camera">Simulated Camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#simulated-actoin">Simulated Actoin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../simulator.html#id1">Simulator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../testing.html#test-angle">Test Angle</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../vision.html">Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.calibrate">Croppings Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.colors">Color Properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#threshold-gui">Threshold GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tools">Vision Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#module-vision.tracker">Trackers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vision.html#id1">Vision</a></li>
+</ul>
+</li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SDP</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>planning.models</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for planning.models</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">Polygon.cPolygon</span> <span class="kn">import</span> <span class="n">Polygon</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">hypot</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">atan2</span>
+<span class="kn">from</span> <span class="nn">vision</span> <span class="kn">import</span> <span class="n">tools</span>
+
+<span class="sd">&#39;&#39;&#39;Models contains all data structures pertaining to the positioning and movement</span>
+<span class="sd">of objects in the physical world.</span>
+
+<span class="sd">    ROBOT_WIDTH     Narrower dimension of the robot</span>
+<span class="sd">    ROBOT_LENGTH    Larger dimension of the robot</span>
+<span class="sd">    ROBOT_HEIGHT    Vertical dimension of the robot</span>
+
+<span class="sd">    BALL_WIDTH      Radius of the ball</span>
+<span class="sd">    BALL_LENGTH     Radius of the ball</span>
+<span class="sd">    BALL_HEIGHT     Radius of the ball</span>
+
+<span class="sd">    GOAL_WIDTH      Distance between goal posts on the Pitch</span>
+<span class="sd">    GOAL_LENGTH     Depth of the goal</span>
+<span class="sd">    GOAL_HEIGHT     Vertical length of the goal</span>
+<span class="sd">&#39;&#39;&#39;</span>     
+
+<span class="n">ROBOT_WIDTH</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">ROBOT_LENGTH</span> <span class="o">=</span> <span class="mi">45</span>
+<span class="n">ROBOT_HEIGHT</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">BALL_WIDTH</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">BALL_LENGTH</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">BALL_HEIGHT</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">GOAL_WIDTH</span> <span class="o">=</span> <span class="mi">140</span>
+<span class="n">GOAL_LENGTH</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">GOAL_HEIGHT</span> <span class="o">=</span> <span class="mi">10</span>
+
+
+<div class="viewcode-block" id="Coordinate"><a class="viewcode-back" href="../../planning.html#planning.models.Coordinate">[docs]</a><span class="k">class</span> <span class="nc">Coordinate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param x: An assignment for x, not None</span>
+<span class="sd">        :param y: An assignment for y, not None</span>
+<span class="sd">        :raises ValueError: If either x or y are None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can not initialize to attributes to None&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">y</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:rvalue: The x-value for this coordinate.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The y-value for this coordinate.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
+
+    <span class="nd">@x.setter</span>
+<div class="viewcode-block" id="Coordinate.x"><a class="viewcode-back" href="../../planning.html#planning.models.Coordinate.x">[docs]</a>    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_x</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param new_x: New assignment value for x, not None</span>
+<span class="sd">        :raises ValueError: If the value is None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">new_x</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can not set attributes of Coordinate to None&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">new_x</span>
+</div>
+    <span class="nd">@y.setter</span>
+<div class="viewcode-block" id="Coordinate.y"><a class="viewcode-back" href="../../planning.html#planning.models.Coordinate.y">[docs]</a>    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_y</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param new_y: New assignment value for y, not None</span>
+<span class="sd">        :raises ValueError: If the value is None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">new_y</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can not set attributes of Coordinate to None&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">new_y</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Constructs a string representation of this coordinate.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="s">&#39;x: </span><span class="si">%s</span><span class="s">, y: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Vector"><a class="viewcode-back" href="../../planning.html#planning.models.Vector">[docs]</a><span class="k">class</span> <span class="nc">Vector</span><span class="p">(</span><span class="n">Coordinate</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Assigns the given values and constructs a Vector.</span>
+
+<span class="sd">        :param x: The x coordinate position, not None</span>
+<span class="sd">        :param y: The y coordinate position, not None</span>
+<span class="sd">        :param angle: The angle of this Vector, in radians. The angle must be \</span>
+<span class="sd">                        not None and in the range [0,2pi]</span>
+<span class="sd">        :param velocity: The force value for this vector.</span>
+<span class="sd">        :raises ValueError: If the angle is outwith the range [0,2pi], or if \</span>
+<span class="sd">                        velocity is negative.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Vector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="c"># Constrain angle and velocity to valid values</span>
+        <span class="k">if</span> <span class="n">angle</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">velocity</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Cannot initialise angle or velocity attributes to None&#39;</span><span class="p">)</span> 
+        <span class="k">elif</span> <span class="n">angle</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">angle</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Vector angle initialised outwith range [0,2pi]&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">velocity</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Vector velocity initialised outwith range: &gt;= 0&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_angle</span> <span class="o">=</span> <span class="n">angle</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span> <span class="o">=</span> <span class="n">velocity</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The angle of this vector&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angle</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The velocity of this vector&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span>
+
+    <span class="nd">@angle.setter</span>
+<div class="viewcode-block" id="Vector.angle"><a class="viewcode-back" href="../../planning.html#planning.models.Vector.angle">[docs]</a>    <span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_angle</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:param new_angle: New assignment value for angle, not None and within the \</span>
+<span class="sd">                        range [0,2pi]</span>
+<span class="sd">        :returns ValueError: If the angle is outwith the range [0,2pi]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">new_angle</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">new_angle</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">new_angle</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Angle can not be None, also must be between 0 and 2pi&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_angle</span> <span class="o">=</span> <span class="n">new_angle</span>
+</div>
+    <span class="nd">@velocity.setter</span>
+<div class="viewcode-block" id="Vector.velocity"><a class="viewcode-back" href="../../planning.html#planning.models.Vector.velocity">[docs]</a>    <span class="k">def</span> <span class="nf">velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_velocity</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:param new_velocity: A new value for velocity</span>
+<span class="sd">        :returns ValueError: If the velocity is None or negative.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">new_velocity</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">new_velocity</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Velocity can not be None or negative&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span> <span class="o">=</span> <span class="n">new_velocity</span>
+</div>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__dict__</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;x: </span><span class="si">%s</span><span class="s">, y: </span><span class="si">%s</span><span class="s">, angle: </span><span class="si">%s</span><span class="s">, velocity: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">_angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="PitchObject"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject">[docs]</a><span class="k">class</span> <span class="nc">PitchObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A class that describes an abstract pitch object</span>
+<span class="sd">    Width measures the front and back of an object</span>
+<span class="sd">    Length measures along the sides of an object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">angle_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param x: x-position</span>
+<span class="sd">        :param y: y-position</span>
+<span class="sd">        :param angle: current angle</span>
+<span class="sd">        :param velocity: current velocity</span>
+<span class="sd">        :param width: front and rear dimension, not None and &gt; 0</span>
+<span class="sd">        :param length: side dimensions, not None and &gt; 0</span>
+<span class="sd">        :param height: vertical dimension, not None and &gt; 0</span>
+<span class="sd">        :param angle_offset: convenient angle offset, used to adjust any specified \</span>
+<span class="sd">                            angle by this amount. default: 0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">width</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">length</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">height</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Object dimensions must be non-None&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">length</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">height</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Object dimensions must be positive&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="n">width</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="n">length</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="n">height</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_angle_offset</span> <span class="o">=</span> <span class="n">angle_offset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="PitchObject.width"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.width">[docs]</a>    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The width of this object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="PitchObject.length"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.length">[docs]</a>    <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The length of this object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="PitchObject.height"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.height">[docs]</a>    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The height (vertical) of this object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="PitchObject.angle_offset"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.angle_offset">[docs]</a>    <span class="k">def</span> <span class="nf">angle_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angle_offset</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="PitchObject.angle"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.angle">[docs]</a>    <span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vector</span><span class="o">.</span><span class="n">angle</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="PitchObject.velocity"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.velocity">[docs]</a>    <span class="k">def</span> <span class="nf">velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vector</span><span class="o">.</span><span class="n">velocity</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="PitchObject.x"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.x">[docs]</a>    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vector</span><span class="o">.</span><span class="n">x</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="PitchObject.y"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.y">[docs]</a>    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vector</span><span class="o">.</span><span class="n">y</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vector</span>
+
+    <span class="nd">@vector.setter</span>
+<div class="viewcode-block" id="PitchObject.vector"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.vector">[docs]</a>    <span class="k">def</span> <span class="nf">vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_vector</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">new_vector</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_vector</span><span class="p">,</span> <span class="n">Vector</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;The new vector can not be None and must be an instance of a Vector&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vector</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="n">new_vector</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">new_vector</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">new_vector</span><span class="o">.</span><span class="n">angle</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_angle_offset</span><span class="p">,</span> <span class="n">new_vector</span><span class="o">.</span><span class="n">velocity</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PitchObject.get_generic_polygon"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.get_generic_polygon">[docs]</a>    <span class="k">def</span> <span class="nf">get_generic_polygon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Retrieves a polygon describing the generic shape of this object and</span>
+<span class="sd">        rotated to correspond to our angle.</span>
+
+<span class="sd">        :param width: The robot width (front and rear dimensions)</span>
+<span class="sd">        :param length: The robot length (side dimensions)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">front_left</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">front_right</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">back_left</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">back_right</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">length</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">((</span><span class="n">front_left</span><span class="p">,</span> <span class="n">front_right</span><span class="p">,</span> <span class="n">back_left</span><span class="p">,</span> <span class="n">back_right</span><span class="p">))</span>
+        <span class="n">poly</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">poly</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="PitchObject.get_polygon"><a class="viewcode-back" href="../../planning.html#planning.models.PitchObject.get_polygon">[docs]</a>    <span class="k">def</span> <span class="nf">get_polygon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns 4 edges of a rectangle bounding the current object in the</span>
+<span class="sd">        following order: front left, front right, bottom left and bottom right.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_generic_polygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;x: </span><span class="si">%s</span><span class="se">\n</span><span class="s">y: </span><span class="si">%s</span><span class="se">\n</span><span class="s">angle: </span><span class="si">%s</span><span class="se">\n</span><span class="s">velocity: </span><span class="si">%s</span><span class="se">\n</span><span class="s">dimensions: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="Robot"><a class="viewcode-back" href="../../planning.html#planning.models.Robot">[docs]</a><span class="k">class</span> <span class="nc">Robot</span><span class="p">(</span><span class="n">PitchObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">ROBOT_WIDTH</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">ROBOT_LENGTH</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">ROBOT_HEIGHT</span><span class="p">,</span> <span class="n">angle_offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets up a new Robot instance with the given parameters.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            Initialises the Robot with the catcher being &#39;open&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Robot</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">angle_offset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zone</span> <span class="o">=</span> <span class="n">zone</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_catcher</span> <span class="o">=</span> <span class="s">&#39;closed&#39;</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Robot.zone"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.zone">[docs]</a>    <span class="k">def</span> <span class="nf">zone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The zone this Robot belongs to, as an integer index into :func:`planning.models.Pitch.zones`</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zone</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">catcher_area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Calculates and returns a polygon representing the catcher area at the</span>
+<span class="sd">        front of the robot. Rotates the polygon to the robot&#39;s angle.</span>
+
+<span class="sd">        :returns: A :class:`Polygon.cPolygon.Polygon` object.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">front_left</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;front_offset&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">front_right</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;front_offset&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;height&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">back_left</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;front_offset&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">back_right</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;front_offset&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span><span class="p">[</span><span class="s">&#39;width&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">((</span><span class="n">front_left</span><span class="p">,</span> <span class="n">front_right</span><span class="p">,</span> <span class="n">back_left</span><span class="p">,</span> <span class="n">back_right</span><span class="p">))</span>
+        <span class="n">area</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">area</span>
+
+    <span class="nd">@catcher_area.setter</span>
+<div class="viewcode-block" id="Robot.catcher_area"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.catcher_area">[docs]</a>    <span class="k">def</span> <span class="nf">catcher_area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">area_dict</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Assigns a new catcher area to the Robot. </span>
+
+<span class="sd">        :returns: area_dict   A dictionary containing the following keys: </span>
+<span class="sd">                - width         Dimension parallel to the front/rear of the robot</span>
+<span class="sd">                - height        Dimension parallel to the sides of the robot</span>
+<span class="sd">                - front_offset  Deviation from center of the robot    </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_catcher_area</span> <span class="o">=</span> <span class="n">area_dict</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">catcher</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns the catcher state, which should be one of [&#39;closed&#39;, &#39;open&#39;]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catcher</span>
+
+    <span class="nd">@catcher.setter</span>
+<div class="viewcode-block" id="Robot.catcher"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.catcher">[docs]</a>    <span class="k">def</span> <span class="nf">catcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_position</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets a new position for the catcher. </span>
+
+<span class="sd">        :param new_position: Value in [&#39;open&#39;, &#39;closed&#39;]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="n">new_position</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;open&#39;</span><span class="p">,</span> <span class="s">&#39;closed&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_catcher</span> <span class="o">=</span> <span class="n">new_position</span>
+</div>
+<div class="viewcode-block" id="Robot.can_catch_ball"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.can_catch_ball">[docs]</a>    <span class="k">def</span> <span class="nf">can_catch_ball</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ball</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: True if the ball&#39;s center falls within the catcher area.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catcher_area</span><span class="o">.</span><span class="n">boundingBox</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">ball</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">ball</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;=</span> <span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Robot.has_ball"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.has_ball">[docs]</a>    <span class="k">def</span> <span class="nf">has_ball</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ball</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: True if the ball is within the catcher area and our catcher is closed.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_catcher</span> <span class="o">==</span> <span class="s">&#39;closed&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_catch_ball</span><span class="p">(</span><span class="n">ball</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Robot.get_rotation_to_point"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.get_rotation_to_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_rotation_to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>        
+        <span class="sd">&#39;&#39;&#39;:returns: An angle to which this robot should rotate to be facing the given point, \</span>
+<span class="sd">            within the range [-pi,pi]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">delta_x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">delta_y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">displacement</span> <span class="o">=</span> <span class="n">hypot</span><span class="p">(</span><span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">displacement</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">delta_y</span><span class="p">,</span> <span class="n">delta_x</span><span class="p">)</span> <span class="o">-</span> <span class="n">atan2</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">),</span> <span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">theta</span> <span class="o">&gt;</span> <span class="n">pi</span><span class="p">:</span>
+                <span class="n">theta</span> <span class="o">-=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span>
+            <span class="k">elif</span> <span class="n">theta</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">pi</span><span class="p">:</span>
+                <span class="n">theta</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span>
+        <span class="k">assert</span> <span class="o">-</span><span class="n">pi</span> <span class="o">&lt;=</span> <span class="n">theta</span> <span class="o">&lt;=</span> <span class="n">pi</span>
+        <span class="k">print</span> <span class="s">&#39;rotation to point: </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">theta</span>
+</div>
+<div class="viewcode-block" id="Robot.get_displacement_to_point"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.get_displacement_to_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_displacement_to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The displacement between our robot&#39;s center and the given x,y position.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">delta_x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">delta_y</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">displacement</span> <span class="o">=</span> <span class="n">hypot</span><span class="p">(</span><span class="n">delta_x</span><span class="p">,</span> <span class="n">delta_y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">displacement</span>
+</div>
+<div class="viewcode-block" id="Robot.get_direction_to_point"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.get_direction_to_point">[docs]</a>    <span class="k">def</span> <span class="nf">get_direction_to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: A tuple, containing:</span>
+<span class="sd">                [0]     The displacement to the given x,y position</span>
+<span class="sd">                [1]     The angle between our robot and the given x,y position</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_displacement_to_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rotation_to_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Robot.get_pass_path"><a class="viewcode-back" href="../../planning.html#planning.models.Robot.get_pass_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_pass_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Calculates a polygon representing the passing &#39;channel&#39; between our robot and the </span>
+<span class="sd">        given target. This channel is a Polygon instance constructed between the front</span>
+<span class="sd">        of our robot and the front of the target object.</span>
+
+<span class="sd">        :returns: A :class:`Polygon.cPolygon.Polygon` instance containing the above defined area.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">robot_poly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_polygon</span><span class="p">()</span>
+        <span class="n">target_poly</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">get_polygon</span><span class="p">()</span>
+
+        <span class="c"># [0] index is Front-left of a Robot, [1] index is Front-Right of a Robot.</span>
+        <span class="k">return</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">robot_poly</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">robot_poly</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">target_poly</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">target_poly</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;zone: </span><span class="si">%s</span><span class="se">\n</span><span class="s">x: </span><span class="si">%s</span><span class="se">\n</span><span class="s">y: </span><span class="si">%s</span><span class="se">\n</span><span class="s">angle: </span><span class="si">%s</span><span class="se">\n</span><span class="s">velocity: </span><span class="si">%s</span><span class="se">\n</span><span class="s">dimensions: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zone</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="Ball"><a class="viewcode-back" href="../../planning.html#planning.models.Ball">[docs]</a><span class="k">class</span> <span class="nc">Ball</span><span class="p">(</span><span class="n">PitchObject</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The Ball is a simple PitchObject with predefined constants for dimensions. Represents</span>
+<span class="sd">    our ball on the Pitch.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Ball</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">BALL_WIDTH</span><span class="p">,</span> <span class="n">BALL_LENGTH</span><span class="p">,</span> <span class="n">BALL_HEIGHT</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Goal"><a class="viewcode-back" href="../../planning.html#planning.models.Goal">[docs]</a><span class="k">class</span> <span class="nc">Goal</span><span class="p">(</span><span class="n">PitchObject</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The Goal class represents a goal in the Pitch and is simply a PitchObject with the zone</span>
+<span class="sd">    property to allow querying of the goal&#39;s zone.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Goal</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">GOAL_WIDTH</span><span class="p">,</span> <span class="n">GOAL_LENGTH</span><span class="p">,</span> <span class="n">GOAL_HEIGHT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zone</span> <span class="o">=</span> <span class="n">zone</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Goal.zone"><a class="viewcode-back" href="../../planning.html#planning.models.Goal.zone">[docs]</a>    <span class="k">def</span> <span class="nf">zone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns the zone this goal belongs to, as an integer index into :func:`planning.models.Pitch.zones` </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zone</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&#39;zone: </span><span class="si">%s</span><span class="se">\n</span><span class="s">x: </span><span class="si">%s</span><span class="se">\n</span><span class="s">y: </span><span class="si">%s</span><span class="se">\n</span><span class="s">angle: </span><span class="si">%s</span><span class="se">\n</span><span class="s">velocity: </span><span class="si">%s</span><span class="se">\n</span><span class="s">dimensions: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zone</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="Pitch"><a class="viewcode-back" href="../../planning.html#planning.models.Pitch">[docs]</a><span class="k">class</span> <span class="nc">Pitch</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The Pitch class represents the full physical pitch and separates the pitch into zones based upon the</span>
+<span class="sd">    croppings provided in croppings.json. Zones are specified as Polygon objects.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pitch_num</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets up a new Pitch with the given number. Retrieves zones using tools.py get_croppings, thus pitch_num</span>
+<span class="sd">        must be a valid pitch number.</span>
+
+<span class="sd">        :param pitch_num: A number within [0,1,2], with 0: main area pitch, 1: side area pitch, 2: simulator pitch.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c"># Retrieve croppings from croppings.json with the given pitch key</span>
+        <span class="n">config_json</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_croppings</span><span class="p">(</span><span class="n">pitch</span><span class="o">=</span><span class="n">pitch_num</span><span class="p">)</span>
+
+        <span class="c"># Retrieve width and height as the difference between the x,y extremes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">config_json</span><span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">]])</span> <span class="o">-</span> <span class="nb">min</span><span class="p">([</span><span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">config_json</span><span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">config_json</span><span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">]])</span> <span class="o">-</span> <span class="nb">min</span><span class="p">([</span><span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">config_json</span><span class="p">[</span><span class="s">&#39;outline&#39;</span><span class="p">]])</span>
+        
+        <span class="c"># Invert the y due to differences with CV&#39;s y coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Polygon</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">config_json</span><span class="p">[</span><span class="s">&#39;Zone_0&#39;</span><span class="p">]]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Polygon</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">config_json</span><span class="p">[</span><span class="s">&#39;Zone_1&#39;</span><span class="p">]]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Polygon</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">config_json</span><span class="p">[</span><span class="s">&#39;Zone_2&#39;</span><span class="p">]]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Polygon</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">config_json</span><span class="p">[</span><span class="s">&#39;Zone_3&#39;</span><span class="p">]]))</span>
+
+<div class="viewcode-block" id="Pitch.is_within_bounds"><a class="viewcode-back" href="../../planning.html#planning.models.Pitch.is_within_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">is_within_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Convenience function, checks whether the given x,y position is within the given robot&#39;s </span>
+<span class="sd">        zone.</span>
+<span class="sd"> </span>
+<span class="sd">        :param robot: The robot to check for containment</span>
+<span class="sd">        :param x: The target x position</span>
+<span class="sd">        :param y: The target y position</span>
+
+<span class="sd">        :returns: True if the robot&#39;s zone contains the given x,y position.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">zone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">robot</span><span class="o">.</span><span class="n">zone</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">zone</span><span class="o">.</span><span class="n">isInside</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Pitch.width"><a class="viewcode-back" href="../../planning.html#planning.models.Pitch.width">[docs]</a>    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Pitch.height"><a class="viewcode-back" href="../../planning.html#planning.models.Pitch.height">[docs]</a>    <span class="k">def</span> <span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="Pitch.zones"><a class="viewcode-back" href="../../planning.html#planning.models.Pitch.zones">[docs]</a>    <span class="k">def</span> <span class="nf">zones</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: The full list of zones available on this Pitch.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="World"><a class="viewcode-back" href="../../planning.html#planning.models.World">[docs]</a><span class="k">class</span> <span class="nc">World</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The World class is the high level model describing the entire world through the Pitch model and the </span>
+<span class="sd">    PitchObjects contained within. Heavily passed around, this serves as the querying object for many</span>
+<span class="sd">    different modules.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">our_side</span><span class="p">,</span> <span class="n">pitch_num</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialises a new World instance, with the given side serving to identify robot positionings</span>
+<span class="sd">        and pitch number used to pull the correct croppings for the Pitch.</span>
+
+<span class="sd">        :param our_side: Either &#39;left&#39; or &#39;right&#39;, used to identify robot positions</span>
+<span class="sd">        :param pitch_num: Value in the range [0,1,2], with 0: main pitch, 1: side pitch, 2: simulator.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="n">our_side</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;right&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pitch</span> <span class="o">=</span> <span class="n">Pitch</span><span class="p">(</span><span class="n">pitch_num</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">=</span> <span class="n">our_side</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_their_side</span> <span class="o">=</span> <span class="s">&#39;left&#39;</span> <span class="k">if</span> <span class="n">our_side</span> <span class="o">==</span> <span class="s">&#39;right&#39;</span> <span class="k">else</span> <span class="s">&#39;right&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ball</span> <span class="o">=</span> <span class="n">Ball</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Robot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Robot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Robot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Robot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="c"># Define catchment areas for our robots. If the ball enters these areas then our robot</span>
+        <span class="c"># believes it can catch the ball. Width is parallel to front/rear and height is parallel</span>
+        <span class="c"># to the sides of our robot.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">our_defender</span><span class="o">.</span><span class="n">catcher_area</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;width&#39;</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s">&#39;height&#39;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;front_offset&#39;</span> <span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">catcher_area</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;width&#39;</span> <span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s">&#39;height&#39;</span> <span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s">&#39;front_offset&#39;</span> <span class="p">:</span> <span class="mi">15</span><span class="p">}</span>
+
+        <span class="c"># Calculate the goals as being in fixes positions halfway up the pitch. The latter</span>
+        <span class="c"># goal &#39;faces&#39; towards the left of the pitch.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_goals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Goal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pitch</span><span class="o">.</span><span class="n">height</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Goal</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pitch</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pitch</span><span class="o">.</span><span class="n">height</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">pi</span><span class="p">))</span>
+
+        <span class="c"># Initially true, this ensures we only receive one warning for the sides being wrong.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_allowWarning</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="World.our_attacker"><a class="viewcode-back" href="../../planning.html#planning.models.World.our_attacker">[docs]</a>    <span class="k">def</span> <span class="nf">our_attacker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns the attacker belonging to our side, as a Robot model.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;left&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="World.their_attacker"><a class="viewcode-back" href="../../planning.html#planning.models.World.their_attacker">[docs]</a>    <span class="k">def</span> <span class="nf">their_attacker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns the opposing attacker, as a Robot model.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;left&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="World.our_defender"><a class="viewcode-back" href="../../planning.html#planning.models.World.our_defender">[docs]</a>    <span class="k">def</span> <span class="nf">our_defender</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns the defender belonging to our side, as a Robot model.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;left&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="World.their_defender"><a class="viewcode-back" href="../../planning.html#planning.models.World.their_defender">[docs]</a>    <span class="k">def</span> <span class="nf">their_defender</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns the opposing defender, as a Robot model.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;left&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_robots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="World.ball"><a class="viewcode-back" href="../../planning.html#planning.models.World.ball">[docs]</a>    <span class="k">def</span> <span class="nf">ball</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns the Ball model representing the ball in the world.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ball</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="World.our_goal"><a class="viewcode-back" href="../../planning.html#planning.models.World.our_goal">[docs]</a>    <span class="k">def</span> <span class="nf">our_goal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns a Goal model representing our goal on the Pitch.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;left&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="World.their_goal"><a class="viewcode-back" href="../../planning.html#planning.models.World.their_goal">[docs]</a>    <span class="k">def</span> <span class="nf">their_goal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns a Goal model representing the opposing goal on the Pitch.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;left&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="World.pitch"><a class="viewcode-back" href="../../planning.html#planning.models.World.pitch">[docs]</a>    <span class="k">def</span> <span class="nf">pitch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:returns: Returns the Pitch model this world contains.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pitch</span>
+</div>
+<div class="viewcode-block" id="World.update_positions"><a class="viewcode-back" href="../../planning.html#planning.models.World.update_positions">[docs]</a>    <span class="k">def</span> <span class="nf">update_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos_dict</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Receives a dictionary containing vectors for each of the PitchObjects</span>
+<span class="sd">        in the scene and updates the models with the new positionings.</span>
+
+<span class="sd">        :param pos_dict: A dictionary containing a vector for each of: \</span>
+<span class="sd">                [&#39;our_attacker&#39;, &#39;their_attacker&#39;, &#39;our_defender&#39;, &#39;their_defender&#39;, &#39;ball&#39;]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">pos_dict</span><span class="p">[</span><span class="s">&#39;our_attacker&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">their_attacker</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">pos_dict</span><span class="p">[</span><span class="s">&#39;their_attacker&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">our_defender</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">pos_dict</span><span class="p">[</span><span class="s">&#39;our_defender&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">their_defender</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">pos_dict</span><span class="p">[</span><span class="s">&#39;their_defender&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ball</span><span class="o">.</span><span class="n">vector</span> <span class="o">=</span> <span class="n">pos_dict</span><span class="p">[</span><span class="s">&#39;ball&#39;</span><span class="p">]</span>
+
+        <span class="c"># Only warn once</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allowWarning</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;left&#39;</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">our_defender</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_attacker</span><span class="o">.</span><span class="n">x</span>
+                <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_defender</span><span class="o">.</span><span class="n">x</span><span class="p">)):</span>
+                <span class="k">print</span> <span class="s">&quot;WARNING: The sides are probably wrong!&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_allowWarning</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_our_side</span> <span class="o">==</span> <span class="s">&#39;right&#39;</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">our_defender</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_attacker</span><span class="o">.</span><span class="n">x</span>
+                <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">our_attacker</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">their_defender</span><span class="o">.</span><span class="n">x</span><span class="p">)):</span>
+                <span class="k">print</span> <span class="s">&quot;WARNING: The sides are probably wrong!&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_allowWarning</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="c"># </span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Author.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

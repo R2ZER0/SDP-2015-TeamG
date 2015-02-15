@@ -47,7 +47,7 @@ class Coordinate(object):
 
     @property
     def x(self):
-        ''':rvalue: The x-value for this coordinate.
+        ''':returns: The x-value for this coordinate.
         '''
         return self._x
 
@@ -328,7 +328,7 @@ class Robot(PitchObject):
 
     def get_rotation_to_point(self, x, y):        
         ''':returns: An angle to which this robot should rotate to be facing the given point, \
-            within the range [-pi,pi]
+            within the range **[-pi,pi]**
         '''
 
         delta_x = x - self.x
@@ -356,8 +356,8 @@ class Robot(PitchObject):
 
     def get_direction_to_point(self, x, y):
         ''':returns: A tuple, containing:
-                [0]     The displacement to the given x,y position
-                [1]     The angle between our robot and the given x,y position
+                * The displacement to the given x,y position
+                * The angle between our robot and the given x,y position
         '''
         return self.get_displacement_to_point(x, y), self.get_rotation_to_point(x, y)
 
@@ -392,7 +392,7 @@ class Ball(PitchObject):
 
 class Goal(PitchObject):
     '''
-    The Goal class represents a goal in the Pitch and is simply a PitchObject with the zone
+    The Goal class represents a goal in the Pitch and is a PitchObject with the zone
     property to allow querying of the goal's zone.
     '''
 

@@ -45,34 +45,11 @@ class Planner:
         self._current_state=self.INITIAL_STATE
         self._current_task=None
     
-    # Do we need this stuff?
-    @property
-    def attacker_strat_state(self):
-        return self._attacker_current_strategy.current_state
-
-    @property
-    def defender_strat_state(self):
-        return self._defender_current_strategy.current_state
-
-    @property
-    def attacker_state(self):
-        return self._attacker_state
-
-    @attacker_state.setter
-    def attacker_state(self, new_state):
-        assert new_state in ['defence', 'attack']
-        self._attacker_state = new_state
-
-    @property
-    def defender_state(self):
-        return self._defender_state
-
-    @defender_state.setter
-    def defender_state(self, new_state):
-        assert new_state in ['defence', 'attack']
-        self._defender_state = new_state
-
     def plan(self):
+        '''Catch-all function for the Planner, uses our role, state, and the world model
+        to determine what we should be doing next.
+        '''
+        
         ball = self._world.ball
         our_attacker = self._world.our_attacker
         our_defender = self._world.our_defender

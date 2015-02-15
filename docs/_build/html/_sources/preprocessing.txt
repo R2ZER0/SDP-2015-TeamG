@@ -1,7 +1,7 @@
 Preprocessing
 =============
 
-.. autoclass:: preprocessing.preprocessing.Preprocessing
+.. automodule:: preprocessing.preprocessing.Preprocessing
     :members:
     :undoc-members:
     :show-inheritance:

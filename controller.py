@@ -19,8 +19,8 @@ from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 class Controller:
-	'''Main controller for the Robot. Pulls together all modules to form a cohesive whole.
-	Currently uses Planner to perform simple Tasks through a reactive mechanism.
+	'''Main controller for the Robot. Pulls together all modules and executes our Vision, 
+	Processing and Planning to move the Robot.
 	''' 
 
 	def __init__(self, pitch=0, color='yellow', our_side='left', our_role='attacker', video_port=0, comms=True, sim=False):
@@ -94,8 +94,15 @@ class Controller:
 		self.preprocessing = Preprocessing()
 
 	def run(self):
-		'''Initialises the core loop of the Controller, processing frame-by-frame and
-		running our Vision, Processing, and Planning modules.
+		'''Main loop of the Controller. Executes a continuous loop doing the following:
+		
+		* Retrieve Camera frame, performing barrel distortion fix.
+		* Perform preprocessing fixes to the frame
+		* Pass frame to Vision module to locate positions of objects of interest
+		* Perform postprocessing analysis on the positions
+		* Update our World state with new positions
+		* Contact our Planner to find out next tasks
+		* Redraw the GUI with updated information.
 		'''
 		counter = 1L
 

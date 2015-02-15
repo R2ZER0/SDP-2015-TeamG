@@ -32,7 +32,7 @@ def get_path_to_point(robot, x, y):
     :param robot: The Robot model as the origin point
     :param x: The destination x-position
     :param y: The destination y-position
-    :returns: A 'path' point including target x,y, distance to point, and direction to travel. 
+    :returns: A **Path** tuple including target x,y, distance to point, and direction to travel. 
     '''
     delta_x = x - robot.x
     delta_y = y - robot.y
@@ -64,7 +64,7 @@ def get_avoidance(path, robot, obstacle):
     :param robot: The robot model moving to the ball
     :param obstacle: Another PitchObject to avoid
 
-    :returns: None, if the given obstacle doesn't interfere with the path, or Path tuple containing new position, \
+    :returns: **None**, if the given obstacle doesn't interfere with the path, or Path tuple containing new position, \
         distance, and direction to travel to avoid the obstacle.
     '''
     if path.overlaps(obstacle):
