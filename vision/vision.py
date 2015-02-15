@@ -425,7 +425,7 @@ class GUI(object):
 
     def draw_line(self, frame, points, thickness=2):
         if points is not None:
-            cv2.line(frame, points[0], points[1], BGR_COMMON['red'], thickness)
+            cv2.line(frame, (int(points[0][0]), int(points[0][1])), (int(points[1][0]), int(points[1][1])), BGR_COMMON['red'], thickness)
 
     def data_text(self, frame, frame_offset, our_side, text, x, y, angle, velocity, a_action, d_action):
 
@@ -468,7 +468,7 @@ class GUI(object):
     def draw_text(self, frame, text, x, y, color=BGR_COMMON['green'], thickness=1.3, size=0.3,):
         if x is not None and y is not None:
             cv2.putText(
-                frame, text, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, size, color, thickness)
+                frame, text, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, size, color, int(thickness))
 
     def draw_grabbers(self, frame, grabbers, height):
         def_grabber = grabbers['our_defender'][0]
