@@ -130,7 +130,7 @@ def predict_y_intersection(world, predict_for_x, robot, full_width=False, bounce
         # Calculate extremes of the pitch using fixed offset if full_width is True, otherwise, use our goal
         # coordinates as a relative point
         top_y = world._pitch.height - 60 if full_width else world.our_goal.y + (world.our_goal.width/2) - 30
-        bottom_y = 60 if ful_width else world.our_goal.y - (world.our_goal.width/2) + 30
+        bottom_y = 60 if full_width else world.our_goal.y - (world.our_goal.width/2) + 30
 
         # Only predict if the robot is facing the correct location to the predicted x position
         if (robot.x < predict_for_x and not (pi/2 < angle < 3*pi/2)) or (robot.x > predict_for_x and (3*pi/2 > angle > pi/2)):
