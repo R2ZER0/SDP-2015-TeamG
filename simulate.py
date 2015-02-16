@@ -6,60 +6,56 @@ from vision.vision import Vision, Camera, GUI
 import vision.tools as tools
 from preprocessing.preprocessing import Preprocessing
 from postprocessing.postprocessing import Postprocessing
+import Prediction as pre
 from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
+from simulator.entities import SimulatedRobot, SimulatedBall
 from cv2 import waitKey
 import cv2
 import math
 import serial
 import warnings
 import time
-from planning.models import World
-from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
+import numpy as np
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 class Controller:
-	'''Main controller for the Robot. Pulls together all modules and executes our Vision, 
-	Processing and Planning to move the Robot.
-	''' 
+	'''Simulation Controller. Constructs a simulation and displays a minimal GUI showing the
+	Vision system.
+	'''
 
-	def __init__(self, pitch=0, color='yellow', our_side='left', our_role='attacker', video_port=0, comms=True):
-		'''Initialises the main controller. Constructs all necessary elements; doesn't start until
-		run is called.
+	#: Constant, the index into :mod:`vision.tools.PITCHES` for the Simulator
+	SIM_PITCH = 2
 
-		:param pitch: Pitch number to play on. [0: Main pitch, 1: Secondary pitch]
+	#: Our Simulator instance
+	simulator = None
+
+	#: Our camera, for drawing the current state
+	camera = None
+
+	def __init__(self, color='yellow', our_side='left', our_role='attacker'):
+		'''Initialises the Simulation controller
+
 		:param color: Which color plate to run as; only impact is aesthetic.
 		:param our_side: Designates our side, left represents left of the camera frame, core \
 					distinguishing feature for our / their functions.
 		:param our_role: Designates the role we're playing as, one of ['attacker', 'defender'].
-		:param video_port: Which serial port to use for the camera, an integer, usually 0 for /dev/video0.
-		:param comms: True indicates we should attempt communication with the Arduino, False ignores communications.
-		:param sim: True indicates we should run the simulated pitch rather than the real pitch.
 		'''
-		assert pitch in [0, 1]
 		assert color in ['yellow', 'blue']
 		assert our_side in ['left', 'right']
 		assert our_role in ['attacker', 'defender']
 
-		self.pitch = pitch
+		self.simulator = Simulator(our_side, our_role, color)
+		self.camera = SimulatedCamera(self.simulator)
+		self.robot = SimulatedAction(self.simulator.control_robot)
 
-		# Set up camera for frames
-		self.camera = Camera(port=video_port, pitch=self.pitch)
-
-		if comms:
-			self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
-		else:
-			self.comm = None
-
-		self.robot = Action(self.comm)
-		
 		frame = self.camera.get_frame()
 		center_point = self.camera.get_adjusted_center(frame)
 
-		# Set up vision
-		self.calibration = tools.get_colors(self.pitch)
+		# Set up our vision module
+		self.calibration = self._get_sim_colors()
 		self.vision = Vision(
-			pitch=pitch, color=color, our_side=our_side,
+			pitch=self.SIM_PITCH, color=color, our_side=our_side,
 			frame_shape=frame.shape, frame_center=center_point,
 			calibration=self.calibration)
 
@@ -67,13 +63,13 @@ class Controller:
 		self.postprocessing = Postprocessing()
 
 		# Set up world
-		self.world = World(our_side, pitch)
+		self.world = World(our_side, self.SIM_PITCH)
 
 		# Set up main planner
 		self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
 
 		# Set up GUI
-		self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
+		self.GUI = GUI(calibration=self.calibration, pitch=self.SIM_PITCH)
 
 		self.color = color
 		self.side = our_side
@@ -84,7 +80,7 @@ class Controller:
 	def run(self):
 		'''Main loop of the Controller. Executes a continuous loop doing the following:
 		
-		* Retrieve Camera frame, performing barrel distortion fix.
+		* Retrieve Camera frame.
 		* Perform preprocessing fixes to the frame
 		* Pass frame to Vision module to locate positions of objects of interest
 		* Perform postprocessing analysis on the positions
@@ -93,17 +89,14 @@ class Controller:
 		* Redraw the GUI with updated information.
 		'''
 		counter = 1L
-
-		#: Timer is used for FPS counting
 		timer = time.clock()
-
-		#: Tracker is used for a Planning timer, running Planner only in
-		#: certain time intervals
 		tracker = time.clock()
 
 		c = True
 
 		while c != 27:  # the ESC key
+
+			self.simulator.update(1)
 
 			frame = self.camera.get_frame()
 			pre_options = self.preprocessing.options
@@ -116,13 +109,14 @@ class Controller:
 
 			# Find object positions
 			# model_positions have their y coordinate inverted
+
 			model_positions, regular_positions = self.vision.locate(frame)
 			model_positions = self.postprocessing.analyze(model_positions)
 
 			# Update world state
 			self.world.update_positions(model_positions)
 
-			#: Run planner only every 5ms.
+			# TEST TASKS
 			if (time.clock() - tracker) > 0.05: 
 				self.planner.plan()
 				tracker = time.clock()
@@ -152,31 +146,34 @@ class Controller:
 				defenderState, attacker_actions, defender_actions, grabbers,
 				our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
 			counter += 1
-
+		
 		if self.robot is not None:
 			self.robot.stop()
 
 		tools.save_colors(self.pitch, self.calibration)
 
-# MAIN
+	def _get_sim_colors(self):
+		'''Retrieves colour calibrations for the Simulator, based upon the colours assigned in :mod:`simulator.simulator`.
+		'''
+		colors = {}
+		colors['blue'] = {'max': np.array([120,255,255]), 'min': np.array([120,255,255]), 'contrast': 0, 'blur': 0}
+		colors['plate'] = {'max': np.array([60,255,255]), 'min': np.array([60,255,255]), 'contrast': 0, 'blur': 0}
+		colors['yellow'] = {'max': np.array([30,255,255]), 'min': np.array([30,255,255]), 'contrast': 0, 'blur': 0}
+		colors['dot'] = {'max': np.array([0,0,0]), 'min': np.array([0,0,0]), 'contrast': 0, 'blur': 0}
+		colors['red'] = {'max': np.array([0,255,255]), 'min': np.array([0,255,255]), 'contrast': 0, 'blur': 0}
+
+		return colors
+
 if __name__ == '__main__':
 	import argparse
 	parser = argparse.ArgumentParser()
 
-	parser.add_argument('-p', '--pitch', type=int, default=0, help="[0] Main pitch (Default), [1] Secondary pitch")
 	parser.add_argument('-s', '--side', default='left', help="Our team's side ['left', 'right'] allowed. [Default: left]")
 	parser.add_argument(
 		'-r', '--role', default='attacker', help="Our controlled robot's role ['attacker', 'defender'] allowed. [Default: attacker]")
 	parser.add_argument(
 		'-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
-	parser.add_argument(
-		"-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
 	
 	args = parser.parse_args()
 
-	if args.nocomms:
-		c = Controller(
-			pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False).run()
-	else:
-		c = Controller(
-			pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role).run()
+	Controller(color=args.color, our_side=args.side, our_role=args.role).run()
