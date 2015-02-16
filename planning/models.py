@@ -343,7 +343,6 @@ class Robot(PitchObject):
             elif theta < -pi:
                 theta += 2*pi
         assert -pi <= theta <= pi
-        print 'rotation to point: %f' % (theta)
         return theta
 
     def get_displacement_to_point(self, x, y):
