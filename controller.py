@@ -51,9 +51,9 @@ class Controller:
 		# Set up camera for frames
 		if sim:
 			self.sim = sim
-			self.simulator = Simulator(our_role)
-			self.robot = SimulatedAction(self.simulator)
-			self.camera = SimulatedCamera()
+			self.simulator = Simulator(our_side, our_role, color)
+			self.robot = SimulatedAction(self.simulator.control_robot)
+			self.camera = SimulatedCamera(self.simulator)
 		else:
 			self.sim = None
 			self.camera = Camera(port=video_port, pitch=self.pitch)
@@ -118,8 +118,7 @@ class Controller:
 		while c != 27:  # the ESC key
 
 			if self.sim:
-				world = self.simulator.update(0.25)
-				self.camera.draw(world)
+				self.simulator.update(1)
 
 			frame = self.camera.get_frame()
 			pre_options = self.preprocessing.options

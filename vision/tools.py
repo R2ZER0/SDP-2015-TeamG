@@ -4,6 +4,7 @@ import json
 import socket
 import os
 import cPickle
+from simulator.simulator import Simulator
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 BLACK = (0, 0, 0)
@@ -38,8 +39,13 @@ def get_zones(width, height, filename=PATH+'/calibrations/croppings.json', pitch
 
 
 def get_croppings(filename=PATH+'/calibrations/croppings.json', pitch=0):
-    croppings = get_json(filename)
-    return croppings[PITCHES[pitch]]
+
+    # Handle simulation pitch
+    if (pitch == 2):
+        return Simulator.get_croppings()
+    else:
+        croppings = get_json(filename)
+        return croppings[PITCHES[pitch]]
 
 
 def get_json(filename=PATH+'/calibrations/calibrations.json'):

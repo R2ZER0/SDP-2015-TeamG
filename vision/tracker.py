@@ -206,17 +206,20 @@ class RobotTracker(Tracker):
         height, width, channel = frame.shape
         if height > 0 and width > 0:
             mask_frame = frame.copy()
+            screen_frame = frame.copy()
 
             # Fill the dummy frame
             cv2.rectangle(mask_frame, (0, 0), (width, height), (0, 0, 0), -1)
+            cv2.rectangle(screen_frame, (0, 0), (width, height), (360, 100, 100), -1)
+
             cv2.circle(mask_frame, (width / 2, height / 2), 9, (255, 255, 255), -1)
 
             # Mask the original image
             mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
-            frame = cv2.bitwise_and(frame, frame, mask=mask_frame)
+            cv2.bitwise_and(frame, frame, screen_frame, mask=mask_frame)
 
             adjustment = self.calibration['dot']
-            contours = self.get_contours(frame, adjustment)
+            contours = self.get_contours(screen_frame, adjustment)
 
             if contours and len(contours) > 0:
                 # Take the largest contour
