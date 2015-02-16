@@ -198,7 +198,7 @@ class SimulatedRobot:
 	I_WIDTH, I_LENGTH, I_OFFSET = 10, 6, 5
 	
 	#: Mass of the robot, catcher, and kicker; grams.
-	ROBOT_MASS, CATCHER_MASS, KICKER_MASS = 50, 10, 30
+	ROBOT_MASS, CATCHER_MASS, KICKER_MASS = 50, 10, 10
 
 	#: Tracks the length of the catcher and kicker, in cm.
 	CATCHER_LENGTH, KICKER_LENGTH = 15, 10
@@ -227,7 +227,7 @@ class SimulatedRobot:
 	KICKER_MULTIPLIER = 0.15
 
 	#: The base power for the motors; is multiplied by seconds and speed to receive final vlaue.
-	MOVE_POWER, TURN_POWER = 0.01, 0.0002
+	MOVE_POWER, TURN_POWER = 0.005, 0.0002
 
 	#: Ensure all shapes for the Robot are kept in the same group to prevent collisions
 	ROBOT_GROUP, ROBOT_LAYER = 10, 1
