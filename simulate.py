@@ -6,7 +6,6 @@ from vision.vision import Vision, Camera, GUI
 import vision.tools as tools
 from preprocessing.preprocessing import Preprocessing
 from postprocessing.postprocessing import Postprocessing
-import Prediction as pre
 from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
 from simulator.entities import SimulatedRobot, SimulatedBall
 from cv2 import waitKey
