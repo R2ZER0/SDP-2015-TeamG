@@ -183,7 +183,7 @@ class Robot(PitchObject):
     def __init__(self, zone, x, y, angle, velocity, width=ROBOT_WIDTH, length=ROBOT_LENGTH, height=ROBOT_HEIGHT, angle_offset=0):
         super(Robot, self).__init__(x, y, angle, velocity, width, length, height, angle_offset)
         self._zone = zone
-        self._catcher = 'open'
+        self._catcher = 'closed'
 
     @property
     def zone(self):
@@ -231,6 +231,7 @@ class Robot(PitchObject):
             An angle to which this robot should rotate to be facing the given point,
             within the range [-pi,pi]
         '''
+
         delta_x = x - self.x
         delta_y = y - self.y
         displacement = hypot(delta_x, delta_y)
@@ -243,6 +244,7 @@ class Robot(PitchObject):
             elif theta < -pi:
                 theta += 2*pi
         assert -pi <= theta <= pi
+        print 'rotation to point: %f' % (theta)
         return theta
 
     def get_displacement_to_point(self, x, y):
@@ -412,8 +414,8 @@ class World(object):
         # Define catchment areas for our robots. If the ball enters these areas then our robot
         # believes it can catch the ball. Width is parallel to front/rear and height is parallel
         # to the sides of our robot.
-        self.our_defender.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 25}
-        self.our_attacker.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 25}
+        self.our_defender.catcher_area = {'width' : 25, 'height' : 30, 'front_offset' : 15}
+        self.our_attacker.catcher_area = {'width' : 25, 'height' : 30, 'front_offset' : 15}
 
         # Calculate the goals as being in fixes positions halfway up the pitch. The latter
         # goal 'faces' towards the left of the pitch.

@@ -117,7 +117,7 @@ class Planner:
                     self._current_task = MoveToPoint(world, robot, role, idle_x, idle_y)
                     self._current_task.execute()
 
-                elif our_attacker.has_ball(ball) and self._world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y):
+                elif our_attacker.has_ball(ball) and self._current_task.complete and self._world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y):
                     """
                     We have the ball in our grasp, proceed to next state and invoke the next task
                     """

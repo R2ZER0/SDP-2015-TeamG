@@ -88,7 +88,9 @@ class Postprocessing(object):
             robot_angle = info['angle']
 
             diff = min((2 * pi) - abs(old_angle - robot_angle), abs(old_angle - robot_angle))
-            # Pi/4 threshold on angle adjustment between frames
+            
+            #: pi/2 is the maximum angle turn allowed in a single frame before we reject this as a vision
+            #: error
             if self._vectors[key]['time'] > 10 and diff > pi/2:
                 info['angle'] = old_angle
                 robot_angle = old_angle

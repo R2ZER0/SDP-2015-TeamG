@@ -3,6 +3,7 @@ import math
 from random import randint
 from action import Action
 import pdb
+import time
 
 '''Task base class. Execute function must be implemented by inheriting
 classes.'''
@@ -35,7 +36,7 @@ class Task(object):
 distance from it and then attempt to catch it.'''
 class AcquireBall(Task):
 
-    '''The largest angle (0 - math.pi) between the robot and the ball
+    '''The largest angle (0 - MAX_ANGLE_THRESHOLD) between the robot and the ball
     before we need to turn to face the robot.'''
     ANGLE_THRESHOLD = 0.3
 
@@ -60,21 +61,24 @@ class AcquireBall(Task):
         #Work out the angle between the robot's orientation and the ball.
         angle_to_turn = self.robot_info.get_rotation_to_point(ball_x,ball_y)
         
-        #If the angle is too large, rotate to face the ball.
+        # If the robot is not facing the point...
         if abs(angle_to_turn) > self.ANGLE_THRESHOLD:
+
             ''' This function maps the angle between the robot and the ball
             to a curve using the function log(x*10 + 1) / log(pi*10 + 1).
             The value is normalised to the range [60,100] because the motors
             don't function properly below ~60% power. Plot the curve on
             wolfram alpha to see what it looks like.'''
             rotation_speed = (math.log10((abs(angle_to_turn) * 10) + 1) / math.log10((math.pi * 10) + 1)) * 40 + 60
+
             self.turning = True
 
             #Turn left or right.
-            if angle_to_turn < 0:
+            if angle_to_turn > 0:                
                 self.robot.turn(rotation_speed)
             else:
                 self.robot.turn(-rotation_speed)
+
         #Otherwise, move toward the ball.
         else:
             if self.turning:
@@ -84,10 +88,13 @@ class AcquireBall(Task):
             #Open the catcher.
             if self.robot_info.catcher == 'closed':
                 self.robot.open_catcher()
+                self.robot.open_catcher()
                 self.robot_info.catcher = 'open'
+                return
 
             #Find the distance to the ball.
             displacement = self.robot_info.get_displacement_to_point(ball_x,ball_y)
+
             #If we are too far away, move closer.
             if displacement > self.CATCH_DISTANCE:
                 move_speed = 100
@@ -98,6 +105,7 @@ class AcquireBall(Task):
                 self.robot.stop()
                 if self.robot_info.catcher == 'open':
                     self.robot.catch()
+                    self.robot.catch()
                     self.robot_info.catcher = 'closed'
                     self.complete = True
 
@@ -107,11 +115,11 @@ class MoveToPoint(Task):
     '''The maximum and minimum values of the angle between the robot's
     orientation and the point. Threshold goes from MAX->MIN as
     displacement decreases.'''
-    MIN_ANGLE_THRESHOLD = 0.05
-    MAX_ANGLE_THRESHOLD = 0.3
+    MAX_ANGLE_THRESHOLD = 0.5
+    MIN_ANGLE_THRESHOLD = 0.5
 
     '''How close the robot must be to the point before we stop moving.'''
-    DISP_TOLERANCE = 20
+    DISP_TOLERANCE = 40
 
     '''The x value of the point.'''
     x = 0
@@ -134,16 +142,20 @@ class MoveToPoint(Task):
 
         # Find out the angle between (x,y) and the robot's orientation.
         angle_to_turn = self.robot_info.get_rotation_to_point(self.x,self.y)
-
+        
         # If the robot is not facing the point...
         if abs(angle_to_turn) > angle_threshold:
+
             # Rotation speed decreases as the angle required decreases.
-            rotation_speed = (math.log10((abs(angle_to_turn) * 10) + 1) / math.log10((math.pi * 10) + 1)) * 40 + 60
-            # Turn left or right.
-            if angle_to_turn < 0:
+            #rotation_speed = 40 * math.log10(abs(angle_to_turn))
+            rotation_speed = 40
+            print angle_to_turn
+            #Turn left or right.
+            if angle_to_turn > 0:
                 self.robot.turn(rotation_speed)
             else:
                 self.robot.turn(-rotation_speed)
+
         # If the robot is facing the point...
         else:
             # If the robot is too far away...
@@ -159,7 +171,7 @@ class TurnToPoint(Task):
 
     '''The largest angle (0 - math.pi) between the robot and the ball
     before we need to turn to face the robot.'''
-    ANGLE_THRESHOLD = 0.2
+    ANGLE_THRESHOLD = 0.5
     
     '''The x value of the point.'''
     x = 0
@@ -167,6 +179,8 @@ class TurnToPoint(Task):
     y = 0
     
     complete = False
+
+    time_since_command = 0
 
     def __init__(self,world,robot,role,x,y):
         super(TurnToPoint,self).__init__(world,robot,role)
@@ -178,18 +192,22 @@ class TurnToPoint(Task):
         if self.complete:
             return
 
-        # Find the angle between the robot's orientation and the point.
+            # Find the angle between the robot's orientation and the point.
         angle_to_turn = self.robot_info.get_rotation_to_point(self.x,self.y)
         
         # If the robot is not facing the point...
         if abs(angle_to_turn) > self.ANGLE_THRESHOLD:
+
             # Rotation speed decreases as the angle required decreases.
-            rotation_speed = (math.log10((abs(angle_to_turn) * 10) + 1) / math.log10((math.pi * 10) + 1)) * 40 + 60
-            # Turn left or right.
-            if angle_to_turn < 0:
+            #rotation_speed = 40 * math.log10(abs(angle_to_turn))
+            rotation_speed = 40
+            print angle_to_turn
+            #Turn left or right.
+            if angle_to_turn > 0:
                 self.robot.turn(rotation_speed)
             else:
                 self.robot.turn(-rotation_speed)
+
         else:
             self.complete = True
             self.robot.stop()
@@ -207,6 +225,7 @@ class KickToPoint(Task):
     y = 0
 
     kicked = False
+    check_state = 0
     
     def __init__(self,world,robot,role,x,y):
         super(KickToPoint,self).__init__(world,robot,role)
@@ -220,20 +239,35 @@ class KickToPoint(Task):
 
         # Find the angle between the robot's orientation and the point.
         angle_to_turn = self.robot_info.get_rotation_to_point(self.x,self.y)
-
+        
         # If the robot is not facing the point...
         if abs(angle_to_turn) > self.ANGLE_THRESHOLD:
+
             # Rotation speed decreases as the angle required decreases.
-            rotation_speed = (math.log10((abs(angle_to_turn) * 10) + 1) / math.log10((math.pi * 10) + 1)) * 40 + 60
-            # Turn left or right.
-            if angle_to_turn < 0:
+            #rotation_speed = 40 * math.log10(abs(angle_to_turn))
+            rotation_speed = 40
+            print angle_to_turn
+            #Turn left or right.
+            if angle_to_turn > 0:
                 self.robot.turn(rotation_speed)
             else:
                 self.robot.turn(-rotation_speed)
+
         #Else the robot is facing the point...
         else:
-            self.robot.kick()
-            self.kicked = True
+            if self.check_state <= 1:
+                self.robot.stop()
+                self.check_state += 1
+                return
+            elif self.check_state == 2:
+                if abs(angle_to_turn) <= self.ANGLE_THRESHOLD:
+                    self.check_state += 1
+                else:
+                    self.check_state = 0
+                return
+            else:
+                self.robot.kick()
+                self.kicked = True
 
 '''Shoot task. Rotate robot to face the goal and then kick.'''
 class Shoot(KickToPoint):

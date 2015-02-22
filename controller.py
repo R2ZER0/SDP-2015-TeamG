@@ -1,6 +1,6 @@
 import pdb
 from action import Action
-from planning.tasks import AcquireBall
+from planning.tasks import AcquireBall, MoveToPoint
 from vision.vision import Vision, Camera, GUI
 from planning.planner import Planner
 from postprocessing.postprocessing import Postprocessing
@@ -45,8 +45,6 @@ class Controller:
 
 		self.pitch = pitch
 
-		#pdb.set_trace()
-
 		# Set up camera for frames
 		if sim:
 			self.sim = sim
@@ -58,7 +56,7 @@ class Controller:
 			self.camera = Camera(port=video_port, pitch=self.pitch)
 
 			if comms:
-				self.comm = serial.Serial("/dev/ttyACM1", 115200, timeout=1)
+				self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
 			else:
 				self.comm = None
 
@@ -97,11 +95,15 @@ class Controller:
 		Ready your sword, here be dragons.
 		"""
 		counter = 1L
-		timer = time.clock()
-		#try:
-		c = True
 
-		task = AcquireBall(self.world,self.robot,'attacker')
+		#: Timer is used for FPS counting
+		timer = time.clock()
+
+		#: Tracker is used for a Planning timer, running Planner only in
+		#: certain time intervals
+		tracker = time.clock()
+
+		c = True
 
 		while c != 27:  # the ESC key
 
@@ -111,22 +113,25 @@ class Controller:
 
 			frame = self.camera.get_frame()
 			pre_options = self.preprocessing.options
+
 			# Apply preprocessing methods toggled in the UI
 			preprocessed = self.preprocessing.run(frame, pre_options)
 			frame = preprocessed['frame']
 			if 'background_sub' in preprocessed:
 				cv2.imshow('bg sub', preprocessed['background_sub'])
+
 			# Find object positions
 			# model_positions have their y coordinate inverted
-
 			model_positions, regular_positions = self.vision.locate(frame)
 			model_positions = self.postprocessing.analyze(model_positions)
 
 			# Update world state
 			self.world.update_positions(model_positions)
 
-			# TEST TASKS
-			self.planner.plan()
+			#: Run planner only every 5ms.
+			if (time.clock() - tracker) > 0.05: 
+				self.planner.plan()
+				tracker = time.clock()
 
 			# Information about the grabbers from the world
 			grabbers = {
@@ -162,17 +167,10 @@ class Controller:
 				defenderState, attacker_actions, defender_actions, grabbers,
 				our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
 			counter += 1
-
-		#except:
-		#	
-
-		#finally:
-			# Write the new calibrations to a file.
-			#tools.save_colors(self.pitch, self.calibration)
-			#if self.robot is not None:
-			#	self.robot.stop()
+			
 		if self.robot is not None:
 			self.robot.stop()
+			
 		tools.save_colors(self.pitch, self.calibration)
 
 # MAIN
