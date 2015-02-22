@@ -256,8 +256,7 @@ class RobotTracker(Tracker):
 
         # (1) Find the plates
         plate_corners = self.get_plate(frame)
-        print plate_corners
-
+        
         if plate_corners is not None:
             # Find the bounding box
             plate_bound_box = self.get_bounding_box(plate_corners)
