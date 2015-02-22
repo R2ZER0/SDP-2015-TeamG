@@ -39,10 +39,11 @@ The project has the following dependencies:
 - PySerial
 - OpenCV 2.4.5
 - Numpy
-- pygame (For `xbox360controller/`)
-- pymunk (For Simulation)
-- Flask (For `ControlApp/`)
-- Pyzmq (For the RF Console)
+- pygame 	(For `xbox360controller/`)
+- pymunk 	(For Simulation)
+- Flask 	(For `ControlApp/`)
+- Pyzmq 	(For the RF Console)
+- Sphinx-Docs 	(Generating documentation)
 
 ##### Core Dependencies 
 
