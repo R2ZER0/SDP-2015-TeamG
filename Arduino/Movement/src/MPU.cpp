@@ -46,7 +46,6 @@ static uint8_t fifoBuffer[64]; // FIFO storage buffer
 Quaternion q;
 VectorFloat gravity;
 float yawPitchRoll[3];
-float yawOffset = 0.0f;
 
 ////////////////////////////////////////////////////////////////////////////////
 // MPU Interrupt Handler
@@ -85,9 +84,13 @@ static void cmd_MPU() {
     if(subcmd == NULL) { 
         /* do nothing */
         
-    } else if(strcmp(subcmd, "GETYAW") == 0) {        
-        if(dmpReady) {            
-            Serial.println(yawOffset + yawPitchRoll[0], DECIMAL_PLACES);
+    } else if(strcmp(subcmd, "GETYPR") == 0) {        
+        if(dmpReady) {
+            Serial.print(yawPitchRoll[0], DECIMAL_PLACES);
+            Serial.print(" ");
+            Serial.print(yawPitchRoll[1], DECIMAL_PLACES);
+            Serial.print(" ");
+            Serial.println(yawPitchRoll[2], DECIMAL_PLACES);
             success = true;
         }
         
@@ -100,19 +103,6 @@ static void cmd_MPU() {
     } else if(strcmp(subcmd, "CALIB") == 0) {
         success = Calibrate();        
         
-    } else if(strcmp(subcmd, "SETHOME") == 0) {
-        float home_rotation = 0.0;
-        char* arg = comm->next();
-        if(arg != NULL) {
-            home_rotation = atof(arg);
-        }
-        
-        yawOffset = home_rotation - yawPitchRoll[0];
-#ifdef MPU_DEBUG
-        Serial.print("Set offset of ");
-        Serial.println(yawOffset, DECIMAL_PLACES);
-#endif
-        success = true;
     }
     
     Serial.println(success ? "DONE" : "FAILED");

@@ -1,9 +1,9 @@
 #include <Wire.h>
 #include <SDPArduino.h>
 #include <SerialCommand.h>
-//#include "MPU.h" // Disable MPU for now
+#include "MPU.h" // Disable MPU for now
 
-#define PIN_LED 13
+#define PIN_LED 10
 
 #define MOTOR_MOTOR1  0
 #define MOTOR_MOTOR2  2

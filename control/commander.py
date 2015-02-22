@@ -1,9 +1,11 @@
 # control.commander
 
+from control.command import Command
+
 class Commander():
     """Deals directly with the robot, to cater for all your robot commanding needs"""
     def __init__(self, comm):
-        self.comm = comm
+        self.comm = comm    
         
     def executeCommandList(self, commands):            
         """Takes a list of Command objects, and executes them in order"""
@@ -57,3 +59,16 @@ class Commander():
             commands_to_keep.append(cmd)
             
         return commands_to_keep[::-1]
+    
+    # Command tracking
+    _next_tracking_id = 1
+
+    def getNextTrackingID(self):
+        """Get next available ID for command tracking"""
+        idx = cls._next_tracking_id
+        cls._next_tracking_id += 1
+        return idx
+    
+    class TrackedCommand(object):
+        """Combines a command and a tracking ID"""
+        def __init__(self, command, trid=):
