@@ -337,12 +337,14 @@ class Robot(PitchObject):
         if displacement == 0:
             theta = 0
         else:
-            theta = atan2(delta_y, delta_x) - atan2(sin(self.angle), cos(self.angle))
+            theta = atan2(delta_y, delta_x) + atan2(sin(self.angle), cos(self.angle))
+            theta -= (theta/abs(theta)) * pi/2
             if theta > pi:
                 theta -= 2*pi
             elif theta < -pi:
                 theta += 2*pi
         assert -pi <= theta <= pi
+
         return theta
 
     def get_displacement_to_point(self, x, y):
@@ -500,8 +502,8 @@ class World(object):
         # Define catchment areas for our robots. If the ball enters these areas then our robot
         # believes it can catch the ball. Width is parallel to front/rear and height is parallel
         # to the sides of our robot.
-        self.our_defender.catcher_area = {'width' : 25, 'height' : 30, 'front_offset' : 15}
-        self.our_attacker.catcher_area = {'width' : 25, 'height' : 30, 'front_offset' : 15}
+        self.our_defender.catcher_area = {'width' : 25, 'height' : 20, 'front_offset' : 15}
+        self.our_attacker.catcher_area = {'width' : 25, 'height' : 20, 'front_offset' : 15}
 
         # Calculate the goals as being in fixes positions halfway up the pitch. The latter
         # goal 'faces' towards the left of the pitch.
