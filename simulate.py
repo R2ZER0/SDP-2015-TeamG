@@ -15,6 +15,7 @@ import serial
 import warnings
 import time
 import numpy as np
+from pymunk import Vec2d
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -94,6 +95,16 @@ class Controller:
 		c = True
 
 		while c != 27:  # the ESC key
+
+                        #Move the ball with TFGH
+                        if c == ord('t'):
+                                self.simulator.ball.body.velocity = Vec2d(0,1)
+                        elif c == ord('f'):
+                                self.simulator.ball.body.velocity = Vec2d(-1,0)
+                        elif c == ord('g'):
+                                self.simulator.ball.body.velocity = Vec2d(0,-1)
+                        elif c == ord('h'):
+                                self.simulator.ball.body.velocity = Vec2d(1,0)
 
 			self.simulator.update(1)
 
