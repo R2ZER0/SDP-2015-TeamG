@@ -352,10 +352,11 @@ class SimulatedRobot:
 		far simpler cases.
 		'''
 
-		if self.rotate_speed == 0 and self.move_speed == 0:
+		if self.rotate_speed == 0:
 			self.body.angular_velocity = 0
-			self.body.velocity = Vec2d(0,0)
-			return
+
+                if self.move_speed == 0:
+                        self.body.velocity = Vec2d(0,0)
 
 		# Handle turning first
 		if self.rotate_speed != 0:
