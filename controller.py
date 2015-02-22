@@ -1,14 +1,15 @@
-import pdb
 from action import Action
 from planning.tasks import AcquireBall, MoveToPoint
-from vision.vision import Vision, Camera, GUI
 from planning.planner import Planner
-from postprocessing.postprocessing import Postprocessing
-from preprocessing.preprocessing import Preprocessing
+from planning.models import World
+from vision.vision import Vision, Camera, GUI
 import vision.tools as tools
+from preprocessing.preprocessing import Preprocessing
+from postprocessing.postprocessing import Postprocessing
+from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
 from cv2 import waitKey
-import math
 import cv2
+import math
 import serial
 import warnings
 import time
@@ -17,33 +18,33 @@ from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-
 class Controller:
-	"""
-	Primary source of robot control. Ties vision and planning together.
-	"""
+	'''Main controller for the Robot. Pulls together all modules to form a cohesive whole.
+	Currently uses Planner to perform simple Tasks through a reactive mechanism.
+	''' 
 
-	def __init__(self, pitch, color, our_side, our_role, video_port=0, comm_port='/dev/ttyUSB0', comms=1, sim=True):
-		"""
-		Entry point for the SDP system.
+	def __init__(self, pitch=0, color='yellow', our_side='left', our_role='attacker', video_port=0, comms=True, sim=False):
+		'''Initialises the main controller. Constructs all necessary elements; doesn't start until
+		run is called.
 
-		Params:
-			[int] video_port                port number for the camera
-			[string] comm_port              port number for the arduino
-			[int] pitch                     0 - main pitch, 1 - secondary pitch
-			[string] our_side               the side we're on - 'left' or 'right'
-			*[int] port                     The camera port to take the feed from
-			*[Robot_Controller] attacker    Robot controller object - Attacker Robot has a RED
-											power wire
-			*[Robot_Controller] defender    Robot controller object - Defender Robot has a YELLOW
-											power wire
-		"""
-		assert pitch in [0, 1, 2]
+		:param pitch: Pitch number to play on. [0: Main pitch, 1: Secondary pitch]
+		:param color: Which color plate to run as; only impact is aesthetic.
+		:param our_side: Designates our side, left represents left of the camera frame, core \
+					distinguishing feature for our / their functions.
+		:param our_role: Designates the role we're playing as, one of ['attacker', 'defender'].
+		:param video_port: Which serial port to use for the camera, an integer, usually 0 for /dev/video0.
+		:param comms: True indicates we should attempt communication with the Arduino, False ignores communications.
+		:param sim: True indicates we should run the simulated pitch rather than the real pitch.
+		'''
+		# Pitch is 2 by default for Simulator
+		if not sim:
+			assert pitch in [0, 1]
+
 		assert color in ['yellow', 'blue']
 		assert our_side in ['left', 'right']
 		assert our_role in ['attacker', 'defender']
 
-		self.pitch = pitch
+		self.pitch = 2 if sim else pitch
 
 		# Set up camera for frames
 		if sim:
@@ -90,10 +91,10 @@ class Controller:
 
 		self.preprocessing = Preprocessing()
 
-	def wow(self):
-		"""
-		Ready your sword, here be dragons.
-		"""
+	def run(self):
+		'''Initialises the core loop of the Controller, processing frame-by-frame and
+		running our Vision, Processing, and Planning modules.
+		'''
 		counter = 1L
 
 		#: Timer is used for FPS counting
@@ -149,15 +150,6 @@ class Controller:
 			# Use 'y', 'b', 'r' to change color.
 			c = waitKey(2) & 0xFF
 
-			if c == ord('g'):
-				self.simulator.move_ball(math.pi/2)
-			elif c == ord('t'):
-				self.simulator.move_ball(-math.pi/2)
-			elif c == ord('f'):
-				self.simulator.move_ball(math.pi)
-			elif c == ord('h'):
-				self.simulator.move_ball(0)
-
 			actions = []
 			fps = float(counter) / (time.clock() - timer)
 			# Draw vision content and actions
@@ -167,29 +159,32 @@ class Controller:
 				defenderState, attacker_actions, defender_actions, grabbers,
 				our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
 			counter += 1
-			
+
 		if self.robot is not None:
 			self.robot.stop()
-			
+
 		tools.save_colors(self.pitch, self.calibration)
 
 # MAIN
 if __name__ == '__main__':
 	import argparse
 	parser = argparse.ArgumentParser()
-	parser.add_argument("pitch", help="[0] Main pitch, [1] Secondary pitch")
-	parser.add_argument("side", help="The side of our defender ['left', 'right'] allowed.")
-	parser.add_argument("role", help="The role of our robot ['att', 'def'] allowed.")
-	parser.add_argument("color", help="The color of our team ['yellow', 'blue'] allowed.")
+
+	parser.add_argument('-p', '--pitch', type=int, default=0, help="[0] Main pitch (Default), [1] Secondary pitch")
+	parser.add_argument('-s', '--side', default='left', help="Our team's side ['left', 'right'] allowed. [Default: left]")
+	parser.add_argument(
+		'-r', '--role', default='attacker', help="Our controlled robot's role ['attacker', 'defender'] allowed. [Default: attacker]")
+	parser.add_argument(
+		'-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
 	parser.add_argument(
 		"-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
-	parser.add_argument(
-		"-s", "--sim", help="Enables simulation.", action="store_true")
+	parser.add_argument("--sim", help="Enables simulation.", action="store_true")
 
 	args = parser.parse_args()
+
 	if args.nocomms:
 		c = Controller(
-			pitch=int(args.pitch), color=args.color, our_side=args.side, our_role=args.role, comms=0, sim=args.sim).wow()
+			pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False, sim=args.sim).run()
 	else:
 		c = Controller(
-			pitch=int(args.pitch), color=args.color, our_side=args.side, our_role=args.role, sim=args.sim).wow()
+			pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, sim=args.sim).run()

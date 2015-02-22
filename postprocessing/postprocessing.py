@@ -1,6 +1,7 @@
 from planning.models import Vector
 from copy import deepcopy
 from math import atan2, pi, hypot
+import math
 
 class Postprocessing(object):
     '''
@@ -99,10 +100,6 @@ class Postprocessing(object):
             delta_angle = delta_angle % (2*math.pi)
 
             velocity = hypot(delta_y, delta_x)/(self._time - self._vectors[key]['time'])
-
-            # Make the velocity negative if the angles are not roughly the same
-            if not (-pi / 2 < abs(delta_angle - robot_angle) < pi / 2):
-                velocity = -velocity
 
             self._vectors[key]['vec'] = Vector(info['x'], info['y'], info['angle'], velocity)
             self._vectors[key]['time'] = self._time
