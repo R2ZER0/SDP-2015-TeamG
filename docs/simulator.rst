@@ -1,18 +1,10 @@
 Simulator
 =========
 
-Simulated Camera
-----------------
+Entities
+--------
 
-.. autoclass:: simulator.simulator.SimulatedCamera
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-Simulated Actoin
-----------------
-
-.. autoclass:: simulator.simulator.SimulatedAction
+.. automodule:: simulator.entities
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +12,7 @@ Simulated Actoin
 Simulator
 ---------
 
-.. autoclass:: simulator.simulator.Simulator
+.. automodule:: simulator.simulator
     :members:
     :undoc-members:
     :show-inheritance:
