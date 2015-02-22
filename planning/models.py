@@ -331,8 +331,8 @@ class Robot(PitchObject):
             within the range **[-pi,pi]**
         '''
 
-        delta_x = x - self.x
-        delta_y = y - self.y
+        delta_x = self.x - x
+        delta_y = self.y - y
         displacement = hypot(delta_x, delta_y)
         if displacement == 0:
             theta = 0
