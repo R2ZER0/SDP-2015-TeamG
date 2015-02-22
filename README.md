@@ -44,6 +44,7 @@ The project has the following dependencies:
 - Flask 	(For `ControlApp/`)
 - Pyzmq 	(For the RF Console)
 - Sphinx-Docs 	(Generating documentation)
+- RTD Theme 	(Documentation Theme)
 
 ##### Core Dependencies 
 

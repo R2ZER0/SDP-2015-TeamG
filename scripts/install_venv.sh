@@ -31,6 +31,7 @@ pip install ArgParse
 pip install unittest2
 pip install pymunk
 pip install Sphinx
+pip install sphinx_rtd_theme
 
 #download cv2
 curl -L -O http://downloads.sourceforge.net/project/opencvlibrary/opencv-unix/2.4.10/opencv-2.4.10.zip
