@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 from collections import namedtuple
 import warnings
 
@@ -196,8 +197,8 @@ class RobotTracker(Tracker):
             2. Fill a dummy frame with black and draw white cirlce around to create a mask.
             3. Mask against the frame to eliminate any robot parts looking like dark dots.
             4. Use contours to detect the dot and return it's center.
-
-        Params:
+ 
+       Params:
             frame       The frame to search
             x_offset    The offset from the uncropped image - to be added to the final values
             y_offset    The offset from the uncropped image - to be added to the final values
@@ -205,27 +206,55 @@ class RobotTracker(Tracker):
         # Create dummy mask
         height, width, channel = frame.shape
         if height > 0 and width > 0:
-            mask_frame = frame.copy()
-            screen_frame = frame.copy()
+            
+            # Calculate angle between first two polygons
+            point_pair = (plate_corners[0], plate_corners[1])
+            angle = math.atan2(point_pair[1][1]-point_pair[0][1], 
+                               point_pair[1][0]-point_pair[0][0])
 
-            # Fill the dummy frame
-            cv2.rectangle(mask_frame, (0, 0), (width, height), (0, 0, 0), -1)
-            cv2.rectangle(screen_frame, (0, 0), (width, height), (360, 100, 100), -1)
+            # Largest contour stored here
+            largest_contour = None
+            area = 0
 
-            cv2.circle(mask_frame, (width / 2, height / 2), 9, (255, 255, 255), -1)
+            # Attempt circle mask for every multiple of this
+            for theta in [angle, 2*angle, 3*angle, 4*angle]:
 
-            # Mask the original image
-            mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
-            cv2.bitwise_and(frame, frame, screen_frame, mask=mask_frame)
+                # Calculate dot's dx,dy based on this theta
+                DOT_DISTANCE = 10
+                dx = DOT_DISTANCE * math.cos(theta)
+                dy = DOT_DISTANCE * math.sin(theta)
 
-            adjustment = self.calibration['dot']
-            contours = self.get_contours(screen_frame, adjustment)
+                mask_frame = frame.copy()
+                screen_frame = frame.copy()
 
-            if contours and len(contours) > 0:
-                # Take the largest contour
-                contour = self.get_largest_contour(contours)
-                (x, y), radius = self.get_contour_centre(contour)
-                return Center(x + x_offset, y + y_offset)
+                # Fill the dummy frame
+                cv2.rectangle(mask_frame, (0, 0), (width, height), (0, 0, 0), -1)
+                cv2.rectangle(screen_frame, (0, 0), (width, height), (360, 100, 100), -1)
+
+                cv2.circle(mask_frame, (int(dx + (width / 2)), int(dy + (height / 2))), 4, (255, 255, 255), -1)
+
+                # Mask the original image
+                mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
+                cv2.bitwise_and(frame, frame, screen_frame, mask=mask_frame)
+
+                adjustment = self.calibration['dot']
+                contours = self.get_contours(screen_frame, adjustment)
+
+                if contours and len(contours) > 0:
+                    # Take the largest contour
+                    contour = self.get_largest_contour(contours)
+                    contour_area = cv2.contourArea(contour)
+
+                    # Replace previous if this is larger
+                    if largest_contour is None or contour_area > area:
+                        area = contour_area
+                        largest_contour = contour
+
+            if largest_contour is None:
+                return Center(0,0)
+
+            (x, y), radius = self.get_contour_centre(largest_contour)
+            return Center(x + x_offset, y + y_offset)
 
     def find(self, frame, queue):
         """
@@ -307,6 +336,7 @@ class RobotTracker(Tracker):
 
                     # Put the results together
                     sides = [
+                    
                         (
                             Center(first[1], first[2]),
                             Center(front_rear_distances[0][1], front_rear_distances[0][2])
@@ -407,6 +437,7 @@ class BallTracker(Tracker):
         self.calibration = calibration
 
     def find(self, frame, queue):
+
         for color in self.color:
             contours, hierarchy, mask = self.preprocess(
                 frame,
