@@ -188,7 +188,7 @@ class RobotTracker(Tracker):
         contours = self.get_contours(frame.copy(), adjustments)
         return self.get_contour_corners(self.join_contours(contours))
 
-    def get_dot(self, frame, x_offset, y_offset, plate_corners):
+    def get_dot(self, frame, x_offset, y_offset, plate_corners, angle=None):
         """
         Find center point of the black dot on the plate.
 
@@ -199,9 +199,10 @@ class RobotTracker(Tracker):
             4. Use contours to detect the dot and return it's center.
  
        Params:
-            frame       The frame to search
-            x_offset    The offset from the uncropped image - to be added to the final values
-            y_offset    The offset from the uncropped image - to be added to the final values
+            frame         The frame to search
+            x_offset      The offset from the uncropped image - to be added to the final values
+            y_offset      The offset from the uncropped image - to be added to the final values
+            plate_corners The corners of the plate detected
         """
         # Create dummy mask
         height, width, channel = frame.shape
@@ -217,7 +218,7 @@ class RobotTracker(Tracker):
             area = 0
 
             # Attempt circle mask for every multiple of this
-            for theta in [angle, 2*angle, 3*angle, 4*angle]:
+            for theta in [angle, angle + (math.pi/2), angle + (2*math.pi/2), angle + (3*math.pi/2)]:
 
                 # Calculate dot's dx,dy based on this theta
                 DOT_DISTANCE = 10
