@@ -95,8 +95,8 @@ class Configure(object):
                 self.image = cv2.undistort(image, CMATRIX, DIST, None, NCMATRIX)
 
                 self.get_zone('Zone_0', 'draw LEFT Defender')
-                self.get_zone('Zone_2', 'draw LEFT Attacker')
-                self.get_zone('Zone_1', 'draw RIGHT Attacker')
+                self.get_zone('Zone_1', 'draw LEFT Attacker')
+                self.get_zone('Zone_2', 'draw RIGHT Attacker')
                 self.get_zone('Zone_3', 'draw RIGHT Defender')
 		
 		self.data['Zone_3'].extend(self.data['Zone_2'])
