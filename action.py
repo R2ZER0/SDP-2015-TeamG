@@ -1,4 +1,4 @@
-
+import pdb
 import math
 import motor_calibration
 
@@ -12,7 +12,7 @@ class Action():
 	
 	#: The angles of our wheels, relative to the x-axis. Begins \
 	#: from front-left and moves anticlockwise.
-	MOTOR_ANGLES = [ math.pi*5.0/3.0, math.pi/2.0, math.pi*4/3.0 ]
+	MOTOR_ANGLES = [ math.pi / 4, math.pi * 3/4, math.pi * 5/4, math.pi * 7/4 ]
 
 	#: Trigonometric constants for each motor, used for holonomic movement.
 	MOTORS = list(map(lambda x: (math.cos(x), math.sin(x)), MOTOR_ANGLES))
@@ -35,10 +35,12 @@ class Action():
 				of robot
 		:param scale: Power-scale for this movement, range: -1 to 1
 		"""
+		#: Offset angle to correlate with robot's forward
+		angle  = angle + math.pi / 2
 
-		motor_speeds = [ Action._calc_motor_speed(motor, angle) for motor in self.MOTORS ]
+		motor_speeds = Action._calc_motor_speed(angle)
 		motor_speeds = Action._normalise_speeds(motor_speeds)
-		motor_speeds = map(lambda x: int(x*scale_max), motor_speeds)
+		motor_speeds = map(lambda x: int(x*scale), motor_speeds)
 		self._send_run(motor_speeds)
   
 	def turn(self, speed):
@@ -47,7 +49,7 @@ class Action():
 		:param speed: The speed of the turn, range is [-100,100]. Positive values \
 					result in clockwise rotation, negative in anticlockwise.
 		"""
-		self._send_run([int(speed), int(speed), int(speed)])
+		self._send_run([int(speed), int(speed), int(speed), int(speed)])
   
 	def stop(self):
 		"""Stops the robot's movement by setting all motors to zero.
@@ -56,7 +58,7 @@ class Action():
 
 		   This currently does not stop the Kicker/Catcher mechanisms.
 		"""
-		motor_speeds = [ int(0), int(0), int(0) ]
+		motor_speeds = [ int(0), int(0), int(0), int(0) ]
 		self._send_run(motor_speeds)
   
 	def kick(self, scale=100):
@@ -65,28 +67,28 @@ class Action():
 		:param scale: Power scale for this kick. Range [0,100].
 		'''
 		# Note, scale must be in list form
-		self._send_command("KICK",[scale])
+		self._send_command("KICK", scale)
 	
 	def catch(self, scale=100):
 		"""Sends the catch command to the robot.
 
 		:param scale: Power scale for this catch. Range [0,100].
 		"""
-		self._send_command("CATCH",[scale])
+		self._send_command("CATCH", scale)
 
 	def open_catcher(self, scale=100):
 		"""Sends the command to open the catcher to the robot.
 
 		:param scale: Power scale for the catch. Range [0,100].
 		"""
-		self._send_command("RELEASE", [scale])
+		self._send_command("RELEASE", scale)
 
 	# Utility
 	def ping(self):
 		"""Sends the PING command to the Robot. Robot should return "PONG" via
 		the serial connection if correctly functioning.
 		"""
-		self._send_command("PING", [])
+		self._send_command("PING")
 	
 	# Private Methods #
 	
@@ -96,7 +98,7 @@ class Action():
 
 		:param speeds: A list of motor speeds for each motor. Range [-100,100].
 		"""
-		self._send_command("RUN", speeds)
+		self._send_command("RUN", *speeds)
 
 	# Utility
 	@staticmethod
@@ -128,11 +130,8 @@ class Action():
 		:param angle: The direction of travel.
 		:returns: A list of motor speeds, in the range [-1,1]
 		'''
-		m = [0,0,0]
-		m[0] = math.cos(angle) - math.sin(angle)/(2+math.sqrt(3))
-		m[1] = 2*math.sin(angle)/(2+math.sqrt(3))
-		m[2] = -math.cos(angle) - math.sin(angle)/(2+math.sqrt(3))
-		return m
+		return map(lambda motor: math.cos(angle) * motor[0] - math.sin(angle) * motor[1], 
+							Action.MOTORS)
 
 	@staticmethod
 	def _get_command_string(command, *args):
@@ -157,7 +156,7 @@ class Action():
 		:param command: A command string
 		:param args: None, single argument, multiple argument, or a list.
 		"""
-		commstr = Action._get_command_string(command, args)
+		commstr = Action._get_command_string(command, *args)
 
 		if self.Debug:
 			print "Sending command: " + commstr
