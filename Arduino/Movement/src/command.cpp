@@ -21,3 +21,13 @@
  *  <CatchCmd>   = One of C for Catch, or R for Release.
  *  <CurrentAngle> = Current angle we believe the robot is facing.
  */
+
+void setup_command(void)
+{
+    // TODO
+}
+
+void service_command(void)
+{
+    // TODO
+}

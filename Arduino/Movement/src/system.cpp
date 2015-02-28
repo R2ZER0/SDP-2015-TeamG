@@ -24,18 +24,20 @@ void setup_system(void)
     // Setup LED
     pinMode(PIN_LED, OUTPUT);
     digitalWrite(PIN_LED, HIGH);
-        
+    
+    system_state = SYSTEM_STATE_STARTING;
     
 #ifdef HAS_MPU6050 
     // Setup MPU
     MPU_setup();
 #endif
     
-    system_state = SYSTEM_STATE_STARTING;
+    setup_command();
 }
 
 void service_system(void)
 {
+    service_command();
     service_kicker();
     service_catcher(); 
   
