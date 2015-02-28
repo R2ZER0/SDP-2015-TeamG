@@ -6,8 +6,12 @@
 #include <Arduino.h>
 #include <SDPArduino.h>
 
-byte catcher_state = CATCHER_STATE_STOPPED;
+char catcher_state = CATCHER_STATE_STOPPED;
 unsigned long catcher_stop_time = 0L;
+
+char catcher_get_state(void) {
+    return catcher_state;
+}
 
 void catcher_catch(int scale)
 {
