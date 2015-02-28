@@ -337,15 +337,16 @@ class Robot(PitchObject):
         if displacement == 0:
             theta = 0
         else:
-            theta = atan2(delta_y, delta_x) + atan2(sin(self.angle), cos(self.angle))
-            theta -= (theta/abs(theta)) * pi/2
-            if theta > pi:
-                theta -= 2*pi
-            elif theta < -pi:
-                theta += 2*pi
-        assert -pi <= theta <= pi
+            theta = atan2(delta_y, delta_x)
+            self_angle = -(self.angle - pi)
+            angle_diff = min(2*pi - abs(self_angle-theta), abs(self_angle-theta))
 
-        return theta
+        # Calculate sign for movement
+        if abs(self_angle + angle_diff) - abs(theta) < abs(self_angle - angle_diff) - abs(theta):
+            angle_diff = -angle_diff
+
+        assert -pi <= theta <= pi
+        return angle_diff
 
     def get_displacement_to_point(self, x, y):
         ''':returns: The displacement between our robot's center and the given x,y position.
