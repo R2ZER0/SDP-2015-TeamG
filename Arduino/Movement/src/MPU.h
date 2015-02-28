@@ -6,6 +6,6 @@
 void MPU_setup();
 void MPU_service();
 
-extern float getAngle(int i);
+extern float getAngle();
 
 #endif /* _MPU_H_ */
