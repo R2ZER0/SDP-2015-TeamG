@@ -68,52 +68,15 @@ static void dmpDataReady() {
 // Setup/Service/Command Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPU_setup(SerialCommand* _comm) {
+void MPU_setup() {
     // I2C should already be setup
     // Wire.begin();
-    
-    // Add the MPU command
-    comm = _comm;
-    comm->addCommand("MPU", cmd_MPU);
 }
 
 void MPU_service() {
     // We do not need to service the comm, as that is already done
     
     ServiceDMP();
-}
-
-static void cmd_MPU() {
-    char* subcmd = NULL;
-    subcmd = comm->next();
-    
-    bool success = false;
-    
-    if(subcmd == NULL) { 
-        /* do nothing */
-        
-    } else if(strcmp(subcmd, "GETYPR") == 0) {        
-        if(dmpReady) {
-            Serial.print(yawPitchRoll[0], DECIMAL_PLACES);
-            Serial.print(" ");
-            Serial.print(yawPitchRoll[1], DECIMAL_PLACES);
-            Serial.print(" ");
-            Serial.println(yawPitchRoll[2], DECIMAL_PLACES);
-            success = true;
-        }
-        
-    } else if(strcmp(subcmd, "INIT") == 0) {
-        success = Initialise(); //&& WaitForStabilisation();
-        
-    } else if(strcmp(subcmd, "STABL") == 0) {
-        success = WaitForStabilisation();
-        
-    } else if(strcmp(subcmd, "CALIB") == 0) {
-        success = Calibrate();        
-        
-    }
-    
-    Serial.println(success ? "DONE" : "FAILED");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

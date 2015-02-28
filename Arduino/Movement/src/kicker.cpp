@@ -2,6 +2,8 @@
 // Kicking
 ////////////////////////////////////////////////////////////////////////////////
 #include "kicker.h"
+#include <Arduino.h>
+#include <SDPArduino.h>
 
 static char kicker_state = KICKER_STATE_STOPPED;
 static unsigned long kicker_stop_time = 0L;

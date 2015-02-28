@@ -3,7 +3,7 @@
 
 #define HAS_MPU6050 1
 
-void MPU_setup(SerialCommand* _comm);
+void MPU_setup();
 void MPU_service();
 
 extern float getAngle(int i);
