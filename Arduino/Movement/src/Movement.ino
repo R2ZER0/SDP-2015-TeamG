@@ -1,15 +1,9 @@
 #include <Wire.h>
 #include <SDPArduino.h>
 #include <SerialCommand.h>
-#include "MPU.h" // Disable MPU for now
-
-#define PIN_LED 10
-
-#define MOTOR_MOTOR1  0
-#define MOTOR_MOTOR2  2
-#define MOTOR_MOTOR3  3
-#define MOTOR_KICKER  1
-#define MOTOR_CATCHER 5
+#include "config.h"
+#include "MPU.h"
+#include "kicker.h"
 
 SerialCommand comm;
 
@@ -100,65 +94,6 @@ void runMotor(int motor, int motor_speed)
         
     } else if(motor_speed < 0) {
         motorBackward(motor, -motor_speed);
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Kicking
-////////////////////////////////////////////////////////////////////////////////
-
-#define KICKER_RUNNING_TIME  (400)
-#define KICKER_RETURNING_TIME (800)
-#define KICKER_DEFAULT_SCALE (100)
-
-#define KICKER_STATE_STOPPED   (0x01)
-#define KICKER_STATE_KICKING   (0x02)
-#define KICKER_STATE_RETURNING (0x03)
-
-byte kicker_state = KICKER_STATE_STOPPED;
-unsigned long kicker_stop_time = 0L;
-int kicker_scale = KICKER_DEFAULT_SCALE;
-
-void cmd_KICK()
-{
-    kicker_scale = getInt(KICKER_DEFAULT_SCALE);
-    if(kicker_scale <= 40) {
-      kicker_scale = KICKER_DEFAULT_SCALE;
-    }
-  
-    kicker_stop_time = millis() + (KICKER_RUNNING_TIME * (100/kicker_scale));
-    
-    motorForward(MOTOR_KICKER, kicker_scale);
-    kicker_state = KICKER_STATE_KICKING;
-    
-    Serial.println("DONE");
-}
-
-void kicker_return()
-{
-    kicker_stop_time = millis() + (KICKER_RETURNING_TIME * (100/kicker_scale));
-    
-    motorBackward(MOTOR_KICKER, kicker_scale);
-    kicker_state = KICKER_STATE_RETURNING;    
-}
-
-void service_kicker() {
-    /* Check the kicker state */
-    if(kicker_state != KICKER_STATE_STOPPED) {
-        if(millis() >= kicker_stop_time) {
-            
-            if(kicker_state == KICKER_STATE_KICKING) {
-                /* When the kicker has finished kicking, it needs to return */
-                kicker_return();            
-                    
-            } else if(kicker_state == KICKER_STATE_RETURNING) {
-                /* Finally when finished returning, go to rest */
-                motorStop(MOTOR_KICKER);
-                kicker_state = KICKER_STATE_STOPPED;
-            }
-            
-        }
     }
 }
 
