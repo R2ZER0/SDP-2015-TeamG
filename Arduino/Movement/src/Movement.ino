@@ -4,6 +4,20 @@
 #include "config.h"
 #include "kicker.h"
 
+#define SYSTEM_STATE_STARTING       (0x01)
+#define SYSTEM_STATE_INITIALISING   (0x02)
+#define SYSTEM_STATE_READY          (0x03)
+#define SYSTEM_STATE_MOVING         (0x04)
+#define SYSTEM_STATE_TURNING        (0x05)
+
+static char system_state = SYSTEM_STATE_STARTING;
+
+void service_system(void)
+{
+    // TODO
+}
+
+
 void setup()
 {
   // SDP Setup
@@ -19,7 +33,7 @@ void setup()
   MPU_setup();
 #endif
 
-  Serial.println("STARTED");
+  system_state = SYSTEM_STATE_STARTING;
 }
 
 void loop()
