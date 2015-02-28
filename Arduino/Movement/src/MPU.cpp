@@ -47,6 +47,14 @@ Quaternion q;
 VectorFloat gravity;
 float yawPitchRoll[3];
 
+extern float getAngle(int i) {
+    if(i > 0 && i <= 2) {
+        return yawPitchRoll[i];
+    } else {
+        return 0.0f;
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // MPU Interrupt Handler
 ////////////////////////////////////////////////////////////////////////////////

@@ -6,6 +6,6 @@
 void MPU_setup(SerialCommand* _comm);
 void MPU_service();
 
-extern float yawPitchRoll[3];
+extern float getAngle(int i);
 
 #endif /* _MPU_H_ */
