@@ -2,6 +2,8 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+//#define MPU_DEBUG (true) // Uncomment to enable MPU trace messages
+
 #define PIN_LED 10
 
 #define MOTOR_MOTOR1  0

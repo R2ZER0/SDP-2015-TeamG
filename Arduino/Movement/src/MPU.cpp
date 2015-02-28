@@ -9,8 +9,7 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include "MPU.h"
-
-#define MPU_DEBUG (true)
+#include "config.h"
 
 // Local functions
 static void cmd_MPU();
