@@ -11,6 +11,11 @@
 
 static char system_state = SYSTEM_STATE_STARTING;
 
+char system_get_state(void)
+{
+    return system_state;
+}
+
 void setup_system(void)
 {
     // SDP Setup

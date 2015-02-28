@@ -10,5 +10,6 @@
 
 void setup_system(void);
 void service_system(void);
+char system_get_state(void);
 
 #endif /* _SYSTEM_H_ */
