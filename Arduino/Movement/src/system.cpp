@@ -8,6 +8,7 @@
 #include "MPU.h"
 #include "kicker.h"
 #include "catcher.h"
+#include "command.h"
 
 static char system_state = SYSTEM_STATE_STARTING;
 

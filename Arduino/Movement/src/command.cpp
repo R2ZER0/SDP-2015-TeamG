@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "command.h"
 #include <Arduino.h>
+#include "MPU.h"
 
 /*
  * There are two kinds of message, Arduino to Commander, and Commander to
@@ -35,6 +36,21 @@ static char catcher_command = 'C';
 // Movement command args
 static float movement_direction = 0.0f;
 static int movement_speed = 0;
+
+void send_state_message(void)
+{
+    Serial.print("BEGIN ");
+    Serial.print(movement_command_id); Serial.print(' ');
+    Serial.print(movement_command); Serial.print(' ');
+    Serial.print(movement_direction); Serial.print(' ');
+    Serial.print(movement_speed); Serial.print(' ');
+    Serial.print(kicker_command_id); Serial.print(' ');
+    Serial.print(kicker_command); Serial.print(' ');
+    Serial.print(catcher_command_id); Serial.print(' ');
+    Serial.print(catcher_command); Serial.print(' ');
+    Serial.print(getAngle());
+    Serial.println(" END");
+}
 
 void setup_command(void)
 {
