@@ -3,6 +3,7 @@
 #include "MPU.h"
 #include "config.h"
 #include "kicker.h"
+#include "catcher.h"
 
 #define SYSTEM_STATE_STARTING       (0x01)
 #define SYSTEM_STATE_INITIALISING   (0x02)
@@ -63,51 +64,3 @@ void runMotor(int motor, int motor_speed)
         motorBackward(motor, -motor_speed);
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Catching
-////////////////////////////////////////////////////////////////////////////////
-
-#define CATCHER_RUNNING_TIME  (400)
-#define CATCHER_DEFAULT_SCALE (100)
-
-#define CATCHER_STATE_STOPPED   (0x01)
-#define CATCHER_STATE_CATCHING  (0x02)
-#define CATCHER_STATE_RELEASING (0x03)
-
-byte catcher_state = CATCHER_STATE_STOPPED;
-unsigned long catcher_stop_time = 0L;
-
-void catcher_catch(int scale)
-{
-    if(scale <= 40) {
-        scale = CATCHER_DEFAULT_SCALE;
-    }
-  
-    catcher_stop_time = millis() + (CATCHER_RUNNING_TIME * (100/scale));
-    motorForward(MOTOR_CATCHER, 100);
-    catcher_state = CATCHER_STATE_CATCHING;
-}
-
-void catcher_release(int scale)
-{
-    if(scale <= 40) {
-        scale = CATCHER_DEFAULT_SCALE;
-    }
-    
-    catcher_stop_time = millis() + (CATCHER_RUNNING_TIME * (100/scale));
-    motorBackward(MOTOR_CATCHER, scale);
-    catcher_state = CATCHER_STATE_RELEASING;
-}
-
-void service_catcher() {
-    /* Check the catcher state */
-    if(catcher_state != CATCHER_STATE_STOPPED) {
-        if(millis() >= catcher_stop_time) {
-            motorStop(MOTOR_KICKER);
-            catcher_state = CATCHER_STATE_STOPPED;
-        }
-    }
-}
-
-
