@@ -116,6 +116,24 @@ void process_state_message(void)
     
     Serial.parseFloat(); // CurrentAngle
     Serial.read(); // Terminating ]
+    
+    if(move_cmd_id != movement_command_id) {
+        if(move_cmd == 'M' || move_cmd == 'T' || move_cmd == 'S') {
+            run_movement_command(move_cmd_id, move_cmd, move_dir, move_speed);
+        }
+    }
+    
+    if(kick_cmd_id != kicker_command_id) {
+        if(kick_cmd == 'K' || kick_cmd == 'I') {
+            run_kicker_command(kick_cmd_id, kick_cmd);
+        }
+    }
+    
+    if(catch_cmd_id != catcher_command_id) {
+        if(catch_cmd == 'C' || catch_cmd == 'R' || catch_cmd == 'I') {
+            run_catcher_command(catch_cmd_id, catch_cmd);
+        }
+    }
 }
 
 void setup_command(void)
