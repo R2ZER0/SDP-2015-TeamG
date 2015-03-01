@@ -66,6 +66,10 @@ static void dmpDataReady() {
 void MPU_setup() {
     // I2C should already be setup
     // Wire.begin();
+    bool success = Initialise() && WaitForStabilisation();
+    if(!success) {
+        Serial.println("ERROR: Could not initialise MPU");
+    }
 }
 
 void MPU_service() {
