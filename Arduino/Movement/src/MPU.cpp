@@ -109,13 +109,12 @@ static bool Initialise() {
     mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_1000);
     
     // Calibration offsets
-    // TODO: dynamic calibration
-    /*
-    mpu.setXGyroOffset(220);
-    mpu.setYGyroOffset(76);
-    mpu.setZGyroOffset(-85);
-    mpu.setZAccelOffset(1788);
-    */
+    mpu.setXAccelOffset(MPU_OFFSET_ACELX);
+    mpu.setYAccelOffset(MPU_OFFSET_ACELY);
+    mpu.setZAccelOffset(MPU_OFFSET_ACELZ);
+    mpu.setXGyroOffset(MPU_OFFSET_GYROX);
+    mpu.setYGyroOffset(MPU_OFFSET_GYROY);
+    mpu.setZGyroOffset(MPU_OFFSET_GYROZ);
     
     // Enable DMP
 #ifdef MPU_DEBUG
