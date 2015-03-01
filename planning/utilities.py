@@ -184,6 +184,24 @@ def has_matched(robot, x=None, y=None, angle=None,
     return dist_matched and angle_matched
 
 #2015
+def get_clear_forward_passing_pos(zone, robot, team_mate, obstacle):
+    ghost_x = team_mate.x
+    ghost_y = robot.y
+    ghost = Robot(zone, ghost_x, ghost_y, 0, 0)
+
+    candidate_pass_path = robot.get_pass_path(ghost)
+
+    actual_pass_path = get_avoidance(candidate_pass_path, robot, obstacle)
+
+    if actual_pass_path == None:
+        return (robot.x, robot.y)
+    else:
+        return (actual_pass_path[0], actual_pass_path[1])
+
+
+
+
+#2015
 def current_ball_controller(world):
     ball = world.ball
     if robot_ball_distance(world.their_defender, ball) < 50:
@@ -281,3 +299,4 @@ def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False
 
         else:
             return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0, 'speed': general_speed}
+
