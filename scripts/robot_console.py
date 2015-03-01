@@ -7,6 +7,11 @@ if len(sys.argv) > 1:
     serial_port = sys.argv[1]
     print "Using serial port " + serial_port
 
+ignore_output = False    
+if len(sys.argv) > 2:
+    ignore_output = True
+    
+
 comm = serial.Serial(serial_port, 115200)
 
 valid_commands = ["PING", "LED", "RUN", "KICK", "CATCH", "MPU"]
@@ -35,7 +40,7 @@ while True:
     comm.flush()
     
     # Wait for DONE or FAILED
-    while True:
+    while True and not ignore_output:
         line = comm.readline().rstrip()
         
         print(line)

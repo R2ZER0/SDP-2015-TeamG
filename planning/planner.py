@@ -1,153 +1,119 @@
+import pdb
 from models import *
 from collisions import *
-from strategies import *
+from tasks import *
 from utilities import *
-
 
 class Planner:
 
-    def __init__(self, our_side, pitch_num, world):
-        #self._world = World(our_side, pitch_num)
-        #self._world.our_defender.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 12}
-        #self._world.our_attacker.catcher_area = {'width' : 30, 'height' : 30, 'front_offset' : 14}
+    def __init__(self, world, robot, role, passing):
+        # Initialisation
+        assert role in ['attacker','defender']
+        assert passing in [True, False]
 
-        # self._defender_defence_strat = DefenderDefence(self._world)
-        # self._defender_attack_strat = DefaultDefenderAttack(self._world)
+        self._world = world
+        self._robot = robot
+        self._role = role
 
-        self._attacker_strategies = {'defence' : [AttackerDefend],
-                                     'grab' : [AttackerGrab, AttackerGrabCareful],
-                                     'score' : [AttackerDriveByTurn, AttackerDriveBy, AttackerTurnScore, AttackerScoreDynamic],
-                                     'catch' : [AttackerPositionCatch, AttackerCatch]}
 
-        self._defender_strategies = {'defence' : [DefenderDefence, DefenderPenalty],
-                                     'grab' : [DefenderGrab],
-                                     'pass' : [DefenderBouncePass]}
 
-        self._defender_state = 'defence'
-        self._defender_current_strategy = self.choose_defender_strategy(world)
+        # Encode states
+        self.INITIAL_STATE = 'INITIAL_STATE'
+        self.ACQUIRING_BALL_STATE = 'ACQUIRING_BALL_STATE'
+        self.MOVING_TO_PT_STATE = 'MOVING_TO_PT_STATE'
+        self.IDLE_STATE = 'IDLE_STATE'
+        self.PASSING_STATE = 'PASSING_STATE'
 
-        self._attacker_state = 'defence'
-        self._attacker_current_strategy = self.choose_attacker_strategy(world)
+        
 
-    # Provisional. Choose the first strategy in the applicable list.
-    def choose_attacker_strategy(self, world):
-        next_strategy = self._attacker_strategies[self._attacker_state][0]
-        return next_strategy(world)
+        self._current_state=self.INITIAL_STATE
+        self._current_task=None
+    
+    def plan(self):
+        '''Catch-all function for the Planner, uses our role, state, and the world model
+        to determine what we should be doing next.
+        '''
+        
+        ball = self._world.ball
+        our_attacker = self._world.our_attacker
+        our_defender = self._world.our_defender
 
-    # Provisional. Choose the first strategy in the applicable list.
-    def choose_defender_strategy(self, world):
-        next_strategy = self._defender_strategies[self._defender_state][0]
-        return next_strategy(world)
+        world = self._world
+        role = self._role
+        robot = self._robot
+        
+        state = self._current_state
 
-    @property
-    def attacker_strat_state(self):
-        return self._attacker_current_strategy.current_state
+        our_zone = self._world.pitch.zones[robot.zone]
 
-    @property
-    def defender_strat_state(self):
-        return self._defender_current_strategy.current_state
+        self._current_state = INITIAL_STATE
+        self._current_task = None
 
-    @property
-    def attacker_state(self):
-        return self._attacker_state
+        if passing:
+            if state == INITIAL_STATE:
+                if our_zone.isInside(ball.x, ball.y):
+                    self._current_state = ACQUIRING_BALL_STATE
+                    self._current_task = AcquireBall(world, robot, role)
+                    self._current_task.execute()
+                else:
+                    return 
 
-    @attacker_state.setter
-    def attacker_state(self, new_state):
-        assert new_state in ['defence', 'attack']
-        self._attacker_state = new_state
-
-    @property
-    def defender_state(self):
-        return self._defender_state
-
-    @defender_state.setter
-    def defender_state(self, new_state):
-        assert new_state in ['defence', 'attack']
-        self._defender_state = new_state
-
-    #def update_world(self, position_dictionary):
-    #    self._world.update_positions(position_dictionary)
-
-    def plan(self, world, robot='attacker'):
-        assert robot in ['attacker', 'defender']
-        our_defender = world.our_defender
-        our_attacker = world.our_attacker
-        their_defender = world.their_defender
-        their_attacker = world.their_attacker
-        ball = world.ball
-        if robot == 'defender':
-            # If the ball is in their attacker zone:
-            if world.pitch.zones[their_attacker.zone].isInside(ball.x, ball.y):
-                # If the bal is not in the defender's zone, the state should always be 'defend'.
-                if not self._defender_state == 'defence':
-                    self._defender_state = 'defence'
-                    self._defender_current_strategy = self.choose_defender_strategy(world)
-                return self._defender_current_strategy.generate()
-
-            # We have the ball in our zone, so we grab and pass:
-            elif world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y):
-                # Check if we should switch from a grabbing to a scoring strategy.
-                if  self._defender_state == 'grab' and self._defender_current_strategy.current_state == 'GRABBED':
-                    self._defender_state = 'pass'
-                    self._defender_current_strategy = self.choose_defender_strategy(world)
-
-                # Check if we should switch from a defence to a grabbing strategy.
-                elif self._defender_state == 'defence':
-                    self._defender_state = 'grab'
-                    self._defender_current_strategy = self.choose_defender_strategy(world)
-
-                elif self._defender_state == 'pass' and self._defender_current_strategy.current_state == 'FINISHED':
-                    self._defender_state = 'grab'
-                    self._defender_current_strategy = self.choose_defender_strategy(world)
-
-                return self._defender_current_strategy.generate()
-            # Otherwise, chillax:
-            else:
-
-                return do_nothing()
-
+            elif state == ACQUIRING_BALL_STATE:
+                if not robot.has_ball(ball):
+                    self._current_task = AcquireBall(world, robot, role)
+                    self._current_task.execute()
+                else:
+                    (pass_x_dest, pass_y_dest) = TODO
+                    self._current_state = MOVING_TO_PT_STATE
+                    self._current_task = MoveToPoint(world, robot, role, X, Y)
+                    self.execute()
+            elif state == MOVING_TO_PT_STATE:
+                if abs(robot.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 30:
+                    self._current_task.execute()
+                else:
+                    self._current_state = IDLE_STATE
+                    sel._current_task = None
+            elif state == IDLE_STATE:
+                if our_defender.y == our_attacker.y:
+                    self._current_state = PASSING_STATE
+                    if role == 'attacker':
+                        self._current_task = KickToPoint(world, robot, role, our_defender.x, our_defender.y)    
+                    elif role == 'defender':
+                        self._current_task = KickToPoint(world, robot, role, our_attacker.x, our_attacker.y) 
+                    self._current_task.execute()
+                else:
+                    return
+            elif state == PASSING_STATE:
+                if not self._current_task.kicked:
+                    self._current_task.execute()
+                else:
+                    self._current_state = INITIAL_STATE
+                    self._current_task = None   
         else:
-            # If the ball is in their defender zone we defend:
-            if world.pitch.zones[their_defender.zone].isInside(ball.x, ball.y):
-                if not self._attacker_state == 'defence':
-                    self._attacker_state = 'defence'
-                    self._attacker_current_strategy = self.choose_attacker_strategy(world)
-                return self._attacker_current_strategy.generate()
-
-            # If ball is in our attacker zone, then grab the ball and score:
-            elif world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y):
-
-                # Check if we should switch from a grabbing to a scoring strategy.
-                if self._attacker_state == 'grab' and self._attacker_current_strategy.current_state == 'GRABBED':
-                    self._attacker_state = 'score'
-                    self._attacker_current_strategy = self.choose_attacker_strategy(world)
-
-                elif self._attacker_state == 'grab':
-                    # Switch to careful mode if the ball is too close to the wall.
-                    if abs(world.ball.y - world.pitch.height) < 0 or abs(world.ball.y) < 0:
-                        if isinstance(self._attacker_current_strategy, AttackerGrab):
-                            self._attacker_current_strategy = AttackerGrabCareful(world)
-                    else:
-                        if isinstance(self._attacker_current_strategy, AttackerGrabCareful):
-                            self._attacker_current_strategy = AttackerGrab(world)
-
-                # Check if we should switch from a defence to a grabbing strategy.
-                elif self._attacker_state in ['defence', 'catch'] :
-                    self._attacker_state = 'grab'
-                    self._attacker_current_strategy = self.choose_attacker_strategy(world)
-
-                elif self._attacker_state == 'score' and self._attacker_current_strategy.current_state == 'FINISHED':
-                    self._attacker_state = 'grab'
-                    self._attacker_current_strategy = self.choose_attacker_strategy(world)
-
-                return self._attacker_current_strategy.generate()
-            # If the ball is in our defender zone, prepare to catch the passed ball:
-            elif world.pitch.zones[our_defender.zone].isInside(ball.x, ball.y) or \
-                 self._attacker_state == 'catch':
-                 # world.pitch.zones[their_attacker.zone].isInside(ball.x, ball.y):
-                if not self._attacker_state == 'catch':
-                    self._attacker_state = 'catch'
-                    self._attacker_current_strategy = self.choose_attacker_strategy(world)
-                return self._attacker_current_strategy.generate()
-            else:
-                return calculate_motor_speed(0, 0)
+            if state == INITIAL_STATE:
+                self._current_state = MOVING_TO_PT_STATE
+                if role == 'attacker':
+                    self._current_task = MoveToPoint(world, robot, role, robot.x, our_defender.y)
+                elif role == 'defender':
+                    self._current_task = MoveToPoint(world, robot, role, robot.x, our_attacker.y)
+                self._current_task.execute()
+            elif state == MOVING_TO_PT_STATE:
+                if not our_zone.isInside(ball.x, ball.y):
+                    if role == 'attacker':
+                        self._current_task = MoveToPoint(world, robot, role, robot.x, our_defender.y)
+                    elif role == 'defender':
+                        self._current_task = MoveToPoint(world, robot, role, robot.x, our_attacker.y)
+                    self._current_task.execute()
+                else:
+                    self._current_state = ACQUIRING_BALL_STATE
+                    self._current_task = AcquireBall(world, robot, role)
+                    self._current_task.execute()
+            elif state == ACQUIRING_BALL_STATE:
+                if not robot.has_ball(ball):
+                    self._current_task = AcquireBall(world, robot, role)
+                    self._current_task.execute()
+                else:
+                    self._current_state = INITIAL_STATE
+                    self._current_task = None
+                
+                

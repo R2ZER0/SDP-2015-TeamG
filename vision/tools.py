@@ -21,7 +21,7 @@ RED_HIGHER = np.array([9, 255, 255])
 YELLOW_LOWER = np.array([9, 50, 50])
 YELLOW_HIGHER = np.array([11, 255, 255])
 
-PITCHES = ['Pitch_0', 'Pitch_1']
+PITCHES = ['Pitch_0', 'Pitch_1', 'Sim']
 
 
 def get_zones(width, height, filename=PATH+'/calibrations/croppings.json', pitch=0):
@@ -38,8 +38,14 @@ def get_zones(width, height, filename=PATH+'/calibrations/croppings.json', pitch
 
 
 def get_croppings(filename=PATH+'/calibrations/croppings.json', pitch=0):
-    croppings = get_json(filename)
-    return croppings[PITCHES[pitch]]
+
+    # Handle simulation pitch
+    if (pitch == 2):
+        from simulator.simulator import Simulator
+        return Simulator.get_croppings()
+    else:
+        croppings = get_json(filename)
+        return croppings[PITCHES[pitch]]
 
 
 def get_json(filename=PATH+'/calibrations/calibrations.json'):
