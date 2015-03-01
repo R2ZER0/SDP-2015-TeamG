@@ -53,7 +53,7 @@ class Planner:
 
         if passing:
             if state == INITIAL_STATE:
-                if our_zone.isInside(ball.x, ball.y):
+                if our_zone.isInside(ball.x, ball.y):       # fine for stationary ball starting in our zone
                     self._current_state = ACQUIRING_BALL_STATE
                     self._current_task = AcquireBall(world, robot, role)
                     self._current_task.execute()
@@ -66,7 +66,13 @@ class Planner:
                     self._current_task.execute()
 
                 else:
-                    (pass_x_dest, pass_y_dest) = (clear_pathX, clear_pathY)
+                    if role == 'attacker':
+                        tm_zone = our_defender.zone
+                        teammate = our_defender
+                    elif role == 'defender':
+                        tm_zone = our_attacker
+                        zone = our_attacker.zone
+                    (pass_x_dest, pass_y_dest) = get_clear_forward_passing_pos(tm_zone, robot, teammate, their_attacker) # their attacker?
                     self._current_state = MOVING_TO_PT_STATE
                     self._current_task = MoveToPoint(world, robot, role, pass_x_dest, pass_y_dest)
                     self.execute()
@@ -80,7 +86,7 @@ class Planner:
                     sel._current_task = None
 
             elif state == IDLE_STATE:
-                if abs(robot.get_displacement_to_point(our_defender.y, our_attacker.y)) > 30:
+                if abs(our_defender.y - our_attacker.y)) < 30:
                     self._current_state = PASSING_STATE
                     if role == 'attacker':
                         self._current_task = KickToPoint(world, robot, role, our_defender.x, our_defender.y)    
