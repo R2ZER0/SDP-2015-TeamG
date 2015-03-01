@@ -16,10 +16,10 @@ class Postprocessing(object):
         '''
         self._vectors = {}
         self._vectors['ball'] = {'vec': Vector(0, 0, 0, 0), 'time': 0}
-        self._vectors['our_attacker'] = {'vec': Vector(0, 0, 0, 0), 'time': 0}
-        self._vectors['their_attacker'] = {'vec': Vector(0, 0, 0, 0), 'time': 0}
-        self._vectors['our_defender'] = {'vec': Vector(0, 0, 0, 0), 'time': 0}
-        self._vectors['their_defender'] = {'vec': Vector(0, 0, 0, 0), 'time': 0}
+        self._vectors['our_attacker'] = {'vec': Vector(0, 0, 0, 0), 'ang_velocity': 0, 'time': 0}
+        self._vectors['their_attacker'] = {'vec': Vector(0, 0, 0, 0), 'ang_velocity': 0, 'time': 0}
+        self._vectors['our_defender'] = {'vec': Vector(0, 0, 0, 0), 'ang_velocity': 0, 'time': 0}
+        self._vectors['their_defender'] = {'vec': Vector(0, 0, 0, 0), 'ang_velocity': 0, 'time': 0}
         self._time = 0
 
     def analyze(self, vector_dict):
@@ -101,9 +101,12 @@ class Postprocessing(object):
 
             velocity = hypot(delta_y, delta_x)/(self._time - self._vectors[key]['time'])
 
-            self._vectors[key]['vec'] = Vector(info['x'], info['y'], info['angle'], velocity)
+            # Calculate angular velocity
+            angular_velocity = diff
+
+            self._vectors[key]['vec'] = Vector(info['x'], info['y'], info['angle'], velocity, angular_velocity)
             self._vectors[key]['time'] = self._time
             
-            return Vector(info['x'], info['y'], info['angle'], velocity)
+            return Vector(info['x'], info['y'], info['angle'], velocity, angular_velocity)
         else:
             return deepcopy(self._vectors[key]['vec'])

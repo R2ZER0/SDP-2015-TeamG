@@ -87,7 +87,7 @@ class Coordinate(object):
 
 class Vector(Coordinate):
 
-    def __init__(self, x, y, angle, velocity):
+    def __init__(self, x, y, angle, velocity, angular_velocity=0):
         '''Assigns the given values and constructs a Vector.
 
         :param x: The x coordinate position, not None
@@ -110,6 +110,7 @@ class Vector(Coordinate):
         else:
             self._angle = angle
             self._velocity = velocity
+            self._angular_velocity = angular_velocity
 
     @property
     def angle(self):
@@ -120,6 +121,11 @@ class Vector(Coordinate):
     def velocity(self):
         ''':returns: The velocity of this vector'''
         return self._velocity
+
+    @property
+    def angular_velocity(self):
+        ''':returns: The angular velocity of this vector'''
+        return self._angular_velocity
 
     @angle.setter
     def angle(self, new_angle):
@@ -139,6 +145,12 @@ class Vector(Coordinate):
         if new_velocity == None or new_velocity < 0:
             raise ValueError('Velocity can not be None or negative')
         self._velocity = new_velocity
+
+    @angular_velocity.setter
+    def angular_velocity(self, ang_velocity):
+        ''':param ang_velocity: A new value for the angular velocity
+        '''
+        self._angular_velocity = ang_velocity
 
     def __eq__(self, other):
         return (isinstance(other, self.__class__) and (self.__dict__ == other.__dict__))
@@ -210,6 +222,10 @@ class PitchObject(object):
         return self._vector.velocity
 
     @property
+    def angular_velocity(self):
+        return self._vector.angular_velocity
+
+    @property
     def x(self):
         return self._vector.x
 
@@ -226,7 +242,7 @@ class PitchObject(object):
         if new_vector == None or not isinstance(new_vector, Vector):
             raise ValueError('The new vector can not be None and must be an instance of a Vector')
         else:
-            self._vector = Vector(new_vector.x, new_vector.y, new_vector.angle - self._angle_offset, new_vector.velocity)
+            self._vector = Vector(new_vector.x, new_vector.y, new_vector.angle - self._angle_offset, new_vector.velocity, new_vector.angular_velocity)
 
     def get_generic_polygon(self, width, length):
         '''Retrieves a polygon describing the generic shape of this object and
