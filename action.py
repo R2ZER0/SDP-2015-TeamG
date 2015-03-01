@@ -39,9 +39,10 @@ class Action():
 		angle  = angle + math.pi / 2
 
 		motor_speeds = Action._calc_motor_speed(angle)
-		motor_speeds = Action._normalise_speeds(motor_speeds)
 		motor_speeds = map(lambda x: int(x*scale), motor_speeds)
 		self._send_run(motor_speeds)
+
+		return motor_speeds
   
 	def turn(self, speed):
 		"""Turn the robot with the given power.
@@ -50,6 +51,18 @@ class Action():
 					result in clockwise rotation, negative in anticlockwise.
 		"""
 		self._send_run([int(speed), int(speed), int(speed), int(speed)])
+
+	def slow_turn(self, speed):
+		'''An initial attempt at providing a turning function for precise
+		movements; turns by countering two of the wheels with a negative force
+		on the other two.
+
+		:param speed: The speed of the turn, range is [-100, 100]. Two wheels \
+					  will run at this speed, two at -1/4 of this.
+		'''
+		speeds = [int(speed), int(-speed/4), int(speed), int(-speed/4)]
+		self._send_run(speeds)
+		return speeds
   
 	def stop(self):
 		"""Stops the robot's movement by setting all motors to zero.
