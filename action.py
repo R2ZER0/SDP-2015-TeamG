@@ -1,6 +1,9 @@
 # action.py
 import re
 import threading
+import atexit
+import time
+import signal
 
 class ActionHandle(object):
     """A handle on the result of commands"""
@@ -83,18 +86,33 @@ class Action():
         self.comm = comm    
         
         # Command handles
-        self.move = MovementActionHandle(1, 'S', 
-        self.kick = None
-        self.catch = None
+        self.move = MovementActionHandle(1, 'S', 0, 0)
+        self.kick = KickerActionHandle(0, 0)
+        self.catch = CatcherActionHandle(1, 'I', 0)
         
         # Last known MPU output
         self.curr_dir = 0.0
         
         # Comms threads
+        self._exit = False
+        def set_exit():
+            self._exit = True
+        atexit.register(set_exit)
+        
+        self.prev_handler = None
+        def handler(signum, frame):
+            self._exit = True
+            self.prev_handler(signum, frame)
+        self.prev_handler = signal.signal(2, handler)
+        
         self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
         self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
+        
         self.recv_thread.start()
         self.send_thread.start()
+    
+    def exit():
+        self._exit = True
         
     # Movement commands
     def _cmd_movement(self, cmd, angle, scale):
@@ -149,6 +167,7 @@ class Action():
         catch_fin = (1 == int(res.group(9)))
         
         state_dir = i2f(int(res.group(10)))
+        self.curr_dir = state_dir
         
         # Detect if the command is running, finished etc
         if move_id == self.move.idx:
@@ -172,20 +191,20 @@ class Action():
             if catch_fin and not self.catch.finished:
                 self.catch._onComplete()
                 
-        def run_state_processor():
-            """Processes incoming state messages"""
-            while True:
-                line = comm.readline()
-                self.process_message(line)
-                
-        def run_state_sender():
-            """Sends out state messages"""
-            while True:
-                time.sleep(1/20)
-                message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10})".format(
-                    self.move.idx, self.move.cmd, f2i(self.move.dir), self.move.spd,
-                    self.kick.idx, self.kick.cmd, self.kick.spd,
-                    self.catch.idx, self.catch.cmd, self.catch.spd
-                )
-                
-                comm.write(message)
+    def run_state_processor(self):
+        """Processes incoming state messages"""
+        while not self._exit:
+            line = self.comm.readline()
+            self.process_message(line)
+            
+    def run_state_sender(self):
+        """Sends out state messages"""
+        while not self._exit:
+            time.sleep(1/20)
+            message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
+                self.move.idx, self.move.cmd, f2i(self.move.dir), self.move.spd,
+                self.kick.idx, self.kick.cmd, self.kick.spd,
+                self.catch.idx, self.catch.cmd, self.catch.spd
+            )
+            
+            self.comm.write(message)
