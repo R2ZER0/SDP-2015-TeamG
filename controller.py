@@ -155,6 +155,7 @@ class Controller:
 
 		if self.robot is not None:
 			self.robot.stop()
+			self.robot.exit()
 
 		tools.save_colors(self.pitch, self.calibration)
 

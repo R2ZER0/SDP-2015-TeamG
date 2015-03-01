@@ -111,7 +111,7 @@ class Action():
         self.recv_thread.start()
         self.send_thread.start()
     
-    def exit():
+    def exit(self):
         self._exit = True
         
     # Movement commands
@@ -154,46 +154,48 @@ class Action():
         #              1          2          3           4              5          6              7          8           9                10
         res = Action.msg_re.match(message)
         
-        move_id = int(res.group(1))
-        move_cmd = res.group(2)
-        move_dir = i2f(int(res.group(3)))
-        move_fin = (1 == int(res.group(4)))
-        
-        kick_id = int(res.group(5))
-        kick_fin = (1 == int(res.group(6)))
-        
-        catch_id = int(res.group(7))
-        catch_cmd = res.group(8)
-        catch_fin = (1 == int(res.group(9)))
-        
-        state_dir = i2f(int(res.group(10)))
-        self.curr_dir = state_dir
-        
-        # Detect if the command is running, finished etc
-        if move_id == self.move.idx:
-            if not self.move.running:
-                self.move._onRunning()
-                
-            if move_fin and not self.move.finished:
-                self.move._onComplete()
-        
-        if kick_id == self.kick.idx:
-            if not self.kick.running:
-                self.kick._onRunning()
-                
-            if kick_fin and not self.kick.finished:
-                self.kick._onComplete()
-                
-        if catch_id == self.catch.idx:
-            if not self.catch.running:
-                self.catch._onRunning()
-                
-            if catch_fin and not self.catch.finished:
-                self.catch._onComplete()
+        if res is not None:
+            move_id = int(res.group(1))
+            move_cmd = res.group(2)
+            move_dir = i2f(int(res.group(3)))
+            move_fin = (1 == int(res.group(4)))
+            
+            kick_id = int(res.group(5))
+            kick_fin = (1 == int(res.group(6)))
+            
+            catch_id = int(res.group(7))
+            catch_cmd = res.group(8)
+            catch_fin = (1 == int(res.group(9)))
+            
+            state_dir = i2f(int(res.group(10)))
+            self.curr_dir = state_dir
+            
+            # Detect if the command is running, finished etc
+            if move_id == self.move.idx:
+                if not self.move.running:
+                    self.move._onRunning()
+                    
+                if move_fin and not self.move.finished:
+                    self.move._onComplete()
+            
+            if kick_id == self.kick.idx:
+                if not self.kick.running:
+                    self.kick._onRunning()
+                    
+                if kick_fin and not self.kick.finished:
+                    self.kick._onComplete()
+                    
+            if catch_id == self.catch.idx:
+                if not self.catch.running:
+                    self.catch._onRunning()
+                    
+                if catch_fin and not self.catch.finished:
+                    self.catch._onComplete()
                 
     def run_state_processor(self):
         """Processes incoming state messages"""
         while not self._exit:
+            self.comm.timeout = 0.1
             line = self.comm.readline()
             self.process_message(line)
             
