@@ -11,7 +11,7 @@
  * messages relay the state we wish the arduino to be in, 
  * 
  * Message Format:
- * "BEGIN <MoveCmdID> <MoveCmd> <MoveCmdDir> <MoveCmdSpd> <KickCmdId> <KickCmd> <CatchCmdId> <CatchCmd> <CurrentAngle> END\r\n"
+ * "[<MoveCmdID> <MoveCmd> <MoveCmdDir> <MoveCmdSpd> <KickCmdId> <KickCmd> <CatchCmdId> <CatchCmd> <CurrentAngle>]"
  * Where:
  *  <...CmdID>   = id of command being sent. Non-negative integer.
  *  <...Cmd>     = command. Only the uppercase first letter is sent.
@@ -37,9 +37,32 @@ static char catcher_command = 'C';
 static float movement_direction = 0.0f;
 static int movement_speed = 0;
 
+void run_movement_command(unsigned long id, char cmd, float dir, int speed)
+{
+    // TODO
+    movement_command_id = id;
+    movement_command = cmd;
+    movement_direction = dir;
+    movement_speed = speed;
+}
+
+void run_kicker_command(unsigned long id, char cmd)
+{
+    // TODO
+    kicker_command_id = id;
+    kicker_command = cmd;
+}
+
+void run_catcher_command(unsigned long id, char cmd)
+{
+    // TODO
+    catcher_command_id = id;
+    catcher_command = cmd;
+}
+
 void send_state_message(void)
 {
-    Serial.print("BEGIN ");
+    Serial.print("[");
     Serial.print(movement_command_id); Serial.print(' ');
     Serial.print(movement_command); Serial.print(' ');
     Serial.print(movement_direction); Serial.print(' ');
@@ -49,7 +72,50 @@ void send_state_message(void)
     Serial.print(catcher_command_id); Serial.print(' ');
     Serial.print(catcher_command); Serial.print(' ');
     Serial.print(getAngle());
-    Serial.println(" END");
+    Serial.println("]");
+}
+
+void process_state_message(void)
+{
+    unsigned long move_cmd_id, kick_cmd_id, catch_cmd_id;
+    char move_cmd, kick_cmd, catch_cmd;
+    float move_dir;
+    int move_speed;
+    
+    // Make sure we've got a proper message
+    if(Serial.read() != '[') {
+        // If not, throw it away
+        while(Serial.available() > 0) { Serial.read(); }
+        return;
+    }
+    
+    // Read the things:
+    move_cmd_id = Serial.parseInt();
+    Serial.read(); // space
+    
+    move_cmd = Serial.read();
+    Serial.read(); // space
+    
+    move_dir = Serial.parseFloat();
+    Serial.read(); // space
+    
+    move_speed = Serial.parseInt();
+    Serial.read(); // space
+    
+    kick_cmd_id = Serial.parseInt();
+    Serial.read(); // space
+    
+    kick_cmd = Serial.read();
+    Serial.read(); // space
+    
+    catch_cmd_id = Serial.parseInt();
+    Serial.read(); // space
+    
+    catch_cmd = Serial.read();
+    Serial.read(); // space
+    
+    Serial.parseFloat(); // CurrentAngle
+    Serial.read(); // Terminating ]
 }
 
 void setup_command(void)
@@ -59,5 +125,7 @@ void setup_command(void)
 
 void service_command(void)
 {
-    // TODO
+    if(Serial.available() > 0) {
+        process_state_message();
+    }
 }
