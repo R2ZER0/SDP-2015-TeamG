@@ -4,7 +4,7 @@
 #include "movement.h"
 #include "Angle.h"
 #include <Arduino.h>
-#include <SDPArdino.h>
+#include <SDPArduino.h>
 #include "config.h"
 #include "command.h"
 
@@ -18,7 +18,7 @@ void on_new_command(int cmd, float dir, int spd)
 
 void setup_movement()
 {
-    stopAllMotors();
+    motorAllStop();
 }
 
 void service_movement()
