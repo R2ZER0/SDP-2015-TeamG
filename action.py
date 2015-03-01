@@ -1,4 +1,6 @@
 # action.py
+import re
+import threading
 
 class ActionHandle(object):
     """A handle on the result of commands"""
@@ -26,7 +28,7 @@ class ActionHandle(object):
         self._completed = True
         self._running = False
         
-    def _onFinish(self):
+    def _onComplete(self):
         self._finished = True
         self._running = False
         self._completed = True
@@ -47,8 +49,8 @@ class MovementActionHandle(ActionHandle):
         
 class KickerActionHandle(ActionHandle):
     """A handle to kicker commands"""
-    def __init__(self, idx, cmd, spd):
-        super(KickerActionHandle, self).__init__(idx, cmd)
+    def __init__(self, idx, spd):
+        super(KickerActionHandle, self).__init__(idx, 'K')
         self.spd = spd
         
 class CatcherActionHandle(ActionHandle):
@@ -73,6 +75,10 @@ def mkangle(a):
 
 class Action():
     """Deals directly with the robot, to cater for all your robot commanding needs"""
+    
+    # Regex for parsing state messages
+    msg_re = re.compile('\[ MOVE ID=(\d+) CMD=([SMT]) DIR=(-?\d+) FIN=([10]) KICK ID=(\d+) FIN=([10]) CATCH ID=(\d+) CMD=([CRI]) FIN=([10]) STATE DIR=(-?\d+) \]')
+    
     def __init__(self, comm):
         self.comm = comm    
         
@@ -83,6 +89,12 @@ class Action():
         
         # Last known MPU output
         self.curr_dir = 0.0
+        
+        # Comms threads
+        self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
+        self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
+        self.recv_thread.start()
+        self.send_thread.start()
         
     # Movement commands
     def _cmd_movement(self, cmd, angle, scale):
@@ -116,4 +128,64 @@ class Action():
     
     def open_catcher(self, scale=100):
         return self._cmd_catcher('R', scale)
-
+    
+    # State processing
+    def process_message(self, message):
+        """Parse and process the state message from the arduino"""
+        #'\[ MOVE ID=(\d+) CMD=([SMT]) DIR=(-?\d+) FIN=([10]) KICK ID=(\d+) FIN=([10]) CATCH ID=(\d+) CMD=([CRI]) FIN=([10]) STATE DIR=(-?\d+) \]'
+        #              1          2          3           4              5          6              7          8           9                10
+        res = Action.msg_re.match(message)
+        
+        move_id = int(res.group(1))
+        move_cmd = res.group(2)
+        move_dir = i2f(int(res.group(3)))
+        move_fin = (1 == int(res.group(4)))
+        
+        kick_id = int(res.group(5))
+        kick_fin = (1 == int(res.group(6)))
+        
+        catch_id = int(res.group(7))
+        catch_cmd = res.group(8)
+        catch_fin = (1 == int(res.group(9)))
+        
+        state_dir = i2f(int(res.group(10)))
+        
+        # Detect if the command is running, finished etc
+        if move_id == self.move.idx:
+            if not self.move.running:
+                self.move._onRunning()
+                
+            if move_fin and not self.move.finished:
+                self.move._onComplete()
+        
+        if kick_id == self.kick.idx:
+            if not self.kick.running:
+                self.kick._onRunning()
+                
+            if kick_fin and not self.kick.finished:
+                self.kick._onComplete()
+                
+        if catch_id == self.catch.idx:
+            if not self.catch.running:
+                self.catch._onRunning()
+                
+            if catch_fin and not self.catch.finished:
+                self.catch._onComplete()
+                
+        def run_state_processor():
+            """Processes incoming state messages"""
+            while True:
+                line = comm.readline()
+                self.process_message(line)
+                
+        def run_state_sender():
+            """Sends out state messages"""
+            while True:
+                time.sleep(1/20)
+                message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10})".format(
+                    self.move.idx, self.move.cmd, f2i(self.move.dir), self.move.spd,
+                    self.kick.idx, self.kick.cmd, self.kick.spd,
+                    self.catch.idx, self.catch.cmd, self.catch.spd
+                )
+                
+                comm.write(message)
