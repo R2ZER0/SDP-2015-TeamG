@@ -68,10 +68,10 @@ void send_state_message(void)
 {
     snprintf(&buffer[0], sizeof(buffer)/sizeof(buffer[0]),
         "[ "
-        "M I%ld C%c D%d S%d F%d "
-        "K I%ld C%c F%d "
-        "C I%ld C%c F%d "
-        "S D%d "
+        "M %ld %c %d %d %d "
+        "K %ld %c %d "
+        "C %ld %c %d "
+        "S %d "
         "]",
         
         movement_command_id, movement_command, f2i(movement_direction),
