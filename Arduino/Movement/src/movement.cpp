@@ -5,3 +5,13 @@
 #include "Angle.h"
 
 Angle targetAngle();
+
+void setup_movement()
+{
+    
+}
+
+void service_movement()
+{
+    
+}

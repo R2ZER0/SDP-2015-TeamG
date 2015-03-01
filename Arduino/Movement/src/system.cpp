@@ -9,6 +9,7 @@
 #include "kicker.h"
 #include "catcher.h"
 #include "command.h"
+#include "movement.h"
 
 static char system_state = SYSTEM_STATE_STARTING;
 
@@ -38,6 +39,7 @@ void setup_system(void)
 #endif
     
     setup_command();
+    setup_movement();
     
     digitalWrite(PIN_LED, HIGH);
 }
@@ -47,8 +49,8 @@ void service_system(void)
     service_command();
     service_kicker();
     service_catcher(); 
-  
 #ifdef HAS_MPU6050
     MPU_service();
 #endif
+    service_movement();
 }
