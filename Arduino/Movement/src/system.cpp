@@ -18,15 +18,19 @@ char system_get_state(void)
 }
 
 void setup_system(void)
-{
-    // SDP Setup
-    SDPsetup();
-    
+{    
     // Setup LED
     pinMode(PIN_LED, OUTPUT);
     digitalWrite(PIN_LED, HIGH);
     
     system_state = SYSTEM_STATE_STARTING;
+    
+    delay(100); // flash the LED
+    digitalWrite(PIN_LED, LOW);
+    
+    // Now setup things
+    // SDP Setup
+    SDPsetup();
     
 #ifdef HAS_MPU6050 
     // Setup MPU
@@ -34,6 +38,8 @@ void setup_system(void)
 #endif
     
     setup_command();
+    
+    digitalWrite(PIN_LED, HIGH);
 }
 
 void service_system(void)
