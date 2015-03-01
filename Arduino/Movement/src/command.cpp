@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "command.h"
 #include <Arduino.h>
+#include "config.h"
 #include "MPU.h"
 
 /*
@@ -36,6 +37,9 @@ static char catcher_command = 'C';
 // Movement command args
 static float movement_direction = 0.0f;
 static int movement_speed = 0;
+
+// State message sending timeout
+static unsigned long next_message_time = 0L;
 
 void run_movement_command(unsigned long id, char cmd, float dir, int speed)
 {
@@ -145,5 +149,10 @@ void service_command(void)
 {
     if(Serial.available() > 0) {
         process_state_message();
+    }
+    
+    if(millis() >= next_message_time) {
+        send_state_message();
+        next_message_time = millis() + STATE_MESSAGE_INTERVAL;
     }
 }

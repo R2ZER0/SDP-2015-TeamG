@@ -3,10 +3,9 @@
 #define _CONFIG_H_
 
 //#define MPU_DEBUG (true) // Uncomment to enable MPU trace messages
-
 #define PIN_LED 10
-
 #define TURN_AXIS (0) // 0 = Yaw, 1 = Pitch, 2 = Roll
+#define STATE_MESSAGE_INTERVAL (50) // in milliseconds
 
 #define MOTOR_MOTOR1  0
 #define MOTOR_MOTOR2  2
