@@ -6,17 +6,6 @@
 #include "config.h"
 #include "MPU.h"
 
-#define MOVEMENT_COMMAND_MOVE 'M'
-#define MOVEMENT_COMMAND_TURN 'T'
-#define MOVEMENT_COMMAND_STOP 'S'
-
-#define KICKER_COMMAND_KICK 'K'
-#define KICKER_COMMAND_IDLE 'I'
-
-#define CATCHER_COMMAND_CATCH   'C'
-#define CATCHER_COMMAND_RELEASE 'R'
-#define CATCHER_COMMAND_IDLE    'I'
-
 // Command IDs
 static unsigned long movement_command_id = 0L;
 static unsigned long kicker_command_id = 0L;
@@ -27,6 +16,11 @@ static int movement_command = MOVEMENT_COMMAND_STOP;
 static int kicker_command = KICKER_COMMAND_IDLE;
 static int catcher_command = CATCHER_COMMAND_IDLE;
 
+// Wether they have finished
+static bool movement_command_fin = false;
+static bool kicker_command_fin = false;
+static bool catcher_command_fin = false;
+
 // Movement command args
 static float movement_direction = 0.0f;
 static int movement_speed = 0;
@@ -34,28 +28,36 @@ static int movement_speed = 0;
 // State message sending timeout
 static unsigned long next_message_time = 0L;
 
+// Hook functions
+movement_hook_t movement_hook = NULL;
+kicker_hook_t   kicker_hook   = NULL;
+catcher_hook_t  catcher_hook  = NULL;
+
 // Buffer for reading/writing messages
 static char buffer[256]; // this is probably bigger than it needs to be
 
-void run_movement_command(unsigned long id, char cmd, float dir, int speed)
+void run_movement_command(unsigned long id, int cmd, float dir, int speed)
 {
-    // TODO
+    (*movement_hook)(cmd, dir, speed);
+    
     movement_command_id = id;
     movement_command = cmd;
     movement_direction = dir;
     movement_speed = speed;
 }
 
-void run_kicker_command(unsigned long id, char cmd)
+void run_kicker_command(unsigned long id, int cmd)
 {
-    // TODO
+    (*kicker_hook)(cmd, 100);
+    
     kicker_command_id = id;
     kicker_command = cmd;
 }
 
-void run_catcher_command(unsigned long id, char cmd)
+void run_catcher_command(unsigned long id, int cmd)
 {
-    // TODO
+    (*catcher_hook)(cmd, 100);
+    
     catcher_command_id = id;
     catcher_command = cmd;
 }
@@ -144,6 +146,14 @@ void process_state_message(void)
         }
     }
 }
+
+void command_sethook_movement(movement_hook_t hook) { movement_hook = hook; }
+void command_sethook_kicker(kicker_hook_t hook)     { catcher_hook = hook; }
+void command_sethook_catcher(catcher_hook_t hook)   { kicker_hook = hook; }
+
+void command_finished_movement(void) { movement_command_fin = true; }
+void command_finished_kicker(void)   { kicker_command_fin = true; }
+void command_finished_catcher(void)  { catcher_command_fin = true; }
 
 void setup_command(void)
 {
