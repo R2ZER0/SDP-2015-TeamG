@@ -1,5 +1,5 @@
 from Polygon.cPolygon import Polygon
-from math import cos, sin, hypot, pi, atan2
+from math import acos, cos, sin, hypot, pi, atan2, sqrt
 from vision import tools
 
 '''Models contains all data structures pertaining to the positioning and movement
@@ -330,23 +330,19 @@ class Robot(PitchObject):
         ''':returns: An angle to which this robot should rotate to be facing the given point, \
             within the range **[-pi,pi]**
         '''
-
-        delta_x = self.x - x
-        delta_y = self.y - y
+        delta_x = x - self.x
+        delta_y = y - self.y
         displacement = hypot(delta_x, delta_y)
         if displacement == 0:
             theta = 0
         else:
-            theta = atan2(delta_y, delta_x)
-            self_angle = -(self.angle - pi)
-            angle_diff = min(2*pi - abs(self_angle-theta), abs(self_angle-theta))
-
-        # Calculate sign for movement
-        if abs(self_angle + angle_diff) - abs(theta) < abs(self_angle - angle_diff) - abs(theta):
-            angle_diff = -angle_diff
-
+            theta = atan2(delta_y, delta_x) - atan2(sin(self.angle), cos(self.angle))
+            if theta > pi:
+                theta -= 2*pi
+            elif theta < -pi:
+                theta += 2*pi
         assert -pi <= theta <= pi
-        return angle_diff
+        return theta
 
     def get_displacement_to_point(self, x, y):
         ''':returns: The displacement between our robot's center and the given x,y position.
