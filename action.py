@@ -80,7 +80,7 @@ class Action():
     """Deals directly with the robot, to cater for all your robot commanding needs"""
     
     # Regex for parsing state messages
-    msg_re = re.compile('\[ MOVE ID=(\d+) CMD=([SMT]) DIR=(-?\d+) FIN=([10]) KICK ID=(\d+) FIN=([10]) CATCH ID=(\d+) CMD=([CRI]) FIN=([10]) STATE DIR=(-?\d+) \]')
+    msg_re = re.compile('\((\d+) ([SMT]) (\d+) (1|0) (\d+) (1|0) (\d+) ([CRI]) (1|0) (\d+)\)')
     
     def __init__(self, comm):
         self.comm = comm    
@@ -150,8 +150,9 @@ class Action():
     # State processing
     def process_message(self, message):
         """Parse and process the state message from the arduino"""
-        #'\[ MOVE ID=(\d+) CMD=([SMT]) DIR=(-?\d+) FIN=([10]) KICK ID=(\d+) FIN=([10]) CATCH ID=(\d+) CMD=([CRI]) FIN=([10]) STATE DIR=(-?\d+) \]'
-        #              1          2          3           4              5          6              7          8           9                10
+        #'\((\d+) ([SMT]) (\d+) (1|0) (\d+) (1|0) (\d+) ([CRI]) (1|0) (\d+)\)'
+        #    mID   mCMD   mDIR  mFIN   kID  kFIN   cID   cCMD    cFIN  sDIR
+        #     1      2      3     4     5     6     7      8      9     10
         res = Action.msg_re.match(message)
         
         if res is not None:

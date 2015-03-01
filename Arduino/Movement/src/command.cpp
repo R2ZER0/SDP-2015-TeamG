@@ -69,7 +69,7 @@ float i2f(int i) { return ((float) i)/1024.0f; }
 void send_state_message(void)
 {
     snprintf(&buffer[0], sizeof(buffer)/sizeof(buffer[0]),
-        "(%ld %c %d %d %d %ld %c %d %ld %c %d %d)",        
+        "(%lu %c %d %d %d %lu %c %d %lu %c %d %d)",        
         movement_command_id, movement_command, f2i(movement_direction),
         movement_speed, 0,
         kicker_command_id, kicker_command, 0,
@@ -85,42 +85,37 @@ void process_state_message(void)
     unsigned long move_cmd_id, kick_cmd_id, catch_cmd_id;
     int move_cmd, kick_cmd, catch_cmd;
     float move_dir;
-    int move_speed;
+    int move_speed, kick_speed, catch_speed;
     
     // Make sure we've got a proper message
-    if(Serial.read() != '[') {
+    buffer[0] = Serial.read();
+    if(buffer[0] != '(') {
         // If not, throw it away
         while(Serial.available() > 0) { Serial.read(); }
         return;
     }
     
-    // Read the things:
-    move_cmd_id = Serial.parseInt();
-    Serial.read(); // space
+//     message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
+//                 self.move.idx, self.move.cmd, f2i(self.move.dir), self.move.spd,
+//                 self.kick.idx, self.kick.cmd, self.kick.spd,
+//                 self.catch.idx, self.catch.cmd, self.catch.spd
+//     )
     
-    move_cmd = Serial.read();
-    Serial.read(); // space
+    int i = 0;
+    do {
+        ++i;
+        buffer[i] = Serial.read();
+    } while(buffer[i] != ')');
+    buffer[i+1] = '\0';
     
-    move_dir = Serial.parseFloat();
-    Serial.read(); // space
+    int move_dir_tmp;
+    sscanf(&buffer[0], "(%lu %c %d %d %lu %c %d %lu %c %d)",
+           &move_cmd_id, &move_cmd, &move_dir_tmp, &move_speed,
+           &kick_cmd_id, &kick_cmd, &kick_speed,
+           &catch_cmd_id, &catch_cmd, &catch_speed
+    );
     
-    move_speed = Serial.parseInt();
-    Serial.read(); // space
-    
-    kick_cmd_id = Serial.parseInt();
-    Serial.read(); // space
-    
-    kick_cmd = Serial.read();
-    Serial.read(); // space
-    
-    catch_cmd_id = Serial.parseInt();
-    Serial.read(); // space
-    
-    catch_cmd = Serial.read();
-    Serial.read(); // space
-    
-    Serial.parseFloat(); // CurrentAngle
-    Serial.read(); // Terminating ]
+    move_dir = i2f(move_dir_tmp);
     
     if(move_cmd_id != movement_command_id) {
         if(move_cmd == 'M' || move_cmd == 'T' || move_cmd == 'S') {
