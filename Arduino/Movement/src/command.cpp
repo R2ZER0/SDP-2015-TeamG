@@ -69,13 +69,7 @@ float i2f(int i) { return ((float) i)/1024.0f; }
 void send_state_message(void)
 {
     snprintf(&buffer[0], sizeof(buffer)/sizeof(buffer[0]),
-        "[ "
-        "M %ld %c %d %d %d "
-        "K %ld %c %d "
-        "C %ld %c %d "
-        "S %d "
-        "]",
-        
+        "(%ld %c %d %d %d %ld %c %d %ld %c %d %d)",        
         movement_command_id, movement_command, f2i(movement_direction),
         movement_speed, 0,
         kicker_command_id, kicker_command, 0,

@@ -3,9 +3,15 @@
 #define _CONFIG_H_
 
 #define PIN_LED 13
-#define TURN_AXIS (0) // 0 = Yaw, 1 = Pitch, 2 = Roll
-#define STATE_MESSAGE_INTERVAL (50) // in milliseconds
-//#define MPU_DEBUG (true) // Uncomment to enable MPU trace messages
+
+// 0 = Yaw, 1 = Pitch, 2 = Roll
+#define TURN_AXIS (0)
+
+// in milliseconds
+#define STATE_MESSAGE_INTERVAL (50)
+
+// Uncomment to enable MPU trace messages
+//#define MPU_DEBUG (true)
 
 #define MPU_OFFSET_ACELX (-6476)
 #define MPU_OFFSET_ACELY (-3160)
@@ -14,9 +20,14 @@
 #define MPU_OFFSET_GYROY (16)
 #define MPU_OFFSET_GYROZ (-6)
 
+// Currently set to +/- 1 degree
+#define TURN_ACCEPTABLE_RANGE (0.017453)
+
+#define NUM_MOTORS 4
 #define MOTOR_MOTOR1  0
 #define MOTOR_MOTOR2  2
 #define MOTOR_MOTOR3  3
+#define MOTOR_MOTOR4  4
 #define MOTOR_KICKER  1
 #define MOTOR_CATCHER 5
 
