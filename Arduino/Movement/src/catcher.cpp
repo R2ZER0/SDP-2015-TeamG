@@ -15,7 +15,7 @@ char catcher_get_state(void)
     return catcher_state;
 }
 
-static void on_new_command(int cmd, int spd)
+void catcher_on_new_command(int cmd, int spd)
 {
     if(cmd == CATCHER_COMMAND_IDLE) {
         motorStop(MOTOR_CATCHER);
@@ -54,7 +54,7 @@ void catcher_release(int scale)
 void setup_catcher(void)
 {
     motorStop(MOTOR_CATCHER);
-    command_sethook_catcher(&on_new_command);
+    command_sethook_catcher(&catcher_on_new_command);
 }
 
 void service_catcher(void)

@@ -14,7 +14,7 @@ char kicker_get_state(void) {
     return kicker_state;
 }
 
-static void on_new_command(int cmd, int spd)
+void kicker_on_new_command(int cmd, int spd)
 {
     if(cmd == KICKER_COMMAND_IDLE) {
         motorStop(MOTOR_KICKER);
@@ -48,7 +48,7 @@ static void kicker_return(void)
 
 void setup_kicker(void) {
     motorStop(MOTOR_KICKER);
-    command_sethook_kicker(&on_new_command);
+    command_sethook_kicker(&kicker_on_new_command);
 }
 
 void service_kicker(void) {

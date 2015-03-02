@@ -36,7 +36,7 @@ void calc_motor_speeds(float angle, int scale, int* speed) {
     }
 }
 
-void on_new_command(int cmd, float dir, int spd)
+void movement_on_new_command(int cmd, float dir, int spd)
 {
     if(cmd == MOVEMENT_COMMAND_STOP) {
         current_command = cmd;
@@ -74,7 +74,7 @@ void on_new_command(int cmd, float dir, int spd)
 void setup_movement()
 {
     motorAllStop();
-    command_sethook_movement(&on_new_command);
+    command_sethook_movement(&movement_on_new_command);
 }
 
 // Very useful: http://stackoverflow.com/questions/7242546/move-from-angle-a-to-b-find-shortest-direction
