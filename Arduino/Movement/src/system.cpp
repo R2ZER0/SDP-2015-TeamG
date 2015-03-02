@@ -40,6 +40,7 @@ void setup_system(void)
     
     setup_command();
     setup_movement();
+    setup_kicker();
     
     digitalWrite(PIN_LED, HIGH);
 }

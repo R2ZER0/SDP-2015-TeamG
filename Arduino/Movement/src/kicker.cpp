@@ -4,6 +4,7 @@
 #include "kicker.h"
 #include <Arduino.h>
 #include <SDPArduino.h>
+#include "command.h"
 
 static char kicker_state = KICKER_STATE_STOPPED;
 static unsigned long kicker_stop_time = 0L;
@@ -11,6 +12,18 @@ static int kicker_scale = KICKER_DEFAULT_SCALE;
 
 char kicker_get_state(void) {
     return kicker_state;
+}
+
+static void on_new_command(int cmd, int spd)
+{
+    if(cmd == KICKER_COMMAND_IDLE) {
+        motorStop(MOTOR_KICKER);
+        command_finished_kicker();
+        
+    } else if(cmd == KICKER_COMMAND_KICK) {
+        kicker_kick(spd);
+        command_finished_kicker();
+    }
 }
 
 void kicker_kick(int kicker_scale)
@@ -31,6 +44,11 @@ static void kicker_return(void)
     
     motorBackward(MOTOR_KICKER, kicker_scale);
     kicker_state = KICKER_STATE_RETURNING;    
+}
+
+void setup_kicker(void) {
+    motorStop(MOTOR_KICKER);
+    command_sethook_kicker(&on_new_command);
 }
 
 void service_kicker(void) {
