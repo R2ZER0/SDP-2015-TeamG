@@ -5,12 +5,28 @@
 #include "config.h"
 #include <Arduino.h>
 #include <SDPArduino.h>
+#include "command.h"
 
 char catcher_state = CATCHER_STATE_STOPPED;
 unsigned long catcher_stop_time = 0L;
 
-char catcher_get_state(void) {
+char catcher_get_state(void)
+{
     return catcher_state;
+}
+
+static void on_new_command(int cmd, int spd)
+{
+    if(cmd == CATCHER_COMMAND_IDLE) {
+        motorStop(MOTOR_CATCHER);
+        command_finished_catcher();
+        
+    } else if(cmd == CATCHER_COMMAND_CATCH) {
+        catcher_catch(spd);
+        
+    } else if(cmd == CATCHER_COMMAND_RELEASE) {
+        catcher_release(spd);   
+    }
 }
 
 void catcher_catch(int scale)
@@ -35,13 +51,20 @@ void catcher_release(int scale)
     catcher_state = CATCHER_STATE_RELEASING;
 }
 
+void setup_catcher(void)
+{
+    motorStop(MOTOR_CATCHER);
+    command_sethook_catcher(&on_new_command);
+}
+
 void service_catcher(void)
 {
     /* Check the catcher state */
     if(catcher_state != CATCHER_STATE_STOPPED) {
         if(millis() >= catcher_stop_time) {
-            motorStop(MOTOR_KICKER);
+            motorStop(MOTOR_CATCHER);
             catcher_state = CATCHER_STATE_STOPPED;
+            command_finished_catcher();
         }
     }
 }

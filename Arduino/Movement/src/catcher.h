@@ -10,5 +10,6 @@ void catcher_catch(int scale);
 void catcher_release(int scale);
 void service_catcher(void);
 char catcher_get_state(void);
+void setup_catcher(void);
 
 #endif /* _CATCHER_H_*/
