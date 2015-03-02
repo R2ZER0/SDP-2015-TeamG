@@ -122,7 +122,7 @@ class Action():
     def _cmd_movement(self, cmd, angle, scale):
         self.move_handle._onNextCommand()
         self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
-        return self.move
+        return self.move_handle
     
     def move(self, angle, scale=100):
         return self._cmd_movement('M', angle, scale)
@@ -143,7 +143,7 @@ class Action():
     def _cmd_catcher(self, cmd, scale):
         self.catch_handle._onNextCommand()
         self.catch_handle = CatcherActionHandle(self.catch_handle.idx+1, cmd, scale)
-        return self.catch
+        return self.catch_handle
     
     def catch(self, scale=100):
         return self._cmd_catcher('C', scale)
