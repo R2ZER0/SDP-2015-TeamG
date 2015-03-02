@@ -40,7 +40,10 @@ void on_new_command(int cmd, float dir, int spd)
 {
     if(cmd == MOVEMENT_COMMAND_STOP) {
         current_command = cmd;
-        motorAllStop();
+        motorStop(MOTOR_MOTOR1);
+        motorStop(MOTOR_MOTOR2);
+        motorStop(MOTOR_MOTOR3);
+        motorStop(MOTOR_MOTOR4);
         command_finished_movement();
         
     } else if(cmd == MOVEMENT_COMMAND_MOVE) {
