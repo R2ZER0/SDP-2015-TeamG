@@ -76,6 +76,16 @@ void MPU_service() {
     // We do not need to service the comm, as that is already done
     
     ServiceDMP();
+    
+//     if(millis() % 32 == 0) {
+//         Serial.print(yawPitchRoll[0]);
+//         Serial.print(' ');
+//         Serial.print(yawPitchRoll[1]);
+//         Serial.print(' ');
+//         Serial.print(yawPitchRoll[2]);
+//         Serial.print(' ');
+//         Serial.println(getAngle());
+//     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

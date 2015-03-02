@@ -4,7 +4,7 @@
 
 #define PIN_LED 13
 
-// 0 = Yaw, 1 = Pitch, 2 = Roll
+// 0 = Yaw, 1 = Pitch, 2 = Roll - depends on the orientation of MPU?
 #define TURN_AXIS (0)
 
 // in milliseconds
