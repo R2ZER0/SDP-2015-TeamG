@@ -14,7 +14,7 @@ char kicker_get_state(void) {
     return kicker_state;
 }
 
-void kicker_on_new_command(int cmd, int spd)
+void kicker_on_new_command(char cmd, int spd)
 {
     if(cmd == KICKER_COMMAND_IDLE) {
         motorStop(MOTOR_KICKER);

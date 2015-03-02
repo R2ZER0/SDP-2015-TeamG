@@ -8,7 +8,7 @@
 #define TURN_AXIS (0)
 
 // in milliseconds
-#define STATE_MESSAGE_INTERVAL (50)
+#define STATE_MESSAGE_INTERVAL (120)
 
 // Uncomment to enable MPU trace messages
 //#define MPU_DEBUG (true)

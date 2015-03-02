@@ -11,7 +11,7 @@
 #include "motor.h"
 #include "MPU.h"
 
-int current_command = MOVEMENT_COMMAND_STOP;
+char current_command = MOVEMENT_COMMAND_STOP;
 
 float targetAngle = 0.0; // in radians, +PI to -PI
 int turnSpeed = 100;
@@ -36,7 +36,7 @@ void calc_motor_speeds(float angle, int scale, int* speed) {
     }
 }
 
-void movement_on_new_command(int cmd, float dir, int spd)
+void movement_on_new_command(char cmd, float dir, int spd)
 {
     if(cmd == MOVEMENT_COMMAND_STOP) {
         current_command = cmd;

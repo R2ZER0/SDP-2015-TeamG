@@ -13,9 +13,9 @@
 #define CATCHER_COMMAND_RELEASE 'R'
 #define CATCHER_COMMAND_IDLE    'I'
 
-typedef void (*movement_hook_t)(int, float, int);
-typedef void (*kicker_hook_t)(int, int);
-typedef void (*catcher_hook_t)(int, int);
+typedef void (*movement_hook_t)(char, float, int);
+typedef void (*kicker_hook_t)(char, int);
+typedef void (*catcher_hook_t)(char, int);
 
 void command_sethook_movement(movement_hook_t hook);
 void command_sethook_kicker(kicker_hook_t hook);

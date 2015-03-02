@@ -15,7 +15,7 @@ char catcher_get_state(void)
     return catcher_state;
 }
 
-void catcher_on_new_command(int cmd, int spd)
+void catcher_on_new_command(char cmd, int spd)
 {
     if(cmd == CATCHER_COMMAND_IDLE) {
         motorStop(MOTOR_CATCHER);

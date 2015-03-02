@@ -39,8 +39,8 @@ static char send_buffer[BUFFER_SIZE];
 static char recv_buffer[BUFFER_SIZE];
 static int  recv_buffer_i = 0;
 
-void movement_on_new_command(int cmd, float dir, int spd);
-void run_movement_command(unsigned long id, int cmd, float dir, int speed)
+void movement_on_new_command(char cmd, float dir, int spd);
+void run_movement_command(unsigned long id, char cmd, float dir, int speed)
 {
     movement_on_new_command(cmd, dir, speed);
         
@@ -50,8 +50,8 @@ void run_movement_command(unsigned long id, int cmd, float dir, int speed)
     movement_speed = speed;
 }
 
-void kicker_on_new_command(int cmd, int spd);
-void run_kicker_command(unsigned long id, int cmd)
+void kicker_on_new_command(char cmd, int spd);
+void run_kicker_command(unsigned long id, char cmd)
 {
     kicker_on_new_command(cmd, 100);
     
@@ -60,8 +60,8 @@ void run_kicker_command(unsigned long id, int cmd)
 }
 
 
-void catcher_on_new_command(int cmd, int spd);
-void run_catcher_command(unsigned long id, int cmd)
+void catcher_on_new_command(char cmd, int spd);
+void run_catcher_command(unsigned long id, char cmd)
 {
     catcher_on_new_command(cmd, 100);
     
@@ -114,7 +114,7 @@ void process_state_message(void)
         //Serial.println(recv_buffer);
         
         unsigned long move_cmd_id, kick_cmd_id, catch_cmd_id;
-        int move_cmd, kick_cmd, catch_cmd;
+        char move_cmd, kick_cmd, catch_cmd;
         float move_dir;
         int move_speed, kick_speed, catch_speed;
     
@@ -131,6 +131,9 @@ void process_state_message(void)
             
             move_dir = i2f(move_dir_tmp);
             
+            Serial.print("Move "); Serial.print(move_cmd_id); 
+            Serial.print(' '); Serial.print(movement_command_id);
+            Serial.print(' '); Serial.println(move_cmd);
             if(move_cmd_id != movement_command_id) {
                 if(move_cmd == 'M' || move_cmd == 'T' || move_cmd == 'S') {
                     Serial.println("MOVE");
@@ -156,8 +159,8 @@ void process_state_message(void)
             }
             
         } else {
-            //Serial.print("Got non-matching result ");
-            //Serial.println(result);
+            Serial.print("Got non-matching result ");
+            Serial.println(result);
         }
     }
 }
