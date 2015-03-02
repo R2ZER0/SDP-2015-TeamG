@@ -77,9 +77,9 @@ void send_state_message(void)
 {
     snprintf(&send_buffer[0], BUFFER_SIZE,
         "(%lu %c %d %d %lu %c %d %lu %c %d %d)",        
-        movement_command_id, movement_command, f2i(movement_direction), 0,
-        kicker_command_id, kicker_command, 0,
-        catcher_command_id, catcher_command, 0,
+        movement_command_id, movement_command, f2i(movement_direction), movement_command_fin,
+        kicker_command_id, kicker_command, kicker_command_fin,
+        catcher_command_id, catcher_command, catcher_command_fin,
         f2i(getAngle())        
     );
     
