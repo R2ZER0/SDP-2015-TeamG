@@ -34,7 +34,10 @@ kicker_hook_t   kicker_hook   = NULL;
 catcher_hook_t  catcher_hook  = NULL;
 
 // Buffer for reading/writing messages
-static char buffer[256]; // this is probably bigger than it needs to be
+#define BUFFER_SIZE 128
+static char send_buffer[BUFFER_SIZE];
+static char recv_buffer[BUFFER_SIZE];
+static int  recv_buffer_i = 0;
 
 void movement_on_new_command(int cmd, float dir, int spd);
 void run_movement_command(unsigned long id, int cmd, float dir, int speed)
@@ -72,7 +75,7 @@ float i2f(int i) { return ((float) i)/1024.0f; }
 
 void send_state_message(void)
 {
-    snprintf(&buffer[0], sizeof(buffer)/sizeof(buffer[0]),
+    snprintf(&send_buffer[0], BUFFER_SIZE,
         "(%lu %c %d %d %lu %c %d %lu %c %d %d)",        
         movement_command_id, movement_command, f2i(movement_direction), 0,
         kicker_command_id, kicker_command, 0,
@@ -80,65 +83,81 @@ void send_state_message(void)
         f2i(getAngle())        
     );
     
-    Serial.println((char*)(&buffer[0]));
+    Serial.println((char*)(&send_buffer[0]));
 }
 
 void process_state_message(void)
-{
-    unsigned long move_cmd_id, kick_cmd_id, catch_cmd_id;
-    int move_cmd, kick_cmd, catch_cmd;
-    float move_dir;
-    int move_speed, kick_speed, catch_speed;
+{    
+    //Serial.println("Read into buffer");
     
-//     // Make sure we've got a proper message
-//     buffer[0] = Serial.read();
-//     if(buffer[0] != '(') {
-//         // If not, throw it away
-//         while(Serial.available() > 0) { Serial.read(); }
-//         return;
-//     }
-    
-//     message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
-//                 self.move.idx, self.move.cmd, f2i(self.move.dir), self.move.spd,
-//                 self.kick.idx, self.kick.cmd, self.kick.spd,
-//                 self.catch.idx, self.catch.cmd, self.catch.spd
-//     )
-    
-    int i = -1;
-    do {
-        ++i;
-        buffer[i] = Serial.read();
-    } while(buffer[i] != ')');
-    buffer[i+1] = '\0';
-    
-    int move_dir_tmp;
-    int result = sscanf(&buffer[0], "(%lu %c %d %d %lu %c %d %lu %c %d)",
-           &move_cmd_id, &move_cmd, &move_dir_tmp, &move_speed,
-           &kick_cmd_id, &kick_cmd, &kick_speed,
-           &catch_cmd_id, &catch_cmd, &catch_speed
-    );
-    
-    // Make sure we got a full match
-    if(result == 10) {
-        
-        move_dir = i2f(move_dir_tmp);
-        
-        if(move_cmd_id != movement_command_id) {
-            if(move_cmd == 'M' || move_cmd == 'T' || move_cmd == 'S') {
-                run_movement_command(move_cmd_id, move_cmd, move_dir, move_speed);
-            }
+    bool finished_message = false;
+    while(Serial.available() > 0) {
+        if(recv_buffer_i >= BUFFER_SIZE) {
+            // Buffer overflow :(
+            recv_buffer_i = 0;
         }
         
-        if(kick_cmd_id != kicker_command_id) {
-            if(kick_cmd == 'K' || kick_cmd == 'I') {
-                run_kicker_command(kick_cmd_id, kick_cmd);
-            }
+        recv_buffer[recv_buffer_i] = Serial.read();
+        
+        if(recv_buffer[recv_buffer_i] == ')') {
+            finished_message = true;
+            recv_buffer[recv_buffer_i + 1] = '\0';
+            recv_buffer_i = 0;
+            break;
         }
         
-        if(catch_cmd_id != catcher_command_id) {
-            if(catch_cmd == 'C' || catch_cmd == 'R' || catch_cmd == 'I') {
-                run_catcher_command(catch_cmd_id, catch_cmd);
+        ++recv_buffer_i;
+    }
+    
+    if(finished_message) {
+        //Serial.print("Got: ");
+        //Serial.println(recv_buffer);
+        
+        unsigned long move_cmd_id, kick_cmd_id, catch_cmd_id;
+        int move_cmd, kick_cmd, catch_cmd;
+        float move_dir;
+        int move_speed, kick_speed, catch_speed;
+    
+        int move_dir_tmp;
+        int result = sscanf(&recv_buffer[0], "(%lu %c %d %d %lu %c %d %lu %c %d)",
+            &move_cmd_id, &move_cmd, &move_dir_tmp, &move_speed,
+            &kick_cmd_id, &kick_cmd, &kick_speed,
+            &catch_cmd_id, &catch_cmd, &catch_speed
+        );
+        
+        // Make sure we got a full match
+        if(result == 10) {
+            //Serial.println("Matching Result");
+            
+            move_dir = i2f(move_dir_tmp);
+            
+            if(move_cmd_id != movement_command_id) {
+                if(move_cmd == 'M' || move_cmd == 'T' || move_cmd == 'S') {
+                    Serial.println("MOVE");
+                    run_movement_command(move_cmd_id, move_cmd, move_dir, move_speed);
+                    Serial.println("ENDMOVE");
+                }
             }
+            
+            if(kick_cmd_id != kicker_command_id) {
+                if(kick_cmd == 'K' || kick_cmd == 'I') {
+                    Serial.println("KICK");
+                    run_kicker_command(kick_cmd_id, kick_cmd);
+                    Serial.println("ENDKICK");
+                }
+            }
+            
+            if(catch_cmd_id != catcher_command_id) {
+                if(catch_cmd == 'C' || catch_cmd == 'R' || catch_cmd == 'I') {
+                    Serial.println("CATCH");
+                    run_catcher_command(catch_cmd_id, catch_cmd);
+                    Serial.println("ENDCATCH");
+                }
+            }
+            
+        } else {
+            //Serial.print("Got non-matching result ");
+            //Serial.println(result);
         }
     }
 }
@@ -154,6 +173,7 @@ void command_finished_catcher(void)  { catcher_command_fin = true; }
 void setup_command(void)
 {
     // TODO
+    Serial.println("setup_command");
 }
 
 void service_command(void)
