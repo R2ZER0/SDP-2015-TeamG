@@ -131,9 +131,6 @@ void process_state_message(void)
             
             move_dir = i2f(move_dir_tmp);
             
-            Serial.print("Move "); Serial.print(move_cmd_id); 
-            Serial.print(' '); Serial.print(movement_command_id);
-            Serial.print(' '); Serial.println(move_cmd);
             if(move_cmd_id != movement_command_id) {
                 if(move_cmd == 'M' || move_cmd == 'T' || move_cmd == 'S') {
                     Serial.println("MOVE");
