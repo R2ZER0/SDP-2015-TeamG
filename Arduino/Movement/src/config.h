@@ -24,11 +24,11 @@
 #define TURN_ACCEPTABLE_RANGE (0.017453)
 
 #define NUM_MOTORS 4
-#define MOTOR_MOTOR1  0
-#define MOTOR_MOTOR2  2
-#define MOTOR_MOTOR3  3
-#define MOTOR_MOTOR4  4
-#define MOTOR_KICKER  1
+#define MOTOR_MOTOR1  1
+#define MOTOR_MOTOR2  3
+#define MOTOR_MOTOR3  0
+#define MOTOR_MOTOR4  2
+#define MOTOR_KICKER  4
 #define MOTOR_CATCHER 5
 
 #define KICKER_RUNNING_TIME  (400)
