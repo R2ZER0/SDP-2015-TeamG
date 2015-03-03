@@ -33,7 +33,7 @@ void setup_system(void)
     // SDP Setup
     SDPsetup();
     
-#ifdef HAS_MPU6050 
+#ifdef HAS_MPU6050
     // Setup MPU
     MPU_setup();
 #endif

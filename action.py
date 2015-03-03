@@ -41,6 +41,7 @@ class ActionHandle(object):
         self._running = True
         
     def _onNextCommand(self):
+        self._running = False
         if(not self._completed):
             self._onCancel()
             
@@ -72,9 +73,9 @@ def f2i(f):
 
 def mkangle(a):
     while a > math.pi:
-        a -= math.pi
-    while a < (0 - math.pi):
-        a += math.pi
+        a -= 2.0*math.pi
+    while a <= (0 - math.pi):
+        a += 2.0*math.pi
     return a
 
 class Action():
@@ -124,14 +125,16 @@ class Action():
         self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
         return self.move_handle
     
-    def move(self, angle, scale=100):
+    def move(self, angle, scale=64):
         return self._cmd_movement('M', angle, scale)
         
-    def turnBy(self, angle, scale=100):
-        return self._cmd_movement('T', mkangle(self.curr_dir + angle), scale)
+    def turnBy(self, angle, scale=64):
+        target = mkangle(self.curr_dir + angle)
+        print "Turning from " + str(self.curr_dir) + " to " + str(target)
+        return self._cmd_movement('T', target, scale)
         
     def stop(self):
-        return self._cmd_movement(self.move_handle.idx+1, 'S', 0, 0)
+        return self._cmd_movement('S', 0, 0)
         
      # Kicker command
     def kick(self, scale=100):
@@ -201,8 +204,8 @@ class Action():
                 if catch_fin and not self.catch_handle.finished:
                     self.catch_handle._onComplete()
         else:
-            print "Invalid msg: " + message
-            #pass
+            print "# " + message
+            pass
         
         
     def run_state_processor(self):
@@ -210,8 +213,9 @@ class Action():
         while not self._exit:
             self.comm.timeout = 0.1
             line = self.comm.readline()
+            line = line.rstrip()
             if line != "":
-                #print line[:-1]
+                #print line
                 self.process_message(line)
             
     def run_state_sender(self):

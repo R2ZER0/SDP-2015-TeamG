@@ -19,13 +19,9 @@ bool finishedTurn = true;
 float lastDistance = PI;
 
 float normalise_angle(float a) {
-    while(a > PI) { a -= PI; }
-    while(a < (0-PI)) { a += PI; }
+    while(a > PI) { a -= 2.0*PI; }
+    while(a <= (-PI)) { a += 2.0*PI; }
     return a;
-}
-
-float angular_distance(float x, float y) {
-    return atan2(sin(x-y), cos(x-y));
 }
 
 void calc_motor_speeds(float angle, int scale, int* speed) {
@@ -65,7 +61,7 @@ void movement_on_new_command(char cmd, float dir, int spd)
         targetAngle = normalise_angle(dir);
         turnSpeed = spd;
         finishedTurn = false;
-        lastDistance = angular_distance(getAngle(), targetAngle);
+        //lastDistance = angular_distance(getAngle(), targetAngle);
         
         // Now, we wait...
     }
@@ -74,35 +70,65 @@ void movement_on_new_command(char cmd, float dir, int spd)
 void setup_movement()
 {
     motorAllStop();
-    command_sethook_movement(&movement_on_new_command);
 }
 
-// Very useful: http://stackoverflow.com/questions/7242546/move-from-angle-a-to-b-find-shortest-direction
+//float acw_distance(float a, float b) { return  }
+//float  cw_distance(float a, float b) { return abs(normalise_angle(b - a)); }
+
+//float acw_distance(float x, float y) { return normalise_angle( atan2(cos(y), sin(y)) - atan2(cos(x), sin(y)) ); }
+//float acw_distance(float x, float y) { return PI - abs(abs(x - y) - PI); }
+//float  cw_distance(float x, float y) { return 2.0*PI - acw_distance(x, y); }
+
+float acw_distance(float a, float b) { return (b-a)<0 ? (b - a + PI*2.0) : (b - a); }
+float  cw_distance(float a, float b) { return (a-b)<0 ? (a - b + PI*2.0) : (a - b); }
+
 void service_movement()
 {
     if(!finishedTurn && current_command == MOVEMENT_COMMAND_TURN) {
-        float current_distance = angular_distance(getAngle(), targetAngle);
-        if((current_distance > lastDistance) && (current_distance <= TURN_ACCEPTABLE_RANGE)) {
+        float acw_dist = acw_distance(getAngle(), targetAngle);
+        float  cw_dist =  cw_distance(getAngle(), targetAngle);
+        float current_distance = (acw_dist < cw_dist) ? acw_dist : cw_dist;
+        
+//         Serial.print(getAngle()); Serial.print(" --> "); Serial.print(targetAngle);
+//         Serial.print(" = "); Serial.println(current_distance);
+//         
+        if(current_distance <= TURN_ACCEPTABLE_RANGE) {
             // We've probably finished!
             motorAllStop();
             finishedTurn = true;
             command_finished_movement();
+            Serial.println("Finished turn!");
             return;
         }
         
-        float acw_distance = abs(PI - getAngle()) + abs(-PI - targetAngle);
-        float  cw_distance = targetAngle - getAngle();
+        // Slow down as we approach the target
+        int turnSpeedA = turnSpeed;
+        int turnSpeedB = turnSpeed;
         
-        if(acw_distance < cw_distance) {
-            runMotor(MOTOR_MOTOR1, turnSpeed);
-            runMotor(MOTOR_MOTOR2, turnSpeed);
-            runMotor(MOTOR_MOTOR3, turnSpeed);
-            runMotor(MOTOR_MOTOR4, turnSpeed);            
+        if(current_distance < 0.2) {
+            turnSpeedA = 60;
+            turnSpeedB = -40;
+        
+        } else if(current_distance < 1.5) {
+            turnSpeedB = 50;
+            turnSpeedA = 0;
         } else {
-            runMotor(MOTOR_MOTOR1, -turnSpeed);
-            runMotor(MOTOR_MOTOR2, -turnSpeed);
-            runMotor(MOTOR_MOTOR3, -turnSpeed);
-            runMotor(MOTOR_MOTOR4, -turnSpeed);
+            turnSpeedA = 0;
+            turnSpeedB = 60;
         }
+        
+        if(acw_dist < cw_dist) {
+            runMotor(MOTOR_MOTOR1, turnSpeedA);
+            runMotor(MOTOR_MOTOR2, turnSpeedB);
+            runMotor(MOTOR_MOTOR3, turnSpeedA);
+            runMotor(MOTOR_MOTOR4, turnSpeedB);            
+        } else {
+            runMotor(MOTOR_MOTOR1, 0-turnSpeedA);
+            runMotor(MOTOR_MOTOR2, 0-turnSpeedB);
+            runMotor(MOTOR_MOTOR3, 0-turnSpeedA);
+            runMotor(MOTOR_MOTOR4, 0-turnSpeedB);
+        }
+        
+        Serial.print("dist="); Serial.println(current_distance);
     }
 }

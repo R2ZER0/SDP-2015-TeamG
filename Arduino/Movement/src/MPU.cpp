@@ -66,9 +66,9 @@ static void dmpDataReady() {
 void MPU_setup() {
     // I2C should already be setup
     // Wire.begin();
-    bool success = Initialise();;// && WaitForStabilisation(); //FIXME
+    bool success = Initialise() && WaitForStabilisation(); //FIXME
     if(!success) {
-        Serial.println("ERROR: Could not initialise MPU");
+        Serial.println("ERROR: Could not initialise MPU, will not function.");
     }
 }
 
@@ -116,7 +116,7 @@ static bool Initialise() {
     ASSERT( devStatus == 0 );
     
     // Set full scale range (250, 500, 1000, 2000)
-    mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_1000);
+    mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
     
     // Calibration offsets
     mpu.setXAccelOffset(MPU_OFFSET_ACELX);

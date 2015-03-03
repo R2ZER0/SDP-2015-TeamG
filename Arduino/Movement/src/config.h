@@ -20,8 +20,8 @@
 #define MPU_OFFSET_GYROY (16)
 #define MPU_OFFSET_GYROZ (-6)
 
-// Currently set to +/- 1 degree
-#define TURN_ACCEPTABLE_RANGE (0.017453)
+// Currently set to +/- 1.5 degrees
+#define TURN_ACCEPTABLE_RANGE (0.017453*1.5)
 
 #define NUM_MOTORS 4
 #define MOTOR_MOTOR1  1
