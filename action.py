@@ -98,23 +98,24 @@ class Action():
         # Number of messages received
         self.num_messages_recvd = 0
         
-        # Comms threads
-        self._exit = False
-        def set_exit():
-            self._exit = True
-        atexit.register(set_exit)
-        
-        self.prev_handler = None
-        def handler(signum, frame):
-            self._exit = True
-            self.prev_handler(signum, frame)
-        self.prev_handler = signal.signal(2, handler)
-        
-        self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
-        self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
-        
-        self.recv_thread.start()
-        self.send_thread.start()
+	if self.comm:
+		# Comms threads
+		self._exit = False
+		def set_exit():
+		    self._exit = True
+		atexit.register(set_exit)
+		
+		self.prev_handler = None
+		def handler(signum, frame):
+		    self._exit = True
+		    self.prev_handler(signum, frame)
+		self.prev_handler = signal.signal(2, handler)
+		
+		self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
+		self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
+		
+		self.recv_thread.start()
+		self.send_thread.start()
     
     def exit(self):
         self._exit = True
@@ -124,13 +125,23 @@ class Action():
         self.move_handle._onNextCommand()
         self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
         return self.move_handle
-    
+
+    def last_command(self):
+	if self.move_handle.cmd == 'M':
+		dx = math.cos(self.move_handle.dir)*self.move_handle.spd
+		dy = math.sin(self.move_handle.dir)*self.move_handle.spd
+		return [dx,dy,0]
+	elif self.move_handle.cmd == 'T':
+		return [0,0,self.move_handle.spd]
+	else:
+		return [0,0,0]
+
     def move(self, angle, scale=64):
-        return self._cmd_movement('M', angle, scale)
+        return self._cmd_movement('M', angle+math.pi/2, scale)
         
     def turnBy(self, angle, scale=64):
         target = mkangle(self.curr_dir + angle)
-        print "Turning from " + str(self.curr_dir) + " to " + str(target)
+        #print "Turning from " + str(self.curr_dir) + " to " + str(target)
         return self._cmd_movement('T', target, scale)
         
     def stop(self):
@@ -204,18 +215,20 @@ class Action():
                 if catch_fin and not self.catch_handle.finished:
                     self.catch_handle._onComplete()
         else:
-            print "# " + message
+            #print "# " + message
             pass
         
         
     def run_state_processor(self):
         """Processes incoming state messages"""
         while not self._exit:
+	
             self.comm.timeout = 0.1
             line = self.comm.readline()
             line = line.rstrip()
+	    #if not line.startswith('dist'):
+	    #	print line
             if line != "":
-                #print line
                 self.process_message(line)
             
     def run_state_sender(self):

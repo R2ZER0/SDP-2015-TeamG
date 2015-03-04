@@ -1,5 +1,6 @@
+import pdb
 from Polygon.cPolygon import Polygon
-from math import cos, sin, hypot, pi, atan2
+from math import acos, cos, sin, hypot, pi, atan2, sqrt
 from vision import tools
 
 '''Models contains all data structures pertaining to the positioning and movement
@@ -87,7 +88,7 @@ class Coordinate(object):
 
 class Vector(Coordinate):
 
-    def __init__(self, x, y, angle, velocity):
+    def __init__(self, x, y, angle, velocity, angular_velocity=0):
         '''Assigns the given values and constructs a Vector.
 
         :param x: The x coordinate position, not None
@@ -110,6 +111,7 @@ class Vector(Coordinate):
         else:
             self._angle = angle
             self._velocity = velocity
+            self._angular_velocity = angular_velocity
 
     @property
     def angle(self):
@@ -120,6 +122,11 @@ class Vector(Coordinate):
     def velocity(self):
         ''':returns: The velocity of this vector'''
         return self._velocity
+
+    @property
+    def angular_velocity(self):
+        ''':returns: The angular velocity of this vector'''
+        return self._angular_velocity
 
     @angle.setter
     def angle(self, new_angle):
@@ -139,6 +146,12 @@ class Vector(Coordinate):
         if new_velocity == None or new_velocity < 0:
             raise ValueError('Velocity can not be None or negative')
         self._velocity = new_velocity
+
+    @angular_velocity.setter
+    def angular_velocity(self, ang_velocity):
+        ''':param ang_velocity: A new value for the angular velocity
+        '''
+        self._angular_velocity = ang_velocity
 
     def __eq__(self, other):
         return (isinstance(other, self.__class__) and (self.__dict__ == other.__dict__))
@@ -210,6 +223,10 @@ class PitchObject(object):
         return self._vector.velocity
 
     @property
+    def angular_velocity(self):
+        return self._vector.angular_velocity
+
+    @property
     def x(self):
         return self._vector.x
 
@@ -226,7 +243,7 @@ class PitchObject(object):
         if new_vector == None or not isinstance(new_vector, Vector):
             raise ValueError('The new vector can not be None and must be an instance of a Vector')
         else:
-            self._vector = Vector(new_vector.x, new_vector.y, new_vector.angle - self._angle_offset, new_vector.velocity)
+            self._vector = Vector(new_vector.x, new_vector.y, new_vector.angle - self._angle_offset, new_vector.velocity, new_vector.angular_velocity)
 
     def get_generic_polygon(self, width, length):
         '''Retrieves a polygon describing the generic shape of this object and
@@ -330,21 +347,18 @@ class Robot(PitchObject):
         ''':returns: An angle to which this robot should rotate to be facing the given point, \
             within the range **[-pi,pi]**
         '''
-
-        delta_x = self.x - x
-        delta_y = self.y - y
+        delta_x = x - self.x
+        delta_y = y - self.y
         displacement = hypot(delta_x, delta_y)
         if displacement == 0:
             theta = 0
         else:
-            theta = atan2(delta_y, delta_x) + atan2(sin(self.angle), cos(self.angle))
-            theta -= (theta/abs(theta)) * pi/2
+            theta = atan2(delta_y, delta_x) - atan2(sin(self.angle), cos(self.angle))
             if theta > pi:
                 theta -= 2*pi
             elif theta < -pi:
                 theta += 2*pi
         assert -pi <= theta <= pi
-
         return theta
 
     def get_displacement_to_point(self, x, y):
@@ -373,7 +387,7 @@ class Robot(PitchObject):
         target_poly = target.get_polygon()
 
         # [0] index is Front-left of a Robot, [1] index is Front-Right of a Robot.
-        return Polygon(robot_poly[0], robot_poly[1], target_poly[0], target_poly[1])
+        return Polygon([robot_poly[0], robot_poly[1], target_poly[0], target_poly[1]])
 
     def __repr__(self):
         return ('zone: %s\nx: %s\ny: %s\nangle: %s\nvelocity: %s\ndimensions: %s\n' %
@@ -502,8 +516,8 @@ class World(object):
         # Define catchment areas for our robots. If the ball enters these areas then our robot
         # believes it can catch the ball. Width is parallel to front/rear and height is parallel
         # to the sides of our robot.
-        self.our_defender.catcher_area = {'width' : 25, 'height' : 20, 'front_offset' : 15}
-        self.our_attacker.catcher_area = {'width' : 25, 'height' : 20, 'front_offset' : 15}
+        self.our_defender.catcher_area = {'width' : 21, 'height' : 23, 'front_offset' : 20}
+        self.our_attacker.catcher_area = {'width' : 21, 'height' : 23, 'front_offset' : 20}
 
         # Calculate the goals as being in fixes positions halfway up the pitch. The latter
         # goal 'faces' towards the left of the pitch.
@@ -588,3 +602,4 @@ class World(object):
                 print "WARNING: The sides are probably wrong!"
                 self._allowWarning = False
                 # 
+

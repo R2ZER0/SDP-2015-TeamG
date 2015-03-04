@@ -1,9 +1,10 @@
 from action import Action
-from planning.tasks import AcquireBall, MoveToPoint
+from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint, MirrorObject
 from planning.planner import Planner
 from planning.models import World
 from vision.vision import Vision, Camera, GUI
 import vision.tools as tools
+from prediction.Prediction import KalmanBallPredictor, KalmanRobotPredictor
 from preprocessing.preprocessing import Preprocessing
 from postprocessing.postprocessing import Postprocessing
 from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
@@ -17,13 +18,17 @@ from planning.models import World
 from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-
+class MyError(Exception):
+	     def __init__(self, value):
+	         self.value = value
+	     def __str__(self):
+	         return repr(self.value)
 class Controller:
 	'''Main controller for the Robot. Pulls together all modules and executes our Vision, 
 	Processing and Planning to move the Robot.
 	''' 
 
-	def __init__(self, pitch=0, color='yellow', our_side='left', our_role='attacker', video_port=0, comms=True):
+	def __init__(self, passing, pitch=0, color='yellow', our_side='left', our_role='attacker', video_port=0, comms=True):
 		'''Initialises the main controller. Constructs all necessary elements; doesn't start until
 		run is called.
 
@@ -48,11 +53,12 @@ class Controller:
 
 		if comms:
 			self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
+			self.comm.flushInput()
 		else:
 			self.comm = None
 
 		self.robot = Action(self.comm)
-		
+		time.sleep(7)
 		frame = self.camera.get_frame()
 		center_point = self.camera.get_adjusted_center(frame)
 
@@ -70,14 +76,25 @@ class Controller:
 		self.world = World(our_side, pitch)
 
 		# Set up main planner
-		self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
+		self.planner = Planner(world=self.world, robot=self.robot, role=our_role, passing=passing)
 
 		# Set up GUI
 		self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
+		
+		# Set up predictors
+		self.ball_predictor = None
+		self.robot_predictor = None
+
+		# Set up our cache of commands for the predictors
+		self.command_cache = [[0,0,0]]*8
+		self.command = [0,0,0]
 
 		self.color = color
 		self.side = our_side
 		self.role = our_role
+		self.our_robot = self.world.our_attacker if self.role == 'attacker' else self.world.our_defender
+		
+		self.task = None
 
 		self.preprocessing = Preprocessing()
 
@@ -100,64 +117,82 @@ class Controller:
 		#: Tracker is used for a Planning timer, running Planner only in
 		#: certain time intervals
 		tracker = time.clock()
+		try:
+			c = True
+			mh = None
+			while c != 27:  # the ESC key
 
-		c = True
+				frame = self.camera.get_frame()
+				pre_options = self.preprocessing.options
 
-		while c != 27:  # the ESC key
+				# Apply preprocessing methods toggled in the UI
+				preprocessed = self.preprocessing.run(frame, pre_options)
+				frame = preprocessed['frame']
+				if 'background_sub' in preprocessed:
+					cv2.imshow('bg sub', preprocessed['background_sub'])
 
-			frame = self.camera.get_frame()
-			pre_options = self.preprocessing.options
+				# Find object positions
+				# model_positions have their y coordinate inverted
+				model_positions, regular_positions = self.vision.locate(frame)
+				model_positions = self.postprocessing.analyze(model_positions)
 
-			# Apply preprocessing methods toggled in the UI
-			preprocessed = self.preprocessing.run(frame, pre_options)
-			frame = preprocessed['frame']
-			if 'background_sub' in preprocessed:
-				cv2.imshow('bg sub', preprocessed['background_sub'])
+				# Update world state
+				self.world.update_positions(model_positions)
 
-			# Find object positions
-			# model_positions have their y coordinate inverted
-			model_positions, regular_positions = self.vision.locate(frame)
-			model_positions = self.postprocessing.analyze(model_positions)
+				if self.ball_predictor is None:
+					self.ball_predictor = KalmanBallPredictor(self.world.ball.vector, friction=0)
 
-			# Update world state
-			self.world.update_positions(model_positions)
+				if self.robot_predictor is None:
+					self.robot_predictor = KalmanRobotPredictor(self.world.our_attacker.vector, friction=-10, acceleration=25)
 
-			#: Run planner only every 5ms.
-			if (time.clock() - tracker) > 0.05: 
-				self.planner.plan()
-				tracker = time.clock()
+				#: Run planner only every 5ms.
+				if (time.clock() - tracker) > 0.05: 
+				
+					self.command = self.command_cache.pop(0)
+					self.planner.plan()
+					#self.task.execute()
+					self.command_cache.append(self.robot.last_command())
+					tracker = time.clock()
 
-			# Information about the grabbers from the world
-			grabbers = {
-				'our_defender': self.world.our_defender.catcher_area,
-				'our_attacker': self.world.our_attacker.catcher_area
-			}
+				ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
+				if regular_positions['ball']:
+					regular_positions['ball']['x'] =  self.world.ball.vector.x
+					regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
+				self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
 
-			# Information about states
-			attackerState = (self.planner._current_state, self.planner._current_state)
-			defenderState = (self.planner._current_state, self.planner._current_state)
+				# Information about the grabbers from the world
+				grabbers = {
+					'our_defender': self.world.our_defender.catcher_area,
+					'our_attacker': self.world.our_attacker.catcher_area
+				}
 
-			attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
-			defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+				# Information about states
+				attackerState = (self.planner._current_state, self.planner._current_state)
+				defenderState = (self.planner._current_state, self.planner._current_state)
 
-			# Use 'y', 'b', 'r' to change color.
-			c = waitKey(2) & 0xFF
+				attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+				defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
 
-			actions = []
-			fps = float(counter) / (time.clock() - timer)
-			# Draw vision content and actions
+				# Use 'y', 'b', 'r' to change color.
+				c = waitKey(2) & 0xFF
+
+				actions = []
+				fps = float(counter) / (time.clock() - timer)
+				# Draw vision content and actions
 			
-			self.GUI.draw(
-				frame, model_positions, actions, regular_positions, fps, attackerState,
-				defenderState, attacker_actions, defender_actions, grabbers,
-				our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
-			counter += 1
+				self.GUI.draw(
+					frame, model_positions, actions, regular_positions, fps, attackerState,
+					defenderState, attacker_actions, defender_actions, grabbers,
+					our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
+				counter += 1
+		except MyError as e:
+			print e.value()
+		finally:
+			if self.robot is not None:
+				self.robot.stop()
+				self.robot.exit()
 
-		if self.robot is not None:
-			self.robot.stop()
-			self.robot.exit()
-
-		tools.save_colors(self.pitch, self.calibration)
+			tools.save_colors(self.pitch, self.calibration)
 
 # MAIN
 if __name__ == '__main__':
@@ -173,11 +208,14 @@ if __name__ == '__main__':
 	parser.add_argument(
 		"-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
 	
+	parser.add_argument("--passing", dest='passing', help="Signals us as the passing robot.", action="store_true")
+	parser.add_argument("--receiving", dest='passing', help="Signals us as the receigin robot.", action="store_false")
+	
 	args = parser.parse_args()
 
 	if args.nocomms:
 		c = Controller(
-			pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False).run()
+			args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False).run()
 	else:
 		c = Controller(
-			pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role).run()
+			args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role).run()

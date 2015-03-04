@@ -1,5 +1,7 @@
+import pdb
 from math import tan, pi, hypot, log
 from planning.models import Robot
+from planning.collisions import get_avoidance
 from Polygon import *
 from Polygon.Utils import pointList
 
@@ -183,6 +185,17 @@ def has_matched(robot, x=None, y=None, angle=None,
     
     return dist_matched and angle_matched
 
+
+#2015
+def get_clear_forward_passing_pos(world, robot, team_mate, obstacle):
+    
+    if world.pitch.height - obstacle.y > obstacle.y:
+        target_y = obstacle.y + ((world.pitch.height - obstacle.y) * 3/4)
+    else:
+        target_y = obstacle.y - (obstacle.y * 3/4)
+
+    return (world.pitch.zones[robot.zone].center()[0] - robot.length, target_y)
+
 #2015
 def current_ball_controller(world):
     ball = world.ball
@@ -281,3 +294,4 @@ def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False
 
         else:
             return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0, 'speed': general_speed}
+
