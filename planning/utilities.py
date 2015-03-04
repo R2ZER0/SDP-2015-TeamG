@@ -190,11 +190,11 @@ def has_matched(robot, x=None, y=None, angle=None,
 def get_clear_forward_passing_pos(world, robot, team_mate, obstacle):
     
     if world.pitch.height - obstacle.y > obstacle.y:
-        target_y = obstacle.y + ((world.pitch.height - obstacle.y) * 3/4)
+        target_y = obstacle.y + ((world.pitch.height - obstacle.y) * 1/2)
     else:
-        target_y = obstacle.y - (obstacle.y * 3/4)
+        target_y = obstacle.y - (obstacle.y * 1/2)
 
-    return (world.pitch.zones[robot.zone].center()[0] - robot.length, target_y)
+    return (robot.x, target_y)
 
 #2015
 def current_ball_controller(world):

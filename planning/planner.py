@@ -104,11 +104,7 @@ class Planner:
 
             elif state == self.PASSING_STATE:
                 if not self._current_task.complete:
-                    self._current_task.execute()
-
-                else:
-                    self._current_state = self.INITIAL_STATE
-                    self._current_task = None   
+                    self._current_task.execute() 
         else:
 		self._current_state = 'RECEIVING'
 		if self._current_task == None:

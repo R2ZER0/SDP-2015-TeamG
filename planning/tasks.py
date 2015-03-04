@@ -172,7 +172,7 @@ class MoveToPoint(Task):
 		self.y = y
 		self.last_speed = self.base_speed
 		self.angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
-		self.angle = int(self.angle / (math.pi/4))*math.pi/4
+		self.angle = int(self.angle / (math.pi/4))*(math.pi/4)
 		self.motionHandle = None
 		self.DISP_TOLERANCE = dist
 	def update_position(self, x, y):
@@ -422,10 +422,12 @@ class KickToPoint(Task):
 
 		if not self.turn_task.complete:
 			self.turn_task.execute()
-		else:
+			return
+		
+		if self.kickHandle == None:
 			self.kickHandle = self.robot.kick()
 
-		if self.kickHandle != None and not self.kickHandle.complete:
+		if self.kickHandle != None and not self.kickHandle.completed:
 			pass
 		else:
 			self.complete = True
