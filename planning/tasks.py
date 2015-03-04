@@ -49,7 +49,7 @@ class AcquireBall(Task):
 			l = math.hypot(tx, ty) / 30
 			print 'Move Task 2'
 		else:
-			l = math.hypot(tx, ty) / 80
+			l = math.hypot(tx, ty) / 90
 			print 'Move Task 1'
 
 		tx = self.world.ball.x - tx / l
@@ -58,7 +58,7 @@ class AcquireBall(Task):
 		if self.robot_info.get_displacement_to_point(tx,ty) < 110:
 			self.move_task.last_speed = 50
 		else:
-			self.move_task.last_speed = 70
+			self.move_task.last_speed = 60
 
 	def execute(self):
 		'''Executes another round of this Task. Performs as follows:
@@ -245,7 +245,7 @@ class MirrorObject(Task):
 
 	#: Distance threshold to the point before considering ourselves done
 	DISP_TOLERANCE = 30
-	TRAJECTORY_CONTROL = 0.2
+	TRAJECTORY_CONTROL = 10
 
 	#: obj
 	obj = None
@@ -260,6 +260,7 @@ class MirrorObject(Task):
 		super(MirrorObject,self).__init__(world,robot,role)
 		self.obj = obj
 		self.angle = self.robot_info.get_rotation_to_point(self.robot_info.x, obj.y)
+		self.initial_x = self.robot_info.x
 		self.motionHandle = None
 
 	def update_position(self, obj):
@@ -270,7 +271,7 @@ class MirrorObject(Task):
 		self.complete = False
 	
 	def check(self):
-		return self.robot_info.get_displacement_to_point(self.robot_info.x, self.obj.y) < self.DISP_TOLERANCE
+		return self.robot_info.get_displacement_to_point(self.initial_x, self.obj.y) < self.DISP_TOLERANCE
 	
 	def execute(self):
 		'''Executes another round of this Task. Performs as follows:
@@ -280,29 +281,32 @@ class MirrorObject(Task):
 		'''
 
 		if self.turnHandle == None:
-			angle = -self.robot_info.get_rotation_to_point(self.obj.x,self.robot_info.y)
+			angle = -self.robot_info.get_rotation_to_point(self.obj.x, self.robot_info.y)
 			self.turnHandle = self.robot.turnBy(angle)
 
 		if self.turnHandle.completed:
-			if self.motionHandle == None:
-				self.angle = -self.robot_info.get_rotation_to_point(self.robot_info.x, self.obj.y)
+
+			if self.motionHandle == None and not self.check():
+				self.angle = -self.robot_info.get_rotation_to_point(self.initial_x, self.obj.y)
 				self.motionHandle = self.robot.move(self.angle, scale = self.calc_speed())
 				self.last_speed = self.calc_speed()
-			else:
+			elif self.motionHandle != None:
 				if self.motionHandle.completed or self.motionHandle.finished:
 					if not self.check():
-						if abs(-self.robot_info.get_rotation_to_point(self.robot_info.x, self.obj.y) - self.angle) < self.TRAJECTORY_CONTROL and 						   abs(self.calc_speed() - self.last_speed) < 10:
+						if abs(self.initial_x-self.robot_info.x) < self.TRAJECTORY_CONTROL and abs(self.calc_speed() - self.last_speed) < 10:
 							print "WAIT"
 						else:
-							self.angle = -self.robot_info.get_rotation_to_point(self.robot_info.x, self.obj.y)
+							self.angle = -self.robot_info.get_rotation_to_point(self.initial_x, self.obj.y)
 							self.motionHandle = self.robot.move(self.angle, scale = self.calc_speed())
 							self.last_speed = self.calc_speed()
 					else:
 						self.robot.stop()
+						self.motionHandle = None
+						self.turnHandle = None
 
 	def calc_speed(self):
 		speed = math.sin(self.obj.angle) * self.obj.velocity
-		return min(100, max(50, speed))
+		return min(50, max(50, speed))
 		
 class TurnToPoint(Task):
 	'''Rotation Task; allows turning of the Robot to face a given point to
