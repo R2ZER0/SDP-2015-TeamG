@@ -1,5 +1,7 @@
+import pdb
 from math import tan, pi, hypot, log
 from planning.models import Robot
+from planning.collisions import get_avoidance
 from Polygon import *
 from Polygon.Utils import pointList
 
@@ -182,6 +184,17 @@ def has_matched(robot, x=None, y=None, angle=None,
         angle_matched = abs(angle) < angle_threshold
     
     return dist_matched and angle_matched
+
+
+#2015
+def get_clear_forward_passing_pos(world, robot, team_mate, obstacle):
+    
+    if world.pitch.height - obstacle.y > obstacle.y:
+        target_y = obstacle.y + ((world.pitch.height - obstacle.y) * 1/2)
+    else:
+        target_y = obstacle.y - (obstacle.y * 1/2)
+
+    return (robot.x, target_y)
 
 #2015
 def get_clear_forward_passing_pos(zone, robot, team_mate, obstacle):

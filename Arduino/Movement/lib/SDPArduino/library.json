@@ -1,0 +1,7 @@
+{
+  "name": "SDPArduino",
+  "keywords": "sdp",
+  "description": "Provides functions to access motors and sensors, for the 2015 Edinburgh SDP Course.",
+  "frameworks": "arduino",
+  "platforms": "atmelavr"
+}

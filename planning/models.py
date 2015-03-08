@@ -1,3 +1,4 @@
+import pdb
 from Polygon.cPolygon import Polygon
 from math import acos, cos, sin, hypot, pi, atan2, sqrt
 from vision import tools
@@ -386,7 +387,7 @@ class Robot(PitchObject):
         target_poly = target.get_polygon()
 
         # [0] index is Front-left of a Robot, [1] index is Front-Right of a Robot.
-        return Polygon(robot_poly[0], robot_poly[1], target_poly[0], target_poly[1])
+        return Polygon([robot_poly[0], robot_poly[1], target_poly[0], target_poly[1]])
 
     def __repr__(self):
         return ('zone: %s\nx: %s\ny: %s\nangle: %s\nvelocity: %s\ndimensions: %s\n' %
@@ -515,8 +516,8 @@ class World(object):
         # Define catchment areas for our robots. If the ball enters these areas then our robot
         # believes it can catch the ball. Width is parallel to front/rear and height is parallel
         # to the sides of our robot.
-        self.our_defender.catcher_area = {'width' : 25, 'height' : 20, 'front_offset' : 15}
-        self.our_attacker.catcher_area = {'width' : 25, 'height' : 20, 'front_offset' : 15}
+        self.our_defender.catcher_area = {'width' : 21, 'height' : 23, 'front_offset' : 20}
+        self.our_attacker.catcher_area = {'width' : 21, 'height' : 23, 'front_offset' : 20}
 
         # Calculate the goals as being in fixes positions halfway up the pitch. The latter
         # goal 'faces' towards the left of the pitch.
@@ -601,3 +602,4 @@ class World(object):
                 print "WARNING: The sides are probably wrong!"
                 self._allowWarning = False
                 # 
+

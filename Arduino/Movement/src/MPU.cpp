@@ -9,8 +9,7 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include "MPU.h"
-
-#define MPU_DEBUG (true)
+#include "config.h"
 
 // Local functions
 static void cmd_MPU();
@@ -46,7 +45,10 @@ static uint8_t fifoBuffer[64]; // FIFO storage buffer
 Quaternion q;
 VectorFloat gravity;
 float yawPitchRoll[3];
-float yawOffset = 0.0f;
+
+extern float getAngle(void) {
+    return yawPitchRoll[TURN_AXIS];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // MPU Interrupt Handler
@@ -61,61 +63,29 @@ static void dmpDataReady() {
 // Setup/Service/Command Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPU_setup(SerialCommand* _comm) {
+void MPU_setup() {
     // I2C should already be setup
     // Wire.begin();
-    
-    // Add the MPU command
-    comm = _comm;
-    comm->addCommand("MPU", cmd_MPU);
+    bool success = Initialise() && WaitForStabilisation(); //FIXME
+    if(!success) {
+        Serial.println("ERROR: Could not initialise MPU, will not function.");
+    }
 }
 
 void MPU_service() {
     // We do not need to service the comm, as that is already done
     
     ServiceDMP();
-}
-
-static void cmd_MPU() {
-    char* subcmd = NULL;
-    subcmd = comm->next();
     
-    bool success = false;
-    
-    if(subcmd == NULL) { 
-        /* do nothing */
-        
-    } else if(strcmp(subcmd, "GETYAW") == 0) {        
-        if(dmpReady) {            
-            Serial.println(yawOffset + yawPitchRoll[0], DECIMAL_PLACES);
-            success = true;
-        }
-        
-    } else if(strcmp(subcmd, "INIT") == 0) {
-        success = Initialise(); //&& WaitForStabilisation();
-        
-    } else if(strcmp(subcmd, "STABL") == 0) {
-        success = WaitForStabilisation();
-        
-    } else if(strcmp(subcmd, "CALIB") == 0) {
-        success = Calibrate();        
-        
-    } else if(strcmp(subcmd, "SETHOME") == 0) {
-        float home_rotation = 0.0;
-        char* arg = comm->next();
-        if(arg != NULL) {
-            home_rotation = atof(arg);
-        }
-        
-        yawOffset = home_rotation - yawPitchRoll[0];
-#ifdef MPU_DEBUG
-        Serial.print("Set offset of ");
-        Serial.println(yawOffset, DECIMAL_PLACES);
-#endif
-        success = true;
-    }
-    
-    Serial.println(success ? "DONE" : "FAILED");
+//     if(millis() % 32 == 0) {
+//         Serial.print(yawPitchRoll[0]);
+//         Serial.print(' ');
+//         Serial.print(yawPitchRoll[1]);
+//         Serial.print(' ');
+//         Serial.print(yawPitchRoll[2]);
+//         Serial.print(' ');
+//         Serial.println(getAngle());
+//     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,16 +116,15 @@ static bool Initialise() {
     ASSERT( devStatus == 0 );
     
     // Set full scale range (250, 500, 1000, 2000)
-    mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_1000);
+    mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
     
     // Calibration offsets
-    // TODO: dynamic calibration
-    /*
-    mpu.setXGyroOffset(220);
-    mpu.setYGyroOffset(76);
-    mpu.setZGyroOffset(-85);
-    mpu.setZAccelOffset(1788);
-    */
+    mpu.setXAccelOffset(MPU_OFFSET_ACELX);
+    mpu.setYAccelOffset(MPU_OFFSET_ACELY);
+    mpu.setZAccelOffset(MPU_OFFSET_ACELZ);
+    mpu.setXGyroOffset(MPU_OFFSET_GYROX);
+    mpu.setYGyroOffset(MPU_OFFSET_GYROY);
+    mpu.setZGyroOffset(MPU_OFFSET_GYROZ);
     
     // Enable DMP
 #ifdef MPU_DEBUG

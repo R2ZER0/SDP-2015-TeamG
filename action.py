@@ -1,182 +1,246 @@
-import pdb
+# action.py
+import re
+import threading
+import atexit
+import time
+import signal
 import math
-import motor_calibration
+
+class ActionHandle(object):
+    """A handle on the result of commands"""
+    def __init__(self, idx, cmd):
+        self._finished = False
+        self._completed = False
+        self._running = False
+        self.idx = idx
+        self.cmd = cmd
+
+    @property
+    def finished(self):
+        return self._finished
+    
+    @property
+    def completed(self):
+        return self._completed
+    
+    @property
+    def running(self):
+        return self._running
+    
+    # Helpers to update the state of this handle
+    def _onCancel(self):
+        self._completed = True
+        self._running = False
+        
+    def _onComplete(self):
+        self._finished = True
+        self._running = False
+        self._completed = True
+        
+    def _onRunning(self):
+        self._running = True
+        
+    def _onNextCommand(self):
+        self._running = False
+        if(not self._completed):
+            self._onCancel()
+            
+class MovementActionHandle(ActionHandle):
+    """A handle to a movement-related command"""
+    def __init__(self, idx, cmd, dir, spd):
+        super(MovementActionHandle, self).__init__(idx, cmd)
+        self.dir = dir
+        self.spd = spd
+        
+class KickerActionHandle(ActionHandle):
+    """A handle to kicker commands"""
+    def __init__(self, idx, cmd, spd):
+        super(KickerActionHandle, self).__init__(idx, cmd)
+        self.spd = spd
+        
+class CatcherActionHandle(ActionHandle):
+    """A handle to catcher commands"""
+    def __init__(self, idx, cmd, spd):
+        super(CatcherActionHandle, self).__init__(idx, cmd)
+        self.spd = spd
+
+# A simple (approx) encoding for floats
+def i2f(i):
+    return float(i)/1024.0
+
+def f2i(f):
+    return int(f*1024)
+
+def mkangle(a):
+    while a > math.pi:
+        a -= 2.0*math.pi
+    while a <= (0 - math.pi):
+        a += 2.0*math.pi
+    return a
 
 class Action():
-	'''Provides an interface allowing the sending high-level movement commands
-	to the Robot.
-	'''
-
-	#: Setting True enables verbose output of commands
-	Debug = False
-	
-	#: The angles of our wheels, relative to the x-axis. Begins \
-	#: from front-left and moves anticlockwise.
-	MOTOR_ANGLES = [ math.pi / 4, math.pi * 3/4, math.pi * 5/4, math.pi * 7/4 ]
-
-	#: Trigonometric constants for each motor, used for holonomic movement.
-	MOTORS = list(map(lambda x: (math.cos(x), math.sin(x)), MOTOR_ANGLES))
-	
-	def __init__(self, comm):
-		'''Initialises an Action instance with the given communication object.
-
-		:param comm: A pySerial serial object for communication
-		'''
-		self.comm = comm
-	
-	def move(self, angle, scale):
-		"""Moves the robot in the given angle with given scale as power value.
-
-		.. warning::
-
-		  Movement currently not functioning for angles other than 0 and pi.
-
-		:param angle: The direction of movement, in radians, relative to x-axis \
-				of robot
-		:param scale: Power-scale for this movement, range: -1 to 1
-		"""
-		#: Offset angle to correlate with robot's forward
-		angle  = angle + math.pi / 2
-
-		motor_speeds = Action._calc_motor_speed(angle)
-		motor_speeds = map(lambda x: int(x*scale), motor_speeds)
-		self._send_run(motor_speeds)
-
-		return motor_speeds
-  
-	def turn(self, speed):
-		"""Turn the robot with the given power.
-
-		:param speed: The speed of the turn, range is [-100,100]. Positive values \
-					result in clockwise rotation, negative in anticlockwise.
-		"""
-		self._send_run([int(speed), int(speed), int(speed), int(speed)])
-
-	def slow_turn(self, speed):
-		'''An initial attempt at providing a turning function for precise
-		movements; turns by countering two of the wheels with a negative force
-		on the other two.
-
-		:param speed: The speed of the turn, range is [-100, 100]. Two wheels \
-					  will run at this speed, two at -1/4 of this.
-		'''
-		speeds = [int(speed), int(-speed/4), int(speed), int(-speed/4)]
-		self._send_run(speeds)
-		return speeds
-  
-	def stop(self):
-		"""Stops the robot's movement by setting all motors to zero.
-
-		.. note::
-
-		   This currently does not stop the Kicker/Catcher mechanisms.
-		"""
-		motor_speeds = [ int(0), int(0), int(0), int(0) ]
-		self._send_run(motor_speeds)
-  
-	def kick(self, scale=100):
-		'''Sends the kick command to the robot.
-
-		:param scale: Power scale for this kick. Range [0,100].
-		'''
-		# Note, scale must be in list form
-		self._send_command("KICK", scale)
-	
-	def catch(self, scale=100):
-		"""Sends the catch command to the robot.
-
-		:param scale: Power scale for this catch. Range [0,100].
-		"""
-		self._send_command("CATCH", scale)
-
-	def open_catcher(self, scale=100):
-		"""Sends the command to open the catcher to the robot.
-
-		:param scale: Power scale for the catch. Range [0,100].
-		"""
-		self._send_command("RELEASE", scale)
-
-	# Utility
-	def ping(self):
-		"""Sends the PING command to the Robot. Robot should return "PONG" via
-		the serial connection if correctly functioning.
-		"""
-		self._send_command("PING")
-	
-	# Private Methods #
-	
-	# Commands
-	def _send_run(self, speeds):
-		"""Convenience function for sending the given motor speeds to the Robot.
-
-		:param speeds: A list of motor speeds for each motor. Range [-100,100].
-		"""
-		self._send_command("RUN", *speeds)
-
-	# Utility
-	@staticmethod
-	def _normalise_speeds(speeds):
-		'''Normalises a list of motor speeds to be ratio of speed to 
-		maximum speed in the list.
-
-		:param speeds: A list of motor speeds
-		:returns: A new list of motor speeds, with speeds relative to maximum.
-		'''
-		maxspeed = max([abs(s) for s in speeds])
-		return map( lambda x: (x/maxspeed), speeds )        
-	
-	@staticmethod
-	def _percentage_speed(speed):
-		"""Constrains speed to be within the range [-100,100].
-
-		:param speed: A speed in the range [-1,1]
-		"""
-		speed = int(round(100.0 * speed))
-		speed = max(-100, min(speed, 100))
-		return speed
-	
-	@staticmethod
-	def _calc_motor_speed(angle):
-		'''Hardcoded motor speed calculations for wheels in current placement of robot.
-		Calculates wheel powers for each wheel to move in the given direction.
-
-		:param angle: The direction of travel.
-		:returns: A list of motor speeds, in the range [-1,1]
-		'''
-		return map(lambda motor: math.cos(angle) * motor[0] - math.sin(angle) * motor[1], 
-							Action.MOTORS)
-
-	@staticmethod
-	def _get_command_string(command, *args):
-		"""Constructs a suitable syntax command string for sending the given
-		command to the Robot with supplied arguments.
-
-		:param command: A command string
-		:param args: None, single argument, multiple argument, or a list.
-		"""
-		commstr = str(command)
+    """Deals directly with the robot, to cater for all your robot commanding needs"""
+    
+    # Regex for parsing state messages
+    msg_re = re.compile('\((\d+) ([SMT]) (-?\d+) (1|0) (\d+) ([KI]) (1|0) (\d+) ([CRI]) (1|0) (-?\d+)\)')
+    
+    def __init__(self, comm):
+        self.comm = comm    
+        
+        # Command handles
+        self.move_handle = MovementActionHandle(100, 'S', 0, 0)
+        self.kick_handle = KickerActionHandle(100, 'I', 0)
+        self.catch_handle = CatcherActionHandle(100, 'I', 0)
+        
+        # Last known MPU output
+        self.curr_dir = 0.0
+        
+        # Number of messages received
+        self.num_messages_recvd = 0
+        
+	if self.comm:
+		# Comms threads
+		self._exit = False
+		def set_exit():
+		    self._exit = True
+		atexit.register(set_exit)
 		
-		# Append each argument with a space
-		for arg in args:
-			commstr = commstr + " " + str(arg)
-			
-		# Terminate with correct newline syntax
-		return commstr + "\r\n"            
-	
-	def _send_command(self, command, *args):
-		"""Sends the given command to the robot, with arguments.
-
-		:param command: A command string
-		:param args: None, single argument, multiple argument, or a list.
-		"""
-		commstr = Action._get_command_string(command, *args)
-
-		if self.Debug:
-			print "Sending command: " + commstr
+		self.prev_handler = None
+		def handler(signum, frame):
+		    self._exit = True
+		    self.prev_handler(signum, frame)
+		self.prev_handler = signal.signal(2, handler)
 		
-		if self.comm is not None:
-			self.comm.write(commstr)
-			self.comm.flush()
+		self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
+		self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
+		
+		self.recv_thread.start()
+		self.send_thread.start()
+    
+    def exit(self):
+        self._exit = True
+        
+    # Movement commands
+    def _cmd_movement(self, cmd, angle, scale):
+        self.move_handle._onNextCommand()
+        self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
+        return self.move_handle
+
+    def last_command(self):
+	if self.move_handle.cmd == 'M':
+		dx = math.cos(self.move_handle.dir)*self.move_handle.spd
+		dy = math.sin(self.move_handle.dir)*self.move_handle.spd
+		return [dx,dy,0]
+	elif self.move_handle.cmd == 'T':
+		return [0,0,self.move_handle.spd]
+	else:
+		return [0,0,0]
+
+    def move(self, angle, scale=64):
+        return self._cmd_movement('M', angle+math.pi/2, scale)
+        
+    def turnBy(self, angle, scale=64):
+        target = mkangle(self.curr_dir + angle)
+        #print "Turning from " + str(self.curr_dir) + " to " + str(target)
+        return self._cmd_movement('T', target, scale)
+        
+    def stop(self):
+        return self._cmd_movement('S', 0, 0)
+        
+     # Kicker command
+    def kick(self, scale=100):
+        self.kick_handle._onNextCommand()
+        self.kick_handle = KickerActionHandle(self.kick_handle.idx+1, 'K', scale)
+        return self.kick_handle
+    
+    # Catcher commands
+    def _cmd_catcher(self, cmd, scale):
+        self.catch_handle._onNextCommand()
+        self.catch_handle = CatcherActionHandle(self.catch_handle.idx+1, cmd, scale)
+        return self.catch_handle
+    
+    def catch(self, scale=100):
+        return self._cmd_catcher('C', scale)
+    
+    def open_catcher(self, scale=100):
+        return self._cmd_catcher('R', scale)
+    
+    # State processing
+    def process_message(self, message):
+        """Parse and process the state message from the arduino"""
+        #'\((\d+) ([SMT]) (-?\d+) (1|0) (\d+) ([KI]) (1|0) (\d+) ([CRI]) (1|0) (-?\d+)\)'
+        #    mID   mCMD   mDIR    mFIN   kID   kCMD   kFIN   cID   cCMD   cFIN  sDIR
+        #     1      2      3       4     5     6       7     8      9     10    11
+        res = Action.msg_re.match(message)
+        
+        if res is not None:
+            #print "Got msg " + str(self.num_messages_recvd)
+            self.num_messages_recvd += 1
+            
+            move_id = int(res.group(1))
+            move_cmd = res.group(2)
+            move_dir = i2f(int(res.group(3)))
+            move_fin = (1 == int(res.group(4)))
+            
+            kick_id = int(res.group(5))
+            kick_cmd = res.group(6)
+            kick_fin = (1 == int(res.group(7)))
+            
+            catch_id = int(res.group(8))
+            catch_cmd = res.group(9)
+            catch_fin = (1 == int(res.group(10)))
+            
+            state_dir = i2f(int(res.group(11)))
+            self.curr_dir = state_dir
+            
+            # Detect if the command is running, finished etc
+            if move_id == self.move_handle.idx:
+                if not self.move_handle.running:
+                    self.move_handle._onRunning()
+                    
+                if move_fin and not self.move_handle.finished:
+                    self.move_handle._onComplete()
+            
+            if kick_id == self.kick_handle.idx:
+                if not self.kick_handle.running:
+                    self.kick_handle._onRunning()
+                    
+                if kick_fin and not self.kick_handle.finished:
+                    self.kick_handle._onComplete()
+                    
+            if catch_id == self.catch_handle.idx:
+                if not self.catch_handle.running:
+                    self.catch_handle._onRunning()
+                    
+                if catch_fin and not self.catch_handle.finished:
+                    self.catch_handle._onComplete()
+        else:
+            #print "# " + message
+            pass
+        
+        
+    def run_state_processor(self):
+        """Processes incoming state messages"""
+        while not self._exit:
 	
-	
-	
+            self.comm.timeout = 0.1
+            line = self.comm.readline()
+            line = line.rstrip()
+	    #if not line.startswith('dist'):
+	    #	print line
+            if line != "":
+                self.process_message(line)
+            
+    def run_state_sender(self):
+        """Sends out state messages"""
+        while not self._exit:
+            time.sleep(0.120)
+            
+            if self.num_messages_recvd > 10:
+                message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
+                    self.move_handle.idx, self.move_handle.cmd, f2i(self.move_handle.dir), self.move_handle.spd,
+                    self.kick_handle.idx, self.kick_handle.cmd, self.kick_handle.spd,
+                    self.catch_handle.idx, self.catch_handle.cmd, self.catch_handle.spd
+                )
+                
+                self.comm.write(message)
