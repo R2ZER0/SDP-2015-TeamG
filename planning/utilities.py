@@ -2,12 +2,38 @@ from math import tan, pi, hypot, log
 from planning.models import Robot
 
 DISTANCE_MATCH_THRESHOLD = 15
-ANGLE_MATCH_THRESHOLD = pi/10
-BALL_ANGLE_THRESHOLD = pi/20
-MAX_DISPLACEMENT_SPEED = 690
-MAX_ANGLE_SPEED = 50
+ANGLE_MATCH_THRESHOLD = pi/8
+BALL_ANGLE_THRESHOLD = pi/15
+CURVE_THRESHOLD = pi/5
+CURVE_SPEED_DIFF = 10
+
+FORWARD_SPEED = 80
+FORWARD_SPEED_CAREFUL = 40
+TURNING_SPEED = 60
+TURNING_SPEED_CAREFUL = 40
+
 BALL_VELOCITY = 3
 
+def in_line(robot1, robot2, careful=False):
+    '''
+    Checks if robot1 and robot2 are horizontally in line
+    '''
+    if careful:
+        threshold = DISTANCE_MATCH_THRESHOLD
+    else:
+        threshold = DISTANCE_MATCH_THRESHOLD + 10
+    return abs(robot1.y - robot2.y) < threshold
+
+def is_facing(robot1, robot2, careful=False):
+    '''
+    Checks if robot1 is facing robot2
+    '''
+    if careful:
+        threshold = BALL_ANGLE_THRESHOLD
+    else:
+        threshold = ANGLE_MATCH_THRESHOLD
+    angle = robot1.get_rotation_to_point(robot2.x, robot2.y)
+    return abs(angle) < threshold
 
 def is_shot_blocked(world, our_robot, their_robot):
     '''
@@ -86,17 +112,17 @@ def predict_y_intersection(world, predict_for_x, robot, full_width=False, bounce
 
 
 def grab_ball():
-    return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 1, 'speed': 1000}
+    return {'catcher': 1}
 
 
-def kick_ball():
-    return {'left_motor': 0, 'right_motor': 0, 'kicker': 1, 'catcher': 0, 'speed': 1000}
+def kick_ball(power):
+    return {'kicker': power}
 
 
 def open_catcher():
-    return {'left_motor': 0, 'right_motor': 0, 'kicker': 1, 'catcher': 0, 'speed': 1000}
+    return {'drop': 1}
 
-
+# LB: Not currently supported by arduino
 def turn_shoot(orientation):
     return {'turn_90': orientation, 'left_motor': 0, 'right_motor': 0, 'kicker': 1, 'catcher': 0, 'speed': 1000}
 
@@ -114,43 +140,67 @@ def has_matched(robot, x=None, y=None, angle=None,
 
 def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False):
     '''
-    Simplistic view of calculating the speed: no modes or trying to be careful
+    Simplistic view of calculating the speed
     '''
-    moving_backwards = False
-    general_speed = 95 if careful else 300
-    angle_thresh = BALL_ANGLE_THRESHOLD if careful else ANGLE_MATCH_THRESHOLD
 
-    if backwards_ok and abs(angle) > pi/2:
-        angle = (-pi + angle) if angle > 0 else (pi + angle)
-        moving_backwards = True
-
-    if not (displacement is None):
-
-        if displacement < DISTANCE_MATCH_THRESHOLD:
-            return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0, 'speed': general_speed}
-
-        elif abs(angle) > angle_thresh:
-            speed = (angle/pi) * MAX_ANGLE_SPEED
-            return {'left_motor': -speed, 'right_motor': speed, 'kicker': 0, 'catcher': 0, 'speed': general_speed}
-
-        else:
-            speed = log(displacement, 10) * MAX_DISPLACEMENT_SPEED
-            speed = -speed if moving_backwards else speed
-            # print 'DISP:', displacement
-            if careful:
-                return {'left_motor': speed, 'right_motor': speed, 'kicker': 0, 'catcher': 0, 'speed': 1000/(1+10**(-0.1*(displacement-85)))}
-            return {'left_motor': speed, 'right_motor': speed, 'kicker': 0, 'catcher': 0, 'speed': 1000/(1+10**(-0.1*(displacement-30)))}
-
+    # LB: potentially calculate careful turning speed based on angle
+    # - Slow down as we get closer
+    if careful:
+        threshold = BALL_ANGLE_THRESHOLD
     else:
+        threshold = ANGLE_MATCH_THRESHOLD
 
-        if abs(angle) > angle_thresh:
-            speed = (angle/pi) * MAX_ANGLE_SPEED
-            return {'left_motor': -speed, 'right_motor': speed, 'kicker': 0, 'catcher': 0, 'speed': general_speed}
+    if angle is not None:
 
+        # Multiplier is negative if the motors are to run backwards
+        multiplier = 1
+
+        # Check if we can get there with less turning by going backwards
+        if backwards_ok and abs(angle) > pi/2:
+            moving_backwards = True
+            if angle > 0:
+                angle = (angle - pi)
+            else:
+                angle = (angle + pi)
+            multiplier = -1
+        
+        if (careful and abs(angle) < CURVE_THRESHOLD and abs(angle) > threshold and 
+                displacement is not None and displacement > DISTANCE_MATCH_THRESHOLD):
+            # Move forward curving
+            turnSpeedHigh = min(100, TURNING_SPEED_CAREFUL + CURVE_SPEED_DIFF)
+            turnSpeedLow = max(0, TURNING_SPEED_CAREFUL - CURVE_SPEED_DIFF)           
+            if angle <= 0:
+                return {'left_motor': turnSpeedLow, 'right_motor': turnSpeedHigh}
+            else:
+                return {'left_motor': turnSpeedHigh, 'right_motor': turnSpeedLow}
+        elif abs(angle) > threshold:
+            if careful:
+                turnSpeed = TURNING_SPEED_CAREFUL * multiplier
+            else:
+                turnSpeed = TURNING_SPEED * multiplier
+
+            if angle <= 0:
+                return {'left_motor': -turnSpeed, 'right_motor': turnSpeed}
+            else:
+                return {'left_motor': turnSpeed, 'right_motor': -turnSpeed}
+        elif displacement is not None and displacement > DISTANCE_MATCH_THRESHOLD:
+            if careful:
+                speed = FORWARD_SPEED_CAREFUL * multiplier
+            else:
+                speed = FORWARD_SPEED * multiplier
+            return {'left_motor': speed, 'right_motor': speed}
+            
         else:
-            return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0, 'speed': general_speed}
-
-
+            return {'left_motor': 0, 'right_motor': 0}
+        
+    elif displacement is not None and displacement > DISTANCE_MATCH_THRESHOLD:
+        if careful:
+            speed = FORWARD_SPEED_CAREFUL
+        else:
+            speed = FORWARD_SPEED
+        return {'left_motor': speed, 'right_motor': speed}
+    else:
+        return {'left_motor': 0, 'right_motor': 0}
 
 def do_nothing():
-    return calculate_motor_speed(0, 0)
+    return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0}
