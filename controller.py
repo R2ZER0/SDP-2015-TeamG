@@ -19,203 +19,282 @@ from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 class MyError(Exception):
-	     def __init__(self, value):
-	         self.value = value
-	     def __str__(self):
-	         return repr(self.value)
+         def __init__(self, value):
+             self.value = value
+         def __str__(self):
+             return repr(self.value)
 class Controller:
-	'''Main controller for the Robot. Pulls together all modules and executes our Vision, 
-	Processing and Planning to move the Robot.
-	''' 
+    '''Main controller for the Robot. Pulls together all modules and executes our Vision, 
+    Processing and Planning to move the Robot.
+    ''' 
 
-	def __init__(self, passing, pitch=0, color='yellow', our_side='left', our_role='attacker', video_port=0, comms=True):
-		'''Initialises the main controller. Constructs all necessary elements; doesn't start until
-		run is called.
+    def __init__(self, pitch=0, color='yellow', our_side='left', video_port=0, comms=True):
+        '''Initialises the main controller. Constructs all necessary elements; doesn't start until
+        run is called.
 
-		:param pitch: Pitch number to play on. [0: Main pitch, 1: Secondary pitch]
-		:param color: Which color plate to run as; only impact is aesthetic.
-		:param our_side: Designates our side, left represents left of the camera frame, core \
-					distinguishing feature for our / their functions.
-		:param our_role: Designates the role we're playing as, one of ['attacker', 'defender'].
-		:param video_port: Which serial port to use for the camera, an integer, usually 0 for /dev/video0.
-		:param comms: True indicates we should attempt communication with the Arduino, False ignores communications.
-		:param sim: True indicates we should run the simulated pitch rather than the real pitch.
-		'''
-		assert pitch in [0, 1]
-		assert color in ['yellow', 'blue']
-		assert our_side in ['left', 'right']
-		assert our_role in ['attacker', 'defender']
+        :param pitch: Pitch number to play on. [0: Main pitch, 1: Secondary pitch]
+        :param color: Which color plate to run as; only impact is aesthetic.
+        :param our_side: Designates our side, left represents left of the camera frame, core \
+                    distinguishing feature for our / their functions.
+        :param our_role: Designates the role we're playing as, one of ['attacker', 'defender'].
+        :param video_port: Which serial port to use for the camera, an integer, usually 0 for /dev/video0.
+        :param comms: True indicates we should attempt communication with the Arduino, False ignores communications.
+        :param sim: True indicates we should run the simulated pitch rather than the real pitch.
+        '''
+        assert pitch in [0, 1]
+        assert color in ['yellow', 'blue']
+        assert our_side in ['left', 'right']
 
-		self.pitch = pitch
+        self.pitch = pitch
 
-		# Set up camera for frames
-		self.camera = Camera(port=video_port, pitch=self.pitch)
+        # Set up camera for frames
+        self.camera = Camera(port=video_port, pitch=self.pitch)
+        
+        # Group10 Robot init:
+        # Set up the Arduino communications
+        self.arduino10 = Arduino(comm_port, 115200, 1, comms)
+        self.robot10 = Robot_Controller()
 
-		if comms:
-			self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
-			self.comm.flushInput()
-		else:
-			self.comm = None
+        # Group9 Robot init:
+        if comms:
+            self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
+            self.comm.flushInput()
+        else:
+            self.comm = None
 
-		self.robot = Action(self.comm)
-		time.sleep(7)
-		frame = self.camera.get_frame()
-		center_point = self.camera.get_adjusted_center(frame)
+        self.robot9 = Action(self.comm)
 
-		# Set up vision
-		self.calibration = tools.get_colors(self.pitch)
-		self.vision = Vision(
-			pitch=pitch, color=color, our_side=our_side,
-			frame_shape=frame.shape, frame_center=center_point,
-			calibration=self.calibration)
+        frame = self.camera.get_frame()
+        center_point = self.camera.get_adjusted_center(frame)
 
-		# Set up postprocessing for vision
-		self.postprocessing = Postprocessing()
+        # Set up vision
+        self.calibration = tools.get_colors(self.pitch)
+        self.vision = Vision(
+            pitch=pitch, color=color, our_side=our_side,
+            frame_shape=frame.shape, frame_center=center_point,
+            calibration=self.calibration)
 
-		# Set up world
-		self.world = World(our_side, pitch)
+        # Set up postprocessing for vision
+        self.postprocessing = Postprocessing()
 
-		# Set up main planner
-		self.planner = Planner(world=self.world, robot=self.robot, role=our_role, passing=passing)
+        # Set up world
+        self.world = World(our_side, pitch)
 
-		# Set up GUI
-		self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
-		
-		# Set up predictors
-		self.ball_predictor = None
-		self.robot_predictor = None
+        # Set up main planner
+        self.planner = Planner(world=self.world, robot=self.robot9)
 
-		# Set up our cache of commands for the predictors
-		self.command_cache = [[0,0,0]]*8
-		self.command = [0,0,0]
+        # Set up GUI
+        self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
+        
+        # Set up predictors
+        self.ball_predictor = None
+        self.robot_predictor = None
 
-		self.color = color
-		self.side = our_side
-		self.role = our_role
-		self.our_robot = self.world.our_attacker if self.role == 'attacker' else self.world.our_defender
-		
-		self.task = None
+        # Set up our cache of commands for the predictors
+        self.command_cache = [[0,0,0]]*8
+        self.command = [0,0,0]
 
-		self.preprocessing = Preprocessing()
+        self.color = color
+        self.side = our_side
 
-	def run(self):
-		'''Main loop of the Controller. Executes a continuous loop doing the following:
-		
-		* Retrieve Camera frame, performing barrel distortion fix.
-		* Perform preprocessing fixes to the frame
-		* Pass frame to Vision module to locate positions of objects of interest
-		* Perform postprocessing analysis on the positions
-		* Update our World state with new positions
-		* Contact our Planner to find out next tasks
-		* Redraw the GUI with updated information.
-		'''
-		counter = 1L
+        self.preprocessing = Preprocessing()
 
-		#: Timer is used for FPS counting
-		timer = time.clock()
+    def run(self):
+        '''Main loop of the Controller. Executes a continuous loop doing the following:
+        
+        * Retrieve Camera frame, performing barrel distortion fix.
+        * Perform preprocessing fixes to the frame
+        * Pass frame to Vision module to locate positions of objects of interest
+        * Perform postprocessing analysis on the positions
+        * Update our World state with new positions
+        * Contact our Planner to find out next tasks
+        * Redraw the GUI with updated information.
+        '''
+        counter = 1L
 
-		#: Tracker is used for a Planning timer, running Planner only in
-		#: certain time intervals
-		tracker = time.clock()
-		try:
-			c = True
-			mh = None
-			while c != 27:  # the ESC key
+        #: Timer is used for FPS counting
+        timer = time.clock()
 
-				frame = self.camera.get_frame()
-				pre_options = self.preprocessing.options
+        try:
+            c = True
+            mh = None
+            while c != 27:  # the ESC key
 
-				# Apply preprocessing methods toggled in the UI
-				preprocessed = self.preprocessing.run(frame, pre_options)
-				frame = preprocessed['frame']
-				if 'background_sub' in preprocessed:
-					cv2.imshow('bg sub', preprocessed['background_sub'])
+                frame = self.camera.get_frame()
+                pre_options = self.preprocessing.options
 
-				# Find object positions
-				# model_positions have their y coordinate inverted
-				model_positions, regular_positions = self.vision.locate(frame)
-				model_positions = self.postprocessing.analyze(model_positions)
+                # Apply preprocessing methods toggled in the UI
+                preprocessed = self.preprocessing.run(frame, pre_options)
+                frame = preprocessed['frame']
+                if 'background_sub' in preprocessed:
+                    cv2.imshow('bg sub', preprocessed['background_sub'])
 
-				# Update world state
-				self.world.update_positions(model_positions)
+                # Find object positions
+                # model_positions have their y coordinate inverted
+                model_positions, regular_positions = self.vision.locate(frame)
+                model_positions = self.postprocessing.analyze(model_positions)
 
-				if self.ball_predictor is None:
-					self.ball_predictor = KalmanBallPredictor(self.world.ball.vector, friction=0)
+                # Update world state
+                self.world.update_positions(model_positions)
 
-				if self.robot_predictor is None:
-					self.robot_predictor = KalmanRobotPredictor(self.world.our_attacker.vector, friction=-10, acceleration=25)
+                if self.ball_predictor is None:
+                    self.ball_predictor = KalmanBallPredictor(self.world.ball.vector, friction=0)
 
-				#: Run planner only every 5ms.
-				if (time.clock() - tracker) > 0.05: 
-				
-					self.command = self.command_cache.pop(0)
-					self.planner.plan()
-					#self.task.execute()
-					self.command_cache.append(self.robot.last_command())
-					tracker = time.clock()
+                if self.robot_predictor is None:
+                    self.robot_predictor = KalmanRobotPredictor(self.world.our_attacker.vector, friction=-10, acceleration=25)
+                
+                # Run the planner
+                self.command = self.command_cache.pop(0)
+                self.planner.plan()
+                self.command_cache.append(self.robot9.last_command())
+                # FIXME add robot10 as well
 
-				ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
-				if regular_positions['ball']:
-					regular_positions['ball']['x'] =  self.world.ball.vector.x
-					regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
-				self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
+                ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
+                if regular_positions['ball']:
+                    regular_positions['ball']['x'] =  self.world.ball.vector.x
+                    regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
+                self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
 
-				# Information about the grabbers from the world
-				grabbers = {
-					'our_defender': self.world.our_defender.catcher_area,
-					'our_attacker': self.world.our_attacker.catcher_area
-				}
+                # Information about the grabbers from the world
+                grabbers = {
+                    'our_defender': self.world.our_defender.catcher_area,
+                    'our_attacker': self.world.our_attacker.catcher_area
+                }
 
-				# Information about states
-				attackerState = (self.planner._current_state, self.planner._current_state)
-				defenderState = (self.planner._current_state, self.planner._current_state)
+                # Use 'y', 'b', 'r' to change color.
+                c = waitKey(2) & 0xFF
 
-				attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
-				defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+                # TODO: fix the GUI stuff, i.e. why does it need this actions?
+                # also the grabbers above.
+                # Maybe just give GUI the world?
+                actions = []
+                fps = float(counter) / (time.clock() - timer)
+                # Draw vision content and actions
+            
+                self.GUI.draw(
+                    frame, model_positions, actions, regular_positions, fps, attackerState,
+                    defenderState, attacker_actions, defender_actions, grabbers,
+                    our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
+                counter += 1
+        except MyError as e:
+            print e.value()
+        finally:
+            if self.robot9 is not None:
+                self.robot9.stop()
+                self.robot9.exit()
+                
+            if self.robot10 is not None:
+                self.robot10.shutdown(self.arduino10)
 
-				# Use 'y', 'b', 'r' to change color.
-				c = waitKey(2) & 0xFF
-
-				actions = []
-				fps = float(counter) / (time.clock() - timer)
-				# Draw vision content and actions
-			
-				self.GUI.draw(
-					frame, model_positions, actions, regular_positions, fps, attackerState,
-					defenderState, attacker_actions, defender_actions, grabbers,
-					our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
-				counter += 1
-		except MyError as e:
-			print e.value()
-		finally:
-			if self.robot is not None:
-				self.robot.stop()
-				self.robot.exit()
-
-			tools.save_colors(self.pitch, self.calibration)
+            tools.save_colors(self.pitch, self.calibration)
 
 # MAIN
 if __name__ == '__main__':
-	import argparse
-	parser = argparse.ArgumentParser()
+    import argparse
+    parser = argparse.ArgumentParser()
 
-	parser.add_argument('-p', '--pitch', type=int, default=0, help="[0] Main pitch (Default), [1] Secondary pitch")
-	parser.add_argument('-s', '--side', default='left', help="Our team's side ['left', 'right'] allowed. [Default: left]")
-	parser.add_argument(
-		'-r', '--role', default='attacker', help="Our controlled robot's role ['attacker', 'defender'] allowed. [Default: attacker]")
-	parser.add_argument(
-		'-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
-	parser.add_argument(
-		"-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
-	
-	parser.add_argument("--passing", dest='passing', help="Signals us as the passing robot.", action="store_true")
-	parser.add_argument("--receiving", dest='passing', help="Signals us as the receigin robot.", action="store_false")
-	
-	args = parser.parse_args()
+    parser.add_argument('-p', '--pitch', type=int, default=0, help="[0] Main pitch (Default), [1] Secondary pitch")
+    parser.add_argument('-s', '--side', default='left', help="Our team's side ['left', 'right'] allowed. [Default: left]")
+    parser.add_argument(
+        '-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
+    parser.add_argument(
+        "-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
+    
+    
+    args = parser.parse_args()
 
-	if args.nocomms:
-		c = Controller(
-			args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False).run()
-	else:
-		c = Controller(
-			args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role).run()
+        c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, comms=(not args.nocomms)).run()
+
+class Arduino:
+
+    def __init__(self, port, rate, timeOut, comms):
+        self.serial = None
+        self.comms = comms
+        self.port = port
+        self.rate = rate
+        self.timeout = timeOut
+        self.last_command = ""
+        self.setComms(comms)
+        self.increment_command=0
+
+    def setComms(self, comms):
+        if comms:
+            self.comms = True
+            if self.serial is None:
+                try:
+                    self.serial = serial.Serial(self.port, self.rate, timeout=self.timeout)
+                except:
+                    print self.port
+                    print self.rate
+                    print self.timeout
+                    print "No Arduino detected!"
+                    print "Continuing without comms."
+                    self.comms = False
+        else:
+            self.write('RUN_ENG %d %d\r' % (0, 0))
+            self.comms = False
+
+    def write(self, string):
+        if self.comms:
+            self.increment_command+=1;
+            if self.last_command != string or self.increment_command > 5:
+                self.increment_command=0;
+                print string
+                self.last_command = string
+                self.serial.write(string)
+
+class Robot_Controller(object):
+    """
+    Robot_Controller class for robot control.
+    """
+
+    def __init__(self):
+        """
+        Initialise variables
+        """
+        self.current_speed = 0
+        self.last_command = ""
+
+    def execute(self, comm, action):
+        """
+        Execute robot action.
+        """
+
+        # Do whatever actions are specified in the action dict
+        # To kick without affecting wheels, don't send 'left_motor' or 'right_motor' at all
+        if action is not None:
+            if 'left_motor' in action or 'right_motor' in action:
+                left_motor = 0
+                right_motor = 0
+                if 'left_motor' in action:
+                    left_motor = int(action['left_motor'])
+                if 'right_motor' in action:
+                    right_motor = int(action['right_motor'])
+                msg = 'RUN_ENG %d %d\r' % (max(min(left_motor, 99), -99), max(min(right_motor, 99), -99))
+                comm.write(msg)
+
+            if 'speed' in action:
+                # LB: need to decide whether to use this or not
+                speed = action['speed']
+
+            if 'kicker' in action and action['kicker'] != 0:
+                try:
+                    comm.write('RUN_KICK %d\r' % (action['kicker']))
+                    comm.write('RUN_KICK %d\r' % (action['kicker']))
+                    # Let the kick finish before we tell it what else to do
+                except StandardError:
+                    pass
+            elif 'catcher' in action and action['catcher'] != 0:
+                try:
+                    comm.write('RUN_CATCH\r')
+                except StandardError:
+                    pass
+            elif 'drop' in action and action['drop'] != 0:
+                try:
+                    comm.write('DROP\r')
+                except StandardError:
+                    pass
+
+    def shutdown(self, comm):
+        comm.write('RUN_ENG %d %d\r' % (0, 0))
+        time.sleep(1)

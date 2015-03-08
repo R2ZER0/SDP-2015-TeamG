@@ -1,11 +1,24 @@
-##System Design Project - Group 9##
+# System Design Project - Team G 
+
+## Group 9
 
 *Thomas Cumming, Rikki Guy, Joseph Kennelly, Ayrton Massey, Robert Oyler, Sebastian Schulze, Ronan Turner*
 
 ![alt text](http://i.imgur.com/Y6Z5NtE.png "I think he just says ""bloop bloop bloop"")
 ------
 
-###Future SDP teams
+## Group 10
+
+![alt text](http://i.imgur.com/HJGyC1p.png "Praying: please work")
+
+* Paul    Scott    S1126779 +447403455564
+* Paulius Gedminas S1239099 +447598481742
+* Lewis   Barker   S1236818 +447784319897
+* Finlay  Mcafee   S1220880 +447447019638
+* Michael    Nelson  S1223336 +447450219904
+* Christopher White   S1238020 
+
+### Future SDP teams
 
 The planner and vision are very good.
 
@@ -39,12 +52,12 @@ The project has the following dependencies:
 - PySerial
 - OpenCV 2.4.5
 - Numpy
-- pygame 	(For `xbox360controller/`)
-- pymunk 	(For Simulation)
-- Flask 	(For `ControlApp/`)
-- Pyzmq 	(For the RF Console)
-- Sphinx-Docs 	(Generating documentation)
-- RTD Theme 	(Documentation Theme)
+- pygame    (For `xbox360controller/`)
+- pymunk    (For Simulation)
+- Flask     (For `ControlApp/`)
+- Pyzmq     (For the RF Console)
+- Sphinx-Docs   (Generating documentation)
+- RTD Theme     (Documentation Theme)
 
 ##### Core Dependencies 
 

@@ -35,7 +35,6 @@ class Postprocessing(object):
 
         self._frames.append(_vectors)
         self._measure.append(_vectors)
-
     def analyze(self, vector_dict):
         '''
         This method analyzes current positions and collects them into a dictionary
@@ -71,7 +70,6 @@ class Postprocessing(object):
         # Either way, append our new vector frame to the cache
         self._frames.append(new_vector)
         self._measure.append(new_vector)
-	# print self.probDist()
         return new_vector_dict
 
     def analyze_ball(self, info):
@@ -88,9 +86,10 @@ class Postprocessing(object):
 
             
             # Use difference between current time and previous time as the duration of movement
-	    delta_x = info['x'] - self._frames[-1]['ball']['vec'].x
-	    delta_y = info['y'] - self._frames[-1]['ball']['vec'].y
-	    velocity = hypot(delta_y, delta_x)
+            delta_x = info['x'] - self._frames[-1]['ball']['vec'].x
+            delta_y = info['y'] - self._frames[-1]['ball']['vec'].y
+            velocity = hypot(delta_y, delta_x)
+            
             if velocity == 0:
                 angle = 0
             else:
@@ -151,21 +150,21 @@ class Postprocessing(object):
         return sum_vel / len(self._frames)
 
     def probDist(self):
-	feat = np.array([
-            		[self._measure[0]['our_attacker']['vec'].x],
-            		[self._measure[0]['our_attacker']['vec'].y],
-            		[self._measure[0]['our_attacker']['vec'].angle],
-            		[math.cos(self._measure[0]['our_attacker']['vec'].angle)*self._measure[0]['our_attacker']['vec'].velocity],
-            		[math.sin(self._measure[0]['our_attacker']['vec'].angle)*self._measure[0]['our_attacker']['vec'].velocity],
-            		[self._measure[0]['our_attacker']['vec'].angular_velocity]])
-	tmp = self._measure.pop(0)
+    feat = np.array([
+                    [self._measure[0]['our_attacker']['vec'].x],
+                    [self._measure[0]['our_attacker']['vec'].y],
+                    [self._measure[0]['our_attacker']['vec'].angle],
+                    [math.cos(self._measure[0]['our_attacker']['vec'].angle)*self._measure[0]['our_attacker']['vec'].velocity],
+                    [math.sin(self._measure[0]['our_attacker']['vec'].angle)*self._measure[0]['our_attacker']['vec'].velocity],
+                    [self._measure[0]['our_attacker']['vec'].angular_velocity]])
+    tmp = self._measure.pop(0)
         for vector_frame in self._measure:
-		feat = np.concatenate((feat, np.array([
-            		[vector_frame['our_attacker']['vec'].x],
-            		[vector_frame['our_attacker']['vec'].y],
-            		[vector_frame['our_attacker']['vec'].angle],
-            		[math.cos(vector_frame['our_attacker']['vec'].angle)*vector_frame['our_attacker']['vec'].velocity],
-            		[math.sin(vector_frame['our_attacker']['vec'].angle)*vector_frame['our_attacker']['vec'].velocity],
-            		[vector_frame['our_attacker']['vec'].angular_velocity] ])), axis = 1)
-	self._measure.insert(0, tmp)
+        feat = np.concatenate((feat, np.array([
+                    [vector_frame['our_attacker']['vec'].x],
+                    [vector_frame['our_attacker']['vec'].y],
+                    [vector_frame['our_attacker']['vec'].angle],
+                    [math.cos(vector_frame['our_attacker']['vec'].angle)*vector_frame['our_attacker']['vec'].velocity],
+                    [math.sin(vector_frame['our_attacker']['vec'].angle)*vector_frame['our_attacker']['vec'].velocity],
+                    [vector_frame['our_attacker']['vec'].angular_velocity] ])), axis = 1)
+    self._measure.insert(0, tmp)
         return  np.var(feat, axis = 1)
