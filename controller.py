@@ -7,7 +7,7 @@ import warnings
 
 from action import Action
 from planning.planner import Planner
-from planning.tasks import AcquireBall
+from planning.tasks import AcquireBall, TurnToPoint, TurnToObject
 from vision.vision import Vision, Camera, GUI
 import vision.tools as tools
 from prediction.Prediction import KalmanBallPredictor, KalmanRobotPredictor

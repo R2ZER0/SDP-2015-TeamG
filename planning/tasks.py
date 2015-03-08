@@ -66,6 +66,7 @@ class MoveToPoint(Task):
     def move(self):
         """Updates this Task's motionHandle to move toward a new point."""
         if self.check_displacement():
+            self.robot.stop()
             return True
         else:
             if self.motionHandle is None:
@@ -73,7 +74,7 @@ class MoveToPoint(Task):
                 self.angle = int(self.angle / (math.pi / 4)) * math.pi / 4  # round to nearest 45 degrees
                 self.motionHandle = self.robot.move(self.angle, scale=self.get_movement_speed())
             else:
-                if self.motionHandle.complete or self.motionHandle.finished:
+                if self.motionHandle.completed or self.motionHandle.finished:
                     self.motionHandle = None
             return False
 
@@ -118,42 +119,71 @@ class TurnToPoint(Task):
                 rotation = self.get_rotation()
                 self.motionHandle = self.robot.turnBy(rotation, scale=self.get_rotation_speed())
             else:
-                if self.motionHandle.complete or self.motionHandle.finished:
+                if self.motionHandle.completed or self.motionHandle.finished:
                     self.motionHandle = None
             return False
 
+    def update(self, x, y):
+        self.x = x
+        self.y = y
+        self.complete = False
+        
     def check_rotation(self):
         """Check if the robot is closer than ROTATION_TOLERANCE radians to self.x, self.y"""
-        return self.get_rotation() <= self.ROTATION_TOLERANCE
+        return abs(self.get_rotation()) <= self.ROTATION_TOLERANCE
 
     def get_rotation(self):
         return self.angle_to_point(self.x, self.y)
 
     def get_rotation_speed(self):
-        return min(self.BASE_MOTOR_SPEED, max(self.get_rotation() / math.pi * 100, 40))
+        return min(self.BASE_MOTOR_SPEED, max(abs(self.get_rotation()) / (math.pi/2) * 100, 40))
 
     def execute(self):
         if self.complete:
+            self.robot.stop()
             return
-
+        
         if self.turn():
             self.complete = True
 
+class TurnToObject(TurnToPoint):
+
+    pitch_object = None
+    
+    def __init__(self, world, robot, role, pitch_object):
+        self.pitch_object = pitch_object
+        super(TurnToObject,self).__init__(world, robot, role, self.pitch_object.x, self.pitch_object.y)
+
+    def update(self):
+        self.x = self.pitch_object.x
+        self.y = self.pitch_object.y
+        self.complete = False
+        
+    
 
 class AcquireBall(MoveToPoint, TurnToPoint):
 
-    def __init__(self, world, robot, role, x, y, displacement_tolerance=30, rotation_tolerance=0.2):
-        super(AcquireBall, self).__init__(world, robot, role)
-        self.x = x
-        self.y = y
+    def __init__(self, world, robot, role, displacement_tolerance=30, rotation_tolerance=0.2):
+        Task.__init__(self, world, robot, role)
+        self.x = self.world.ball.x
+        self.y = self.world.ball.y
         self.DISPLACEMENT_TOLERANCE = displacement_tolerance
         self.ROTATION_TOLERANCE = rotation_tolerance
 
+    def update(self):
+        self.x = self.world.ball.x
+        self.y = self.world.ball.y
+
+    turned = False
+    moved = False
+        
     def execute(self):
         if self.complete:
+            robot.stop()
             return
 
         if self.turn():
+            self.robot.open_catcher()
             if self.move():
                 self.robot.catch()
                 self.complete = True
