@@ -24,8 +24,8 @@ Attributes:
 '''
 
 DISTANCE_MATCH_THRESHOLD = 15
-ANGLE_MATCH_THRESHOLD = pi/8
-BALL_ANGLE_THRESHOLD = pi/15
+ANGLE_MATCH_THRESHOLD = pi/10
+BALL_ANGLE_THRESHOLD = pi/20
 CURVE_THRESHOLD = pi/5
 CURVE_SPEED_DIFF = 10
 
@@ -186,9 +186,6 @@ def predict_y_intersection(world, predict_for_x, robot, full_width=False, bounce
         else:
             return None
 
-<<<<<<< HEAD
-=======
-
 def grab_ball():
     return {'catcher': 1}
 
@@ -200,12 +197,6 @@ def kick_ball(power):
 def open_catcher():
     return {'drop': 1}
 
-# LB: Not currently supported by arduino
-def turn_shoot(orientation):
-    return {'turn_90': orientation, 'left_motor': 0, 'right_motor': 0, 'kicker': 1, 'catcher': 0, 'speed': 1000}
-
-
->>>>>>> tbm-theirs
 def has_matched(robot, x=None, y=None, angle=None,
                 angle_threshold=ANGLE_MATCH_THRESHOLD, distance_threshold=DISTANCE_MATCH_THRESHOLD):
     '''Convenience function; checks if the given Robot is at the provided x,y position and/or angle
@@ -374,10 +365,6 @@ def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False
             return {'left_motor': speed, 'right_motor': speed}
             
         else:
-<<<<<<< HEAD
-            return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0, 'speed': general_speed}
-
-=======
             return {'left_motor': 0, 'right_motor': 0}
         
     elif displacement is not None and displacement > DISTANCE_MATCH_THRESHOLD:
@@ -391,4 +378,3 @@ def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False
 
 def do_nothing():
     return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0}
->>>>>>> tbm-theirs
