@@ -19,10 +19,10 @@ class Planner:
         # Encode states
         self.INITIAL_STATE = 'INITIAL_STATE'
         self.ACQUIRING_BALL_STATE = 'ACQUIRING_BALL_STATE'
-        self.MOVING_TO_PT_STATE = 'MOVING_TO_PT_STATE'
-        self.IDLE_STATE = 'IDLE_STATE'
+        self.RECEIVING_STATE = 'RECEIVING_STATE'
+        self.MIRROR_BALL = 'MIRROR_BALL_STATE'
         self.PASSING_STATE = 'PASSING_STATE'
-
+	self.SHOOT = 'SHOOT_STATE'
         self._current_state=self.INITIAL_STATE
         self._current_task=None
     
