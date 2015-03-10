@@ -86,8 +86,8 @@ class Controller:
 		self.robot_predictor = None
 
 		# Set up our cache of commands for the predictors
-		self.command_cache = [[0,0,0]]*8
-		self.command = [0,0,0]
+		self.command_cache = [[0,0]]*8
+		self.command = [0,0]
 
 		self.color = color
 		self.side = our_side
@@ -113,7 +113,7 @@ class Controller:
 
 		#: Timer is used for FPS counting
 		timer = time.clock()
-
+		start = time.clock()
 		#: Tracker is used for a Planning timer, running Planner only in
 		#: certain time intervals
 		tracker = time.clock()
@@ -138,20 +138,26 @@ class Controller:
 
 				# Update world state
 				self.world.update_positions(model_positions)
-
+				if self.task is None:
+					self.task = MoveToPoint(self.world, self.robot, self.role, self.our_robot.x, self.world.pitch.height/2)
 				if self.ball_predictor is None:
 					self.ball_predictor = KalmanBallPredictor(self.world.ball.vector, friction=0)
 
 				if self.robot_predictor is None:
-					self.robot_predictor = KalmanRobotPredictor(self.world.our_attacker.vector, friction=-10, acceleration=25)
+					self.robot_predictor = KalmanRobotPredictor(self.our_robot.vector, friction=-10, acceleration=5)
 
 				#: Run planner only every 5ms.
-				if (time.clock() - tracker) > 0.05: 
-				
+				if (time.clock() - tracker) > 0.05 and time.clock() - start > 1: 
+					
 					self.command = self.command_cache.pop(0)
 					self.planner.plan()
-					#self.task.execute()
-					self.command_cache.append(self.robot.last_command())
+					if self.robot.move_handle.cmd == 'M':
+						dx = math.cos(self.our_robot.vector.angle + self.robot.move_handle.dir - math.pi / 2)*self.robot.move_handle.spd
+						dy = math.sin(self.our_robot.vector.angle + self.robot.move_handle.dir - math.pi / 2)*self.robot.move_handle.spd
+						last_com = [dx,dy]
+					else:
+						last_com = [0,0]
+					self.command_cache.append(last_com)
 					tracker = time.clock()
 
 				ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)

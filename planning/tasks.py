@@ -46,11 +46,9 @@ class AcquireBall(Task):
 		ty = self.world.ball.y - self.robot_info.y
 
 		if self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y) < 110:
-			l = math.hypot(tx, ty) / 30
-			print 'Move Task 2'
+			l = math.hypot(tx, ty) / 1
 		else:
-			l = math.hypot(tx, ty) / 80
-			print 'Move Task 1'
+			l = math.hypot(tx, ty) / 50
 
 		tx = self.world.ball.x - tx / l
 		ty = self.world.ball.y - ty / l
@@ -70,25 +68,20 @@ class AcquireBall(Task):
 		'''
 
 		if self.complete:
-			print "DONE"
 			return
 			
-		
-		
 		if self.robot_info.can_catch_ball(self.world.ball):
 			if self.turn_task != None and self.turn_task.complete:
 				if self.move_task != None:
 					self.move_task = None
 					self.robot.stop()
 				if self.robot_info.catcher == 'closed':
-					print "OPEN"
 					self.robot.open_catcher()
 					self.robot.open_catcher()
 					self.robot_info.catcher = 'open'
 				else:
 					if self.c == None or (self.c.finished and not self.c.completed):
 						self.c = self.robot.catch()
-						print "CAUGHT"
 						return
 					elif self.c.completed:
 						self.complete = True
@@ -106,13 +99,11 @@ class AcquireBall(Task):
 			self.get_move_task()
 
 		if hypot(self.turn_task.x - self.world.ball.x, self.turn_task.y - self.world.ball.y) > self.THRESHOLD:
-			print "UPDATE"
 			if self.turn_task != None:
 				self.turn_task.update_position(self.world.ball.x, self.world.ball.y)
 			if self.move_task != None:
 				self.get_move_task()
 			if self.robot_info.catcher == 'closed':
-				print "OPEN"
 				self.robot.open_catcher()
 				self.robot_info.catcher = 'open'
 			return
@@ -121,7 +112,6 @@ class AcquireBall(Task):
 			if self.robot_info.can_catch_ball(self.world.ball):
 				if self.c == None or (self.c.finished and not self.c.completed):
 					self.c = self.robot.catch()
-					print "CAUGHT"
 					return
 				elif self.c.completed:
 					self.complete = True
@@ -132,13 +122,10 @@ class AcquireBall(Task):
 		if self.turn_task.complete:
 			#Open the catcher.
 			if self.robot_info.catcher == 'closed':
-				print "OPEN"
 				self.robot.open_catcher()
 				self.robot_info.catcher = 'open'
 			self.move_task.execute()
-			print "MOVE - ",
 		else:
-			print "TURN - ",
 			self.turn_task.execute()
 			return
 
@@ -171,8 +158,7 @@ class MoveToPoint(Task):
 		self.x = x
 		self.y = y
 		self.last_speed = self.base_speed
-		self.angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
-		self.angle = int(self.angle / (math.pi/4))*(math.pi/4)
+		self.angle = self.new_angle(-self.robot_info.get_rotation_to_point(self.x,self.y))
 		self.motionHandle = None
 		self.DISP_TOLERANCE = dist
 	def update_position(self, x, y):
@@ -198,41 +184,33 @@ class MoveToPoint(Task):
 		'''
 		if self.complete:
 			return
-		print self.angle
 		if self.motionHandle == None:
-			self.angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
-			self.angle = int(self.angle / (math.pi/4))*math.pi/4
+			self.angle = self.new_angle(-self.robot_info.get_rotation_to_point(self.x,self.y))
 			self.motionHandle = self.robot.move(self.angle, scale = self.last_speed)
 			self.last_speed = max(self.last_speed - 10, 40)
 		else:
 			if self.motionHandle.completed:
 				if not self.check():
 					if abs(-self.robot_info.get_rotation_to_point(self.x,self.y) - self.angle) < self.thresh():
-						print abs(-self.robot_info.get_rotation_to_point(self.x,self.y) - self.angle), self.thresh()
+						pass
 					else:
-						self.angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
-						self.angle = int(self.angle / (math.pi/4))*math.pi/4
+						self.angle = self.new_angle(-self.robot_info.get_rotation_to_point(self.x,self.y))
 						self.motionHandle = self.robot.move(self.angle, scale = self.last_speed)
 						self.last_speed = max(self.last_speed - 10, 40)
-						print abs(-self.robot_info.get_rotation_to_point(self.x,self.y) - self.angle), self.thresh()
-						print "REDO1"
 				else:
 					self.motionHandle = self.robot.stop()
 					self.last_speed = self.base_speed
 					self.complete = True
-					print "STOPPED"
 			elif self.motionHandle.finished:
 				if self.check():
 					self.complete = True
 					self.robot.stop()
-					print "STOPPED"
 				else:
-					self.angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
-					self.angle = int(self.angle / (math.pi/4))*math.pi/4
+					self.angle = self.new_angle(-self.robot_info.get_rotation_to_point(self.x,self.y))
 					self.motionHandle = self.robot.move(self.angle, scale = self.last_speed)
-					print "REDO2"
-			else: print "MOVE ALT"
-
+	def new_angle(self, angle):
+		print angle, "->", round(angle / (math.pi/4))*math.pi/4
+		return round(angle / (math.pi/4))*math.pi/4
 	def thresh(self):
 		if self.robot_info.get_displacement_to_point(self.x,self.y) > 100:
 			return 0.2
@@ -292,7 +270,7 @@ class MirrorObject(Task):
 				if self.motionHandle.completed or self.motionHandle.finished:
 					if not self.check():
 						if abs(-self.robot_info.get_rotation_to_point(self.robot_info.x, self.obj.y) - self.angle) < self.TRAJECTORY_CONTROL and 						   abs(self.calc_speed() - self.last_speed) < 10:
-							print "WAIT"
+							pass
 						else:
 							self.angle = -self.robot_info.get_rotation_to_point(self.robot_info.x, self.obj.y)
 							self.motionHandle = self.robot.move(self.angle, scale = self.calc_speed())
@@ -358,7 +336,6 @@ class TurnToPoint(Task):
 			angle_to_turn = -self.robot_info.get_rotation_to_point(self.x,self.y)
 			self.motionHandle = self.robot.turnBy(angle_to_turn, scale = self.last_speed)
 			self.last_speed = max(self.last_speed - 10, 40)
-			print angle_to_turn
 		else:
 			if self.motionHandle.completed:
 				if self.check():
@@ -367,7 +344,6 @@ class TurnToPoint(Task):
 					angle_to_turn = -self.robot_info.get_rotation_to_point(self.x,self.y)
 					self.motionHandle = self.robot.turnBy(angle_to_turn, scale = self.last_speed)
 					self.last_speed = max(self.last_speed - 10, 40)
-					print angle_to_turn
 			elif self.motionHandle.finished:
 				if abs(self.robot_info.angular_velocity) < 0.1 and self.check():
 					self.complete = True
@@ -375,7 +351,6 @@ class TurnToPoint(Task):
 					angle_to_turn = -self.robot_info.get_rotation_to_point(self.x,self.y)
 					self.motionHandle = self.robot.turnBy(angle_to_turn, scale = self.last_speed)
 					self.last_speed = max(self.last_speed - 10, 40)
-					print angle_to_turn
 			else:
 				pass
 

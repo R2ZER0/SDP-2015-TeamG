@@ -39,6 +39,7 @@ class Planner:
         their_defender = self._world.their_defender
 
         our_robot = our_attacker if self._role == 'attacker' else our_defender
+	our_partner =  our_attacker if self._role != 'attacker' else our_defender
 
         world = self._world
         role = self._role
@@ -48,71 +49,81 @@ class Planner:
 
         our_zone = self._world.pitch.zones[our_robot.zone]
 
-        if self.passing:
-            if state == self.INITIAL_STATE:
-                if our_zone.isInside(ball.x, ball.y):       # fine for stationary ball starting in our zone
-                    self._current_state = self.ACQUIRING_BALL_STATE
-                    self._current_task = AcquireBall(world, robot, role)
-                    self._current_task.execute()
-                else:
-                    return 
+	if state == self.INITIAL_STATE:
+		if our_zone.isInside(ball.x, ball.y):
+		    self._current_state = self.ACQUIRING_BALL_STATE
+		    self._current_task = AcquireBall(world, robot, role)
+		    self._current_task.execute()
+		    return
+		elif self._world.pitch.zones[our_partner.zone].isInside(ball.x, ball.y):
+		    self._current_state = self.RECEIVING_STATE
+		    return
+		else:
+		    self._current_state = self.MIRROR_BALL
+		    return
 
-            elif state == self.ACQUIRING_BALL_STATE:
-
-                if not our_zone.isInside(ball.x, ball.y):
-                    robot.stop()
-                    self._current_state = self.INITIAL_STATE
-                    self._current_task = None
-                    return
-
-                if isinstance(self._current_task, AcquireBall):
+	elif state == self.ACQUIRING_BALL_STATE:
+		if not our_zone.isInside(ball.x, ball.y):
+		    robot.stop()
+		    self._current_state = self.INITIAL_STATE
+		    self._current_task = None
+		    return
+		if isinstance(self._current_task, AcquireBall):
 			if self._current_task.complete:
-				if role == 'attacker':
-				    teammate = our_defender
-				elif role == 'defender':
-				    teammate = our_attacker
-				(pass_x_dest, pass_y_dest) = get_clear_forward_passing_pos(world, our_robot, teammate, their_attacker) # their attacker?
-				print pass_x_dest, pass_y_dest
-				self._current_state = self.MOVING_TO_PT_STATE
-				self._current_task = MoveToPoint(world, robot, role, pass_x_dest, pass_y_dest)
-				self._current_task.execute()
+				self._current_state = self.SHOOT
+				self._current_task = None
 			else:
 				self._current_task.execute()
-                else:
-			self._current_task = AcquireBall(world, robot, role)
-                    
-
-            elif state == self.MOVING_TO_PT_STATE:
-                if abs(our_robot.get_displacement_to_point(self._current_task.x, self._current_task.y)) > 30:
-                    self._current_task.execute()
-
-                else:
-                    self._current_state = self.IDLE_STATE
-                    robot.stop()
-                    self._current_task = None
-
-            elif state == self.IDLE_STATE:
-                if abs(our_defender.y - our_attacker.y) < 30:
-                    self._current_state = self.PASSING_STATE
-                    if role == 'attacker':
-                        self._current_task = KickToPoint(world, robot, role, our_defender.x, our_defender.y)    
-                    elif role == 'defender':
-                        self._current_task = KickToPoint(world, robot, role, our_attacker.x, our_attacker.y) 
-                    self._current_task.execute()
-                else:
-                    return
-
-            elif state == self.PASSING_STATE:
-                if not self._current_task.complete:
-                    self._current_task.execute() 
-        else:
-		self._current_state = 'RECEIVING'
-		if self._current_task == None:
-			if role == 'attacker':
-				self._current_task = MirrorObject(world, robot, role, world.our_defender)
-	   		else:
-				self._current_task = MirrorObject(world, robot, role, world.our_attacker)               
 		else:
-			self._current_task.execute() 
-                
+			self._current_task = AcquireBall(world, robot, role)
+
+	elif state == self.RECEIVING:
+		if not self._world.pitch.zones[our_partner.zone].isInside(ball.x, ball.y):
+		    robot.stop()
+		    self._current_state = self.INITIAL_STATE
+		    self._current_task = None
+		    return
+		if isinstance(self._current_task, MirrorObject):
+			self._current_task.execute()
+		else:
+			self._current_task = MirrorObject(world, robot, role, our_partner)
+	
+
+	elif state == self.MIRROR_BALL:
+		if isinstance(self._current_task, MirrorObject):
+			self._current_task.execute()
+		else:
+			self._current_task = MirrorObject(world, robot, role, ball)
+			self._current_task.execute()
+		self._current_state = self.INITIAL_STATE
+		return
+
+	elif state == self.SHOOT:
+		if our_robot.get_displacement_to_point(ball.x, ball.y)) > 30:
+			robot.stop()
+			self._current_state = self.INITIAL_STATE
+			self._current_task = None
+			return
+		if self._current_task == None:
+			(x,y) = choose_attacker_destination(world)
+			self._current_task = MoveToPoint(world, robot, role, x, y)
+		if isinstance(self._current_task, MoveToPoint) and self._current_task.complete:
+			if abs(their_goal.y + 30 - their_defender.y) > abs(their_goal.y - 30 - their_defender.y):
+        			y = their_goal.y + 20
+    			else:
+       				y = their_goal.y - 20
+			self._current_task = KickToPoint(world, robot, role, their_goal.x, y)
+			self._current_task.execute()
+		if isinstance(self._current_task, KickToPoint) and self._current_task.complete:
+			robot.stop()
+			self._current_state = self.INITIAL_STATE
+			self._current_task = None
+
+	else:
+		robot.stop()
+		self._current_state = self.INITIAL_STATE
+		self._current_task = None
+		
+
+		
 

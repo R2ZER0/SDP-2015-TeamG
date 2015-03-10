@@ -70,7 +70,7 @@ class Postprocessing(object):
         # Either way, append our new vector frame to the cache
         self._frames.append(new_vector)
         self._measure.append(new_vector)
-	# print self.probDist()
+	#print self.probDist()
         return new_vector_dict
 
     def analyze_ball(self, info):
@@ -132,10 +132,10 @@ class Postprocessing(object):
             # Offset the angle if negative, we only want positive values
             delta_angle = delta_angle % (2*math.pi)
 
-            velocity = hypot(delta_y, delta_x)/(self._time - old_vector['time'])
+            velocity = hypot(delta_y, delta_x)
 
             # Store angular velocity in rads / s
-            angular_velocity = diff / (self._time - old_vector['time'])
+            angular_velocity = diff
             
             return Vector(info['x'], info['y'], info['angle'], velocity, angular_velocity)
         else:

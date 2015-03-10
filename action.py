@@ -126,16 +126,6 @@ class Action():
         self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
         return self.move_handle
 
-    def last_command(self):
-	if self.move_handle.cmd == 'M':
-		dx = math.cos(self.move_handle.dir)*self.move_handle.spd
-		dy = math.sin(self.move_handle.dir)*self.move_handle.spd
-		return [dx,dy,0]
-	elif self.move_handle.cmd == 'T':
-		return [0,0,self.move_handle.spd]
-	else:
-		return [0,0,0]
-
     def move(self, angle, scale=64):
         return self._cmd_movement('M', angle+math.pi/2, scale)
         
