@@ -3,6 +3,7 @@ from models import *
 from collisions import *
 from tasks import *
 from utilities import *
+from pyparse import *
 
 # Thomas, still to document
 
