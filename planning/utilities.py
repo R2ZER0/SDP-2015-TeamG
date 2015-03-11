@@ -3,6 +3,63 @@ from planning.models import Robot
 from Polygon import *
 from Polygon.Utils import pointList
 
+#  Thomas, still to document
+class FSM:
+
+    def __init__(self, name, inAlph, states, initState, finalState, transTable, taskBindings):
+        self._alph = inAlph
+        self._states = states
+        self._initState = initState
+        self._finalState = finalState
+        self._taskBindings = taskBindings
+
+        self._transTable = transTable
+        self._name = name
+
+        self._currentState = self._initState
+        self._currentTask = None
+
+    def consumeInput(self, inp):
+        assert inp in self._alph
+        
+        for tran in self._transTable:
+            if tran[0] == self._currentState and tran[1] == inp:
+                for binding in self._taskBindings:
+                    if binding[0] == self._currentState:
+                        self._currentTask = None #todo
+                self._currentState = tran[2]
+        # self._currentTask.execute() todo
+
+    def getStates(self):
+        return self._states
+
+    def getAlpha(self):
+        return self._alph
+
+    def show(self):
+        print
+        print "------------------------------------------------------------------------------------------------------------------------------"
+        print "FSM '" + self._name + "'"
+        print
+        print "Recognised alphabet: " + str(self._alph)
+        print "States : " + str(self._states)
+        print "Initial State: " + str(self._initState)
+        print "Final State: " + str(self._finalState)
+        print "Current State: " + str(self._currentState)
+        print "Current Task: " + str(self._currentTask)
+        print
+        print "State/Task Bindings: "
+        for binding in self._taskBindings:
+            print binding
+        print
+        print "Transition Function"
+        for transition in self._transTable:
+            print transition
+        print "------------------------------------------------------------------------------------------------------------------------------"
+        print
+
+
+
 '''
 Utilities contains various convenience functions utilised throughout the
 planning module.
@@ -27,6 +84,17 @@ BALL_ANGLE_THRESHOLD = pi/20
 MAX_DISPLACEMENT_SPEED = 690
 MAX_ANGLE_SPEED = 50
 BALL_VELOCITY = 3
+
+# Test fsm condition table
+t = { 'isBallInZone' : lambda world : world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y)}
+
+trans = [(start, 'isBallInZone', getBall)]
+
+
+
+
+
+
 
 
 def is_shot_blocked(world, our_robot, their_robot):
