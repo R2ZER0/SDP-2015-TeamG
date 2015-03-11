@@ -17,13 +17,13 @@ class Planner:
         self.passing = passing
 
         # Encode states
-        self.INITIAL_STATE = 'INITIAL_STATE'
-        self.ACQUIRING_BALL_STATE = 'ACQUIRING_BALL_STATE'
-        self.MOVING_TO_PT_STATE = 'MOVING_TO_PT_STATE'
-        self.IDLE_STATE = 'IDLE_STATE'
+        self.INITIAL = 'INITIAL_STATE'
+        self.ACQUIRING_BALL = 'ACQUIRING_BALL_STATE'
+        self.RECEIVING = 'RECEIVING_STATE'
+        self.MIRROR_BALL = 'MIRROR_BALL_STATE'
         self.PASSING_STATE = 'PASSING_STATE'
-
-        self._current_state=self.INITIAL_STATE
+	self.SHOOT = 'SHOOT_STATE'
+        self._current_state=self.INITIAL
         self._current_task=None
     
     def plan(self):
@@ -49,23 +49,23 @@ class Planner:
 
         our_zone = self._world.pitch.zones[our_robot.zone]
 
-	if state == self.INITIAL_STATE:
+	if state == self.INITIAL:
 		if our_zone.isInside(ball.x, ball.y):
-		    self._current_state = self.ACQUIRING_BALL_STATE
+		    self._current_state = self.ACQUIRING_BALL
 		    self._current_task = AcquireBall(world, robot, role)
 		    self._current_task.execute()
 		    return
 		elif self._world.pitch.zones[our_partner.zone].isInside(ball.x, ball.y):
-		    self._current_state = self.RECEIVING_STATE
+		    self._current_state = self.RECEIVING
 		    return
 		else:
 		    self._current_state = self.MIRROR_BALL
 		    return
 
-	elif state == self.ACQUIRING_BALL_STATE:
+	elif state == self.ACQUIRING_BALL:
 		if not our_zone.isInside(ball.x, ball.y):
 		    robot.stop()
-		    self._current_state = self.INITIAL_STATE
+		    self._current_state = self.INITIAL
 		    self._current_task = None
 		    return
 		if isinstance(self._current_task, AcquireBall):
@@ -80,7 +80,7 @@ class Planner:
 	elif state == self.RECEIVING:
 		if not self._world.pitch.zones[our_partner.zone].isInside(ball.x, ball.y):
 		    robot.stop()
-		    self._current_state = self.INITIAL_STATE
+		    self._current_state = self.INITIAL
 		    self._current_task = None
 		    return
 		if isinstance(self._current_task, MirrorObject):
@@ -90,18 +90,20 @@ class Planner:
 	
 
 	elif state == self.MIRROR_BALL:
-		if isinstance(self._current_task, MirrorObject):
-			self._current_task.execute()
+		if not (our_zone.isInside(ball.x, ball.y) or self._world.pitch.zones[our_partner.zone].isInside(ball.x, ball.y)):
+			if isinstance(self._current_task, MirrorObject):
+				self._current_task.execute()
+			else:
+				self._current_task = MirrorObject(world, robot, role, ball)
+				self._current_task.execute()
 		else:
-			self._current_task = MirrorObject(world, robot, role, ball)
-			self._current_task.execute()
-		self._current_state = self.INITIAL_STATE
+			self._current_state = self.INITIAL
 		return
 
 	elif state == self.SHOOT:
-		if our_robot.get_displacement_to_point(ball.x, ball.y)) > 30:
+		if our_robot.get_displacement_to_point(ball.x, ball.y) > 30:
 			robot.stop()
-			self._current_state = self.INITIAL_STATE
+			self._current_state = self.INITIAL
 			self._current_task = None
 			return
 		if self._current_task == None:
@@ -116,14 +118,15 @@ class Planner:
 			self._current_task.execute()
 		if isinstance(self._current_task, KickToPoint) and self._current_task.complete:
 			robot.stop()
-			self._current_state = self.INITIAL_STATE
+			self._current_state = self.INITIAL
 			self._current_task = None
 
 	else:
 		robot.stop()
-		self._current_state = self.INITIAL_STATE
+		self._current_state = self.INITIAL
 		self._current_task = None
 		
 
 		
+
 
