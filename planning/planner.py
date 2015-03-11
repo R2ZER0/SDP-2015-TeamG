@@ -6,124 +6,99 @@ from utilities import *
 
 class Planner:
 
-    def __init__(self, world, robot, role, passing):
-        # Initialisation
-        assert role in ['attacker','defender']
-        assert passing in [True, False]
+    def __init__(self, world, robot, role, fsmConfigFilepath):
+        self._conditionLambdaBindings = consumeLambdas(lambdaConfigPath)
+        self._grammar = createConfigGrammar()
+        self._configFile = open(fsmConfigFilepath, 'r').read()
 
-        self._world = world
-        self._robot = robot
-        self._role = role
-        self.passing = passing
+        self._parseResults =  grammar.parseString(configFile)
+        self._fsm = createFSM(parseResults)
 
-        # Encode states
-        self.INITIAL = 'INITIAL_STATE'
-        self.ACQUIRING_BALL = 'ACQUIRING_BALL_STATE'
-        self.RECEIVING = 'RECEIVING_STATE'
-        self.MIRROR_BALL = 'MIRROR_BALL_STATE'
-        self.PASSING_STATE = 'PASSING_STATE'
-	self.SHOOT = 'SHOOT_STATE'
-        self._current_state=self.INITIAL
-        self._current_task=None
+        checkLamdas(conditionLambdaBindings)
+
+        self._fsm.show()
+
+    def plan():
+        for alph in fsm.getAlpha():
+            if self._conditionLambdaBindings[a]:
+                fsm.consumeInput(a)
+        
+    def checkLambdas(self, conditionLambdaBindings):
+        for key in conditionLambdaBindings:
+            if key not in self._fsm.getStates():
+                print "Planner Error"
+                quit()
+
+    def consumeLambdas(self, path):
+        lambdaConfig = open(path, 'r').readlines()
+        strippedNewlines = [line.strip("\n") for line in lambdaConfig]
     
-    def plan(self):
-        '''Catch-all function for the Planner, uses our role, state, and the world model
-        to determine what we should be doing next.
-        '''
-        
-        ball = self._world.ball
 
-        our_attacker = self._world.our_attacker
-        our_defender = self._world.our_defender
-        their_attacker = self._world.their_attacker
-        their_defender = self._world.their_defender
+        code = ""
+        dictionary={}
 
-        our_robot = our_attacker if self._role == 'attacker' else our_defender
-	our_partner =  our_attacker if self._role != 'attacker' else our_defender
+        for line in strippedNewlines:
+            code = code + "dictionary.update({ " + line + " })\n"
+    
+        code_obj = compile(code, '<string>', 'exec')
+        exec(code_obj)
+        return dictionary
 
-        world = self._world
-        role = self._role
-        robot = self._robot
-        
-        state = self._current_state
+    def createConfigGrammar(self):
+        # FSM grammar
+        inAlphKWD     = Literal("inAlph")
+        finalSKWD     = Literal("finalState")
+        statesKWD     = Literal("states")
+        initSKWD      = Literal("initialState")
+        nameKWD       = Literal("name")
 
-        our_zone = self._world.pitch.zones[our_robot.zone]
+        separator     = Literal(",")
+        leftBrkt      = Literal("<")
+        rightBrkt     = Literal(">")
+        assign        = Literal("=")
 
-	if state == self.INITIAL:
-		if our_zone.isInside(ball.x, ball.y):
-		    self._current_state = self.ACQUIRING_BALL
-		    self._current_task = AcquireBall(world, robot, role)
-		    self._current_task.execute()
-		    return
-		elif self._world.pitch.zones[our_partner.zone].isInside(ball.x, ball.y):
-		    self._current_state = self.RECEIVING
-		    return
-		else:
-		    self._current_state = self.MIRROR_BALL
-		    return
+        state         = Word(alphanums)
+        taskName      = Word(alphas)
+        conditionName = Word(alphas)
+        name          = Word(alphanums)
 
-	elif state == self.ACQUIRING_BALL:
-		if not our_zone.isInside(ball.x, ball.y):
-		    robot.stop()
-		    self._current_state = self.INITIAL
-		    self._current_task = None
-		    return
-		if isinstance(self._current_task, AcquireBall):
-			if self._current_task.complete:
-				self._current_state = self.SHOOT
-				self._current_task = None
-			else:
-				self._current_task.execute()
-		else:
-			self._current_task = AcquireBall(world, robot, role)
+        nameDef       = Group(nameKWD + name)
+        inAlphabetDef = Group(inAlphKWD + Group(Word(alphanums) + ZeroOrMore(separator + Word(alphanums))))
+        statesDef     = Group(statesKWD + Group(state + ZeroOrMore(separator + state)))
+        initialSDef   = Group(initSKWD + state)
+        finalSDef     = Group(finalSKWD + state)
 
-	elif state == self.RECEIVING:
-		if not self._world.pitch.zones[our_partner.zone].isInside(ball.x, ball.y):
-		    robot.stop()
-		    self._current_state = self.INITIAL
-		    self._current_task = None
-		    return
-		if isinstance(self._current_task, MirrorObject):
-			self._current_task.execute()
-		else:
-			self._current_task = MirrorObject(world, robot, role, our_partner)
-	
+        taskBindKWD   = Literal("taskBindings")
+        machineSecKWD = Literal("machineParams")
+        transitionsKWD= Literal("transitions")
 
-	elif state == self.MIRROR_BALL:
-		if not (our_zone.isInside(ball.x, ball.y) or self._world.pitch.zones[our_partner.zone].isInside(ball.x, ball.y)):
-			if isinstance(self._current_task, MirrorObject):
-				self._current_task.execute()
-			else:
-				self._current_task = MirrorObject(world, robot, role, ball)
-				self._current_task.execute()
-		else:
-			self._current_state = self.INITIAL
-		return
+        taskBinding   = Group(state + separator + taskName)
+        transition    = Group(leftBrkt + state + separator + OneOrMore(conditionName) + separator + state + rightBrkt)
 
-	elif state == self.SHOOT:
-		if our_robot.get_displacement_to_point(ball.x, ball.y) > 30:
-			robot.stop()
-			self._current_state = self.INITIAL
-			self._current_task = None
-			return
-		if self._current_task == None:
-			(x,y) = choose_attacker_destination(world)
-			self._current_task = MoveToPoint(world, robot, role, x, y)
-		if isinstance(self._current_task, MoveToPoint) and self._current_task.complete:
-			if abs(their_goal.y + 30 - their_defender.y) > abs(their_goal.y - 30 - their_defender.y):
-        			y = their_goal.y + 20
-    			else:
-       				y = their_goal.y - 20
-			self._current_task = KickToPoint(world, robot, role, their_goal.x, y)
-			self._current_task.execute()
-		if isinstance(self._current_task, KickToPoint) and self._current_task.complete:
-			robot.stop()
-			self._current_state = self.INITIAL
-			self._current_task = None
+        machineParamSec = machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
+        taskBindingsSec = taskBindKWD + OneOrMore(taskBinding)
+        transitionSec   = transitionsKWD + OneOrMore(transition)
 
-	else:
-		robot.stop()
-		self._current_state = self.INITIAL
-		self._current_task = None
+        config          = Group(machineParamSec) + Group(taskBindingsSec) + Group(transitionSec)
 
+        return config
 
+    def createFSM(parsedInput):
+        alphabet = [x for x in parsedInput[0][2][1] if x != separator]
+        name = parsedInput[0][1][1]
+        startState = parsedInput[0][4][1]
+        finalState = parsedInput[0][5][1]
+        transitions = []
+        for trans in parsedInput[2][1:]:
+            t = tuple([x for x in trans if x != leftBrkt and x != rightBrkt and x != separator])
+            transitions.append(t)
+
+        states = [x for x in parsedInput[0][3][1] if x != separator]
+
+        bindings = []
+        for binding in parsedInput[1][1:]:
+            t = tuple([x for x in binding if x != separator])
+            bindings.append(t)
+
+        fsm = FSM(name, alphabet, states, startState, finalState, transitions, bindings)
+        return fsm
