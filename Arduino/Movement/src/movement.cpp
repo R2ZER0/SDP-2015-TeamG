@@ -72,6 +72,8 @@ void setup_movement()
     motorAllStop();
 }
 
+void rotary_update_positions();
+
 //float acw_distance(float a, float b) { return  }
 //float  cw_distance(float a, float b) { return abs(normalise_angle(b - a)); }
 
@@ -131,4 +133,26 @@ void service_movement()
         
         Serial.print("dist="); Serial.println(current_distance);
     }
+    
+    rotary_update_positions();
+}
+
+
+/* Motor movement sensors stuff */
+int32_t wheel_movement[ROTARY_COUNT] = { 0 };
+
+void rotary_update_positions() {
+  // Request motor position deltas from rotary slave board
+  Wire.requestFrom(ROTARY_SLAVE_ADDRESS, ROTARY_COUNT);
+  
+  // Update the recorded motor positions
+  for (int i = 0; i < ROTARY_COUNT; i++) {
+    wheel_movement[i] += (int8_t) Wire.read();  // Must cast to signed 8-bit type
+  }
+  
+  Serial.print("Wheels: ");
+  Serial.print(wheel_movement[0]); Serial.print(' ');
+  Serial.print(wheel_movement[1]); Serial.print(' ');
+  Serial.print(wheel_movement[2]); Serial.print(' ');
+  Serial.println(wheel_movement[3]);
 }

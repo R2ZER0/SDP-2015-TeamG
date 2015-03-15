@@ -38,4 +38,7 @@
 #define CATCHER_RUNNING_TIME  (400)
 #define CATCHER_DEFAULT_SCALE (100)
 
+#define ROTARY_SLAVE_ADDRESS 5
+#define ROTARY_COUNT 6
+
 #endif /* _CONFIG_H_ */
