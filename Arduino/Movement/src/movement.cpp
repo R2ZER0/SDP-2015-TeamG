@@ -10,6 +10,7 @@
 #include "math.h"
 #include "motor.h"
 #include "MPU.h"
+#include <Wire.h>
 
 char current_command = MOVEMENT_COMMAND_STOP;
 
