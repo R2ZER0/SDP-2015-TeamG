@@ -131,7 +131,7 @@ void service_movement()
             runMotor(MOTOR_MOTOR4, 0-turnSpeedB);
         }
         
-        Serial.print("dist="); Serial.println(current_distance);
+        //Serial.print("dist="); Serial.println(current_distance);
     }
     
     rotary_update_positions();
