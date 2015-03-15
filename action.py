@@ -215,7 +215,7 @@ class Action():
                 if catch_fin and not self.catch_handle.finished:
                     self.catch_handle._onComplete()
         else:
-            #print "# " + message
+            print "# " + message
             pass
         
         
