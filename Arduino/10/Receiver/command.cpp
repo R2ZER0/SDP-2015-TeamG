@@ -19,10 +19,6 @@ static bool movement_command_fin = false;
 static bool kicker_command_fin = false;
 static bool catcher_command_fin = false;
 
-// Movement command args
-static float movement_direction = 0.0f;
-static int movement_speed = 0;
-
 // State message sending timeout
 static unsigned long next_message_time = 0L;
 
@@ -32,27 +28,25 @@ static char send_buffer[BUFFER_SIZE];
 static char recv_buffer[BUFFER_SIZE];
 static int  recv_buffer_i = 0;
 
-void run_movement_command(unsigned long id, char cmd, float dir, int speed)
+void run_movement_command(unsigned long id, char cmd, int arg1, int arg2)
 {
-    movement_on_new_command(cmd, dir, speed);
+    movement_on_new_command(cmd, arg1, arg2);
         
     movement_command_id = id;
     movement_command = cmd;
-    movement_direction = dir;
-    movement_speed = speed;
 }
 
-void run_kicker_command(unsigned long id, char cmd)
+void run_kicker_command(unsigned long id, char cmd, int arg1)
 {
-    kicker_on_new_command(cmd, 100);
+    kicker_on_new_command(cmd, arg1);
     
     kicker_command_id = id;
     kicker_command = cmd;
 }
 
-void run_catcher_command(unsigned long id, char cmd)
+void run_catcher_command(unsigned long id, char cmd, int arg1)
 {
-    catcher_on_new_command(cmd, 100);
+    catcher_on_new_command(cmd, arg1);
     
     catcher_command_id = id;
     catcher_command = cmd;
@@ -61,7 +55,7 @@ void run_catcher_command(unsigned long id, char cmd)
 void send_state_message(void)
 {
     snprintf(&send_buffer[0], BUFFER_SIZE,
-        "(%lu %c %d %d %lu %c %d %lu %c %d %d)\n",        
+        "(%lu %c %d %d %lu %c %d %lu %c %d %d)\n",
         movement_command_id, movement_command, f2i(movement_direction), movement_command_fin,
         kicker_command_id, kicker_command, kicker_command_fin,
         catcher_command_id, catcher_command, catcher_command_fin,
@@ -146,10 +140,6 @@ void process_state_message(void)
         }
     }
 }
-
-void command_sethook_movement(movement_hook_t hook) { movement_hook = hook; }
-void command_sethook_kicker(kicker_hook_t hook)     { catcher_hook = hook; }
-void command_sethook_catcher(catcher_hook_t hook)   { kicker_hook = hook; }
 
 void command_finished_movement(void) { movement_command_fin = true; }
 void command_finished_kicker(void)   { kicker_command_fin = true; }
