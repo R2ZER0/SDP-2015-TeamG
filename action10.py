@@ -97,12 +97,12 @@ class Action10():
     
     def setKickerCommand(self, cmd, arg1):
         self.kick_handle._onNextCommand()
-        self.kick_handle = ActionHandle(self.kick_handle.idx+1, cmd, arg1, None)
+        self.kick_handle = ActionHandle(self.kick_handle.idx+1, cmd, arg1, 0)
         return self.kick_handle
 
     def setCatcherCommand(self, cmd):
         self.catch_handle._onNextCommand()
-        self.catch_handle = ActionHandle(self.catch_handle.idx+1, cmd, None, None)
+        self.catch_handle = ActionHandle(self.catch_handle.idx+1, cmd, 0, 0)
         return self.catch_handle
 
     # Put here extra methods to make sending commands easier
