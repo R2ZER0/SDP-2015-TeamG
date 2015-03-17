@@ -47,7 +47,7 @@ class ActionHandle(object):
         if(not self._completed):
             self._onCancel()
 
-class Action():
+class Action10():
     """Deals directly with the robot, to cater for all your robot commanding needs"""
     
     # Regex for parsing state messages
@@ -89,50 +89,24 @@ class Action():
     def exit(self):
         self._exit = True
         
-    # Movement commands
-    def _cmd_movement(self, cmd, angle, scale):
+    # Use these to send commands
+    def setMovementCommand(self, cmd, arg1, arg2):
         self.move_handle._onNextCommand()
-        self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
+        self.move_handle = ActionHandle(self.move_handle.idx+1, cmd, arg1, arg2)
         return self.move_handle
-
-    def last_command(self):
-	if self.move_handle.cmd == 'M':
-		dx = math.cos(self.move_handle.dir)*self.move_handle.spd
-		dy = math.sin(self.move_handle.dir)*self.move_handle.spd
-		return [dx,dy,0]
-	elif self.move_handle.cmd == 'T':
-		return [0,0,self.move_handle.spd]
-	else:
-		return [0,0,0]
-
-    def move(self, angle, scale=64):
-        return self._cmd_movement('M', angle+math.pi/2, scale)
-        
-    def turnBy(self, angle, scale=64):
-        target = mkangle(self.curr_dir + angle)
-        #print "Turning from " + str(self.curr_dir) + " to " + str(target)
-        return self._cmd_movement('T', target, scale)
-        
-    def stop(self):
-        return self._cmd_movement('S', 0, 0)
-        
-     # Kicker command
-    def kick(self, scale=100):
+    
+    def setKickerCommand(self, cmd, arg1):
         self.kick_handle._onNextCommand()
-        self.kick_handle = KickerActionHandle(self.kick_handle.idx+1, 'K', scale)
+        self.kick_handle = ActionHandle(self.kick_handle.idx+1, cmd, arg1, None)
         return self.kick_handle
-    
-    # Catcher commands
-    def _cmd_catcher(self, cmd, scale):
+
+    def setCatcherCommand(self, cmd):
         self.catch_handle._onNextCommand()
-        self.catch_handle = CatcherActionHandle(self.catch_handle.idx+1, cmd, scale)
+        self.catch_handle = ActionHandle(self.catch_handle.idx+1, cmd, None, None)
         return self.catch_handle
-    
-    def catch(self, scale=100):
-        return self._cmd_catcher('C', scale)
-    
-    def open_catcher(self, scale=100):
-        return self._cmd_catcher('R', scale)
+
+    # Put here extra methods to make sending commands easier
+    # e.g. .move(...), .kick(...), .catch(...)
     
     # State processing
     def process_message(self, message):
