@@ -8,12 +8,14 @@ import math
 
 class ActionHandle(object):
     """A handle on the result of commands"""
-    def __init__(self, idx, cmd):
+    def __init__(self, idx, cmd, arg1, arg2):
         self._finished = False
         self._completed = False
         self._running = False
         self.idx = idx
         self.cmd = cmd
+        self.arg1 = arg1
+        self.arg2 = arg2
 
     @property
     def finished(self):
@@ -44,25 +46,6 @@ class ActionHandle(object):
         self._running = False
         if(not self._completed):
             self._onCancel()
-            
-class MovementActionHandle(ActionHandle):
-    """A handle to a movement-related command"""
-    def __init__(self, idx, cmd, dir, spd):
-        super(MovementActionHandle, self).__init__(idx, cmd)
-        self.dir = dir
-        self.spd = spd
-        
-class KickerActionHandle(ActionHandle):
-    """A handle to kicker commands"""
-    def __init__(self, idx, cmd, spd):
-        super(KickerActionHandle, self).__init__(idx, cmd)
-        self.spd = spd
-        
-class CatcherActionHandle(ActionHandle):
-    """A handle to catcher commands"""
-    def __init__(self, idx, cmd, spd):
-        super(CatcherActionHandle, self).__init__(idx, cmd)
-        self.spd = spd
 
 class Action():
     """Deals directly with the robot, to cater for all your robot commanding needs"""
@@ -220,9 +203,9 @@ class Action():
             
             if self.num_messages_recvd > 10:
                 message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
-                    self.move_handle.idx, self.move_handle.cmd, f2i(self.move_handle.dir), self.move_handle.spd,
-                    self.kick_handle.idx, self.kick_handle.cmd, self.kick_handle.spd,
-                    self.catch_handle.idx, self.catch_handle.cmd, self.catch_handle.spd
+                    self.move_handle.idx, self.move_handle.cmd, self.move_handle.arg1, self.move_handle.arg2,
+                    self.kick_handle.idx, self.kick_handle.cmd, self.kick_handle.arg1,
+                    self.catch_handle.idx, self.catch_handle.cmd, self.catch_handle.arg1
                 )
                 
                 self.comm.write(message)

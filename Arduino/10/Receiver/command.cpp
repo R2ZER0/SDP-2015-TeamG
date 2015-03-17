@@ -93,12 +93,10 @@ void process_state_message(void)
         
         unsigned long move_cmd_id, kick_cmd_id, catch_cmd_id;
         char move_cmd, kick_cmd, catch_cmd;
-        float move_dir;
-        int move_speed, kick_speed, catch_speed;
+        int move_arg1, move_arg2, kick_arg1, catch_arg1;
     
-        int move_dir_tmp;
         int result = sscanf(&recv_buffer[0], "(%lu %c %d %d %lu %c %d %lu %c %d)",
-            &move_cmd_id, &move_cmd, &move_dir_tmp, &move_speed,
+            &move_cmd_id, &move_cmd, &move_arg1, &move_arg2,
             &kick_cmd_id, &kick_cmd, &kick_speed,
             &catch_cmd_id, &catch_cmd, &catch_speed
         );
@@ -107,30 +105,16 @@ void process_state_message(void)
         if(result == 10) {
             //Serial.println("Matching Result");
             
-            move_dir = i2f(move_dir_tmp);
-            
             if(move_cmd_id != movement_command_id) {
-                if(move_cmd == 'M' || move_cmd == 'T' || move_cmd == 'S') {
-                    Serial.println("MOVE");
-                    run_movement_command(move_cmd_id, move_cmd, move_dir, move_speed);
-                    Serial.println("ENDMOVE");
-                }
+                run_movement_command(move_cmd_id, move_cmd, move_arg1, move_arg2);
             }
             
             if(kick_cmd_id != kicker_command_id) {
-                if(kick_cmd == 'K' || kick_cmd == 'I') {
-                    Serial.println("KICK");
-                    run_kicker_command(kick_cmd_id, kick_cmd);
-                    Serial.println("ENDKICK");
-                }
+                run_kicker_command(kick_cmd_id, kick_cmd);
             }
             
             if(catch_cmd_id != catcher_command_id) {
-                if(catch_cmd == 'C' || catch_cmd == 'R' || catch_cmd == 'I') {
-                    Serial.println("CATCH");
-                    run_catcher_command(catch_cmd_id, catch_cmd);
-                    Serial.println("ENDCATCH");
-                }
+                run_catcher_command(catch_cmd_id, catch_cmd);
             }
             
         } else {
