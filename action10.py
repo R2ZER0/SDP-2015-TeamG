@@ -68,7 +68,7 @@ class Action():
     """Deals directly with the robot, to cater for all your robot commanding needs"""
     
     # Regex for parsing state messages
-    msg_re = re.compile('\((\d+) ([SMT]) (-?\d+) (1|0) (\d+) ([KI]) (1|0) (\d+) ([CRI]) (1|0) (-?\d+)\)')
+    msg_re = re.compile('\((\d+) ([SMT]) (1|0) (\d+) ([KI]) (1|0) (\d+) ([CRI]) (1|0)\)')
     
     def __init__(self, comm):
         self.comm = comm    
@@ -154,9 +154,9 @@ class Action():
     # State processing
     def process_message(self, message):
         """Parse and process the state message from the arduino"""
-        #'\((\d+) ([SMT]) (-?\d+) (1|0) (\d+) ([KI]) (1|0) (\d+) ([CRI]) (1|0) (-?\d+)\)'
-        #    mID   mCMD   mDIR    mFIN   kID   kCMD   kFIN   cID   cCMD   cFIN  sDIR
-        #     1      2      3       4     5     6       7     8      9     10    11
+        #'\((\d+) ([SMT]) (1|0) (\d+) ([KI]) (1|0) (\d+) ([CRI]) (1|0)\)'
+        #    mID   mCMD    mFIN   kID   kCMD  kFIN   cID   cCMD   cFIN
+        #     1      2       3     4     5      6     7      8     9  
         res = Action.msg_re.match(message)
         
         if res is not None:
@@ -165,19 +165,15 @@ class Action():
             
             move_id = int(res.group(1))
             move_cmd = res.group(2)
-            move_dir = i2f(int(res.group(3)))
-            move_fin = (1 == int(res.group(4)))
+            move_fin = (1 == int(res.group(3)))
             
-            kick_id = int(res.group(5))
-            kick_cmd = res.group(6)
-            kick_fin = (1 == int(res.group(7)))
+            kick_id = int(res.group(4))
+            kick_cmd = res.group(5)
+            kick_fin = (1 == int(res.group(6)))
             
-            catch_id = int(res.group(8))
-            catch_cmd = res.group(9)
-            catch_fin = (1 == int(res.group(10)))
-            
-            state_dir = i2f(int(res.group(11)))
-            self.curr_dir = state_dir
+            catch_id = int(res.group(7))
+            catch_cmd = res.group(8)
+            catch_fin = (1 == int(res.group(9)))
             
             # Detect if the command is running, finished etc
             if move_id == self.move_handle.idx:
