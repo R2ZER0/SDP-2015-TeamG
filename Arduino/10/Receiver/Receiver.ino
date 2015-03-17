@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include <SerialCommand.h>
 #include <SoftwareSerial.h>   // We need this even if we're not using a SoftwareSerial object due to the way the Arduino IDE compiles
+#include "command.h"
 
 
 #define LED_PIN 13  // Arduino LED on board
@@ -13,6 +14,21 @@
 #define CATCHER_MOTOR 2
 
 SerialCommand SCmd;   // The demo SerialCommand object
+
+void movement_on_new_command(char cmd, int arg1, int arg2)
+{
+  /* TODO */
+}
+
+void kicker_on_new_command(char cmd, int arg1)
+{
+  /* TODO */
+}
+
+void catcher_on_new_command(char cmd, int arg1)
+{
+  /* TODO */
+}
 
 void setup() {
 

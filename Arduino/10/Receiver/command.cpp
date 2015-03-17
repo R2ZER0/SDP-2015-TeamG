@@ -97,8 +97,8 @@ void process_state_message(void)
     
         int result = sscanf(&recv_buffer[0], "(%lu %c %d %d %lu %c %d %lu %c %d)",
             &move_cmd_id, &move_cmd, &move_arg1, &move_arg2,
-            &kick_cmd_id, &kick_cmd, &kick_speed,
-            &catch_cmd_id, &catch_cmd, &catch_speed
+            &kick_cmd_id, &kick_cmd, &kick_arg1,
+            &catch_cmd_id, &catch_cmd, &catch_arg1
         );
         
         // Make sure we got a full match
@@ -110,11 +110,11 @@ void process_state_message(void)
             }
             
             if(kick_cmd_id != kicker_command_id) {
-                run_kicker_command(kick_cmd_id, kick_cmd);
+                run_kicker_command(kick_cmd_id, kick_cmd, kick_arg1);
             }
             
             if(catch_cmd_id != catcher_command_id) {
-                run_catcher_command(catch_cmd_id, catch_cmd);
+                run_catcher_command(catch_cmd_id, catch_cmd, catch_arg1);
             }
             
         } else {
