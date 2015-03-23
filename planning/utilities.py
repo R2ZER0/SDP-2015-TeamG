@@ -1,62 +1,115 @@
 from math import tan, pi, hypot, log
-from planning.models import Robot
+from pyparsing import *
+from planning.models import Robot, FSM
 from Polygon import *
 from Polygon.Utils import pointList
 
 #  Thomas, still to document
-class FSM:
+def createFSM(parsedInput):
+    alphabet = [x for x in parsedInput[0][2][1] if x != ","]
+    name = parsedInput[0][1][1]
+    startState = parsedInput[0][4][1]
+    finalState = parsedInput[0][5][1]
+    transitions = []
 
-    def __init__(self, name, inAlph, states, initState, finalState, transTable, taskBindings):
-        self._alph = inAlph
-        self._states = states
-        self._initState = initState
-        self._finalState = finalState
-        self._taskBindings = taskBindings
+    for trans in parsedInput[1][1:]:
+        t = tuple([x for x in trans if x != "<" and x != ">" and x != ","])
+        transitions.append(t)
 
-        self._transTable = transTable
-        self._name = name
+    states = tuple([x for x in parsedInput[0][3][1] if x != ","])
 
-        self._currentState = self._initState
-        self._currentTask = None
+    lambdas = []
+    for lambdaStmt in parsedInput[2][1:]:
+        t = ''.join(map(str, lambdaStmt))
+        lambdas.append(t)
 
-    def consumeInput(self, inp):
-        assert inp in self._alph
-        
-        for tran in self._transTable:
-            if tran[0] == self._currentState and tran[1] == inp:
-                for binding in self._taskBindings:
-                    if binding[0] == self._currentState:
-                        self._currentTask = None #todo
-                self._currentState = tran[2]
-        # self._currentTask.execute() todo
+    dic = consumeLambdas(lambdas)
 
-    def getStates(self):
-        return self._states
+    checkAlphabet(alphabet, lambdas)
+    checkTransitions(alphabet, transitions)
+    checkLambdas(alphabet, dic)
 
-    def getAlpha(self):
-        return self._alph
+    fsm = FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
+    return fsm
 
-    def show(self):
-        print
-        print "------------------------------------------------------------------------------------------------------------------------------"
-        print "FSM '" + self._name + "'"
-        print
-        print "Recognised alphabet: " + str(self._alph)
-        print "States : " + str(self._states)
-        print "Initial State: " + str(self._initState)
-        print "Final State: " + str(self._finalState)
-        print "Current State: " + str(self._currentState)
-        print "Current Task: " + str(self._currentTask)
-        print
-        print "State/Task Bindings: "
-        for binding in self._taskBindings:
-            print binding
-        print
-        print "Transition Function"
-        for transition in self._transTable:
-            print transition
-        print "------------------------------------------------------------------------------------------------------------------------------"
-        print
+def createConfigGrammar():
+    # FSM grammar
+    inAlphKWD     = Literal("inAlph")
+    finalSKWD     = Literal("finalState")
+    statesKWD     = Literal("states")
+    initSKWD      = Literal("initialState")
+    nameKWD       = Literal("name")
+    lambdaSecKWD  = Literal("lambdaConditions")
+    machineSecKWD = Literal("machineParams")
+    transitionsKWD= Literal("transitions")
+    lambdaKWD     = Literal("lambda ")
+    worldKWD  = Literal("world")
+
+    
+
+    separator     = Literal(",")
+    leftAngBrkt   = Literal("<")
+    rightAngBrkt  = Literal(">")
+    assign        = Literal("=")
+    sMark         = Literal("\"")
+    colon         = Literal(":")
+    leftRndBrkt   = Literal("(")
+    rightRndBrkt  = Literal(")")
+
+
+    state         = Word(alphanums)
+    taskName      = Word(alphas)
+    conditionName = Word(alphas)
+    name          = Word(alphanums) 
+    letter        = Word(alphanums)
+
+    nameDef       = Group(nameKWD + name)
+    inAlphabetDef = Group(inAlphKWD + Group(letter + ZeroOrMore(separator + letter)))
+    statesDef     = Group(statesKWD + Group(state + ZeroOrMore(separator + state)))
+    initialSDef   = Group(initSKWD + state)
+    finalSDef     = Group(finalSKWD + state)
+
+    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + worldKWD + colon + Word(alphanums + ">< .+-(),\t\n"))
+    transition    = Group(leftAngBrkt + state + separator + OneOrMore(letter) + separator + taskName + separator + state + rightAngBrkt)
+
+    machineParamSec = machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
+    transitionSec   = transitionsKWD + OneOrMore(transition)
+    lambdaSec     = lambdaSecKWD + OneOrMore(lambdaStmt)
+
+    config          = Group(machineParamSec) + Group(transitionSec) + Group(lambdaSec)
+
+    return config
+
+def consumeLambdas(text):
+    strippedNewlines = [line.strip("\n") for line in text]
+
+    code = ""
+    dictionary={}
+
+    for line in strippedNewlines:
+        code = code + "dictionary.update({ " + line + " })\n"
+   
+    code_obj = compile(code, '<string>', 'exec')
+    exec(code_obj)
+    return dictionary
+
+def checkTransitions(alphabet, transitions):
+    for transition in transitions:
+        lettersAppearingInTrans = transition[1:len(transition)-2]
+        for candidateLetter in lettersAppearingInTrans:
+            if not candidateLetter in alphabet:
+                print "Parse error: Found a transition statement which is inconsistent with the FSM alphabet definition - namely '" + str(transition) + "'"
+                quit()
+
+def checkLambdas(alphabet, lambdas):
+    for lambdaStmt, code in lambdas.iteritems():
+        if not lambdaStmt in alphabet:
+            print "Parse error: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + lambdaStmt + "'"
+            quit()
+
+def checkAlphabet(alphabet, lambdas):
+    if not len(alphabet) == len(lambdas):
+        print "Parse warning: There are some FSM alphabet letters which do not have corresponding lambda condition triggers."
 
 
 
