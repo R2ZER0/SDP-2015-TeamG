@@ -92,13 +92,6 @@ t = { 'isBallInZone' : lambda world : world.pitch.zones[our_attacker.zone].isIns
 
 trans = [(start, 'isBallInZone', getBall)]
 
-
-
-
-
-
-
-
 def is_shot_blocked(world, our_robot, their_robot):
     '''Convenience function for checking if one robot's shot is blocked
     by another.

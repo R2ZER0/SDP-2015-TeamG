@@ -3,6 +3,7 @@ from models import *
 from collisions import *
 from tasks import *
 from utilities import *
+from pyparsing import *
 
 class Planner:
 

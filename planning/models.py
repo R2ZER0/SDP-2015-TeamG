@@ -603,3 +603,66 @@ class World(object):
                 self._allowWarning = False
                 # 
 
+class FSM:
+
+    def __init__(self, name, inAlph, states, initState, finalState, transTable, lambdaDict, lambdaDescs):
+        self._alph = inAlph
+        self._states = states
+        self._initState = initState
+        self._finalState = finalState
+        self._lambdas = lambdaDict
+        self._lambdaDescs = lambdaDescs
+
+        self._transTable = transTable
+        self._name = name
+
+        self._currentState = self._initState
+        self._currentTask = None
+
+    def consumeInput(self, inp, world, robot, role):
+        assert set(inp) <= set(self._alph)
+        
+        for tran in self._transTable:
+            if tran[0] == self._currentState and inp == list(tran[1:len(tran)-2]):
+                self._currentState = tran[len(tran) - 1]
+                if tran[len(tran) - 2] == "EXISTING":
+                    print "Executing exisiting task"
+                    self._currentTask.execute()
+                    return
+                else:
+                    print "Changing to execute new task"
+                    self._currentTask = eval(tran[len(tran) - 2])(world, robot, role)
+                    self._currentTask.execute()
+                    return
+        print "No transition entry for current state " + self._currentState + " and input '" + str(inp) + "'"
+
+    def getStates(self):
+        return self._states
+
+    def getAlpha(self):
+        return self._alph
+
+    def getLambdaDic(self):
+        return self._lambdas
+
+    def show(self):
+        print
+        print "------------------------------------------------------------------------------------------------------------------------------"
+        print "FSM '" + self._name + "'"
+        print
+        print "Recognised alphabet: " + str(self._alph)
+        print "States : " + str(self._states)
+        print "Initial State: " + str(self._initState)
+        print "Final State: " + str(self._finalState)
+        print "Current State: " + str(self._currentState)
+        print "Current Task: " + str(self._currentTask)
+        print
+        print "Transitions and associated tasks bindings: "
+        for trans in self._transTable:
+            print trans
+        print
+        print "Lambda condition triggers"
+        for lambdaDesc in self._lambdaDescs:
+            print lambdaDesc
+        print "------------------------------------------------------------------------------------------------------------------------------"
+        print
