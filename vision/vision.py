@@ -6,7 +6,7 @@ from colors import BGR_COMMON
 from collections import namedtuple
 import numpy as np
 from findHSV import CalibrationGUI
-
+import math
 
 TEAM_COLORS = set(['yellow', 'blue'])
 SIDES = ['left', 'right']
@@ -42,7 +42,6 @@ class Vision:
         self.zones = zones = self._get_zones(width, height)
 
         opponent_color = self._get_opponent_color(color)
-
         if our_side == 'left':
             self.us = [
                 RobotTracker(
@@ -81,6 +80,7 @@ class Vision:
                     name='Their Attacker', calibration=calibration)
             ]
 
+        self.buffer = [(None, None, None) for i in range(5)]
         # Set up trackers
         self.ball_tracker = BallTracker(
             (0, width, 0, height), 0, pitch, calibration)
@@ -192,12 +192,13 @@ class Vision:
         Returns:
             [5-tuple] positions     - locations of the robots and the ball
         """
+
         queues = [Queue() for i in range(5)]
         objects = [self.us[0], self.us[1], self.opponents[0], self.opponents[1], self.ball_tracker]
 
         # Define processes
         processes = [
-            Process(target=obj.find, args=((frame, queues[i]))) for (i, obj) in enumerate(objects)]
+            Process(target=obj.find, args=((frame, queues[i], self.buffer[i]))) for (i, obj) in enumerate(objects)]
 
         # Start processes
         for process in processes:
@@ -210,6 +211,13 @@ class Vision:
         # terminate processes
         for process in processes:
             process.join()
+        self.buffer = [(p['x'], p['y'], p['angle']) for p in positions]
+
+        for p in positions:
+            if p['angle'] is not None: 
+                p['angle'] = -p['angle']
+                while p['angle'] < 0:
+                    p['angle'] = p['angle'] + 2 * math.pi
 
         return positions
 
@@ -403,7 +411,7 @@ class GUI(object):
             cv2.circle(frame, location, 2, BGR_COMMON['white'], 1)
 
     def draw_robot(self, frame, position_dict, color):
-        if position_dict['box']:
+        if position_dict['box'] is not None:
             cv2.polylines(frame, [np.array(position_dict['box'])], True, BGR_COMMON[color], 2)
 
         if position_dict['front']:
