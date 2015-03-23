@@ -604,7 +604,8 @@ class FSM:
         self._name = name
 
         self._currentState = self._initState
-        self._currentTask = None
+        self._currentTask = AcquireBall(world,robot,"attacker")  #HACK
+        # self._currentTask = None
 
     def consumeInput(self, inp, world, robot, role):
         assert set(inp) <= set(self._alph)
@@ -612,13 +613,21 @@ class FSM:
         for tran in self._transTable:
             if tran[0] == self._currentState and inp == list(tran[1:len(tran)-2]):
                 self._currentState = tran[len(tran) - 1]
-                if tran[len(tran) - 2] == "EXISTING":
+                if tran[len(tran) - 2][1] == "EXISTING":
                     print "Executing exisiting task"
                     self._currentTask.execute()
                     return
                 else:
                     print "Changing to execute new task"
-                    self._currentTask = eval(tran[len(tran) - 2])(world, robot, role)
+                    # print tran[len(tran) - 2]
+                    t=[x for x in tran[len(tran) - 2] if x != "," and x != "[" and x != "]"]
+                    # print t
+                    code = t[0] + "(" + ','.join(t[1:]) + ")"
+                    # print code
+                    # quit()
+                    # self._currentTask = eval(''.join(tran[len(tran) - 2]))#(world, robot, role)
+                    self._currentTask = eval(code)
+                    # quit()
                     self._currentTask.execute()
                     return
         print "No transition entry for current state " + self._currentState + " and input '" + str(inp) + "'"
