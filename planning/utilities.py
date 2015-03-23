@@ -5,8 +5,9 @@ from planning.models import Robot, FSM
 from Polygon import *
 from Polygon.Utils import pointList
 
-#  Thomas, still to document
+
 def createFSM(parsedInput):
+
     alphabet = [x for x in parsedInput[0][2][1] if x != ","]
     name = parsedInput[0][1][1]
     startState = parsedInput[0][4][1]
@@ -14,9 +15,9 @@ def createFSM(parsedInput):
     transitions = []
 
     for trans in parsedInput[1][1:]:
-        t = tuple([x for x in trans if x != "<" and x != ">" and x != ","])
+        t = tuple([(x.asList() if type(x) == ParseResults else x) for x in trans if x != "<" and x != ">" and x != ","])
         transitions.append(t)
-
+    
     states = tuple([x for x in parsedInput[0][3][1] if x != ","])
 
     lambdas = []
@@ -45,6 +46,7 @@ def createConfigGrammar():
     transitionsKWD= Literal("transitions")
     lambdaKWD     = Literal("lambda ")
     worldKWD  = Literal("world")
+    exisitingKWD = Literal("EXISTING")
 
     
 
@@ -56,10 +58,16 @@ def createConfigGrammar():
     colon         = Literal(":")
     leftRndBrkt   = Literal("(")
     rightRndBrkt  = Literal(")")
+    leftSqBrkt    = Literal("[")
+    rightSqBrkt    = Literal("]")
+
+    arg = Word(alphanums)
+    argList = leftRndBrkt + Optional(Word(alphanums) + ZeroOrMore(separator + Word(alphanums+"_"))) + rightRndBrkt
 
 
     state         = Word(alphanums)
-    taskName      = Word(alphas)
+    taskInvocation     = Group(exisitingKWD) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + Word(alphanums+"_()")) + rightSqBrkt)
+    # taskInvocation     = Group(exisitingKWD) ^ Group(Word(alphas) + leftRndBrkt + Word(alphanums + ", ()_") + rightRndBrkt)
     conditionName = Word(alphas)
     name          = Word(alphanums) 
     letter        = Word(alphanums)
@@ -71,7 +79,7 @@ def createConfigGrammar():
     finalSDef     = Group(finalSKWD + state)
 
     lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + worldKWD + colon + Word(alphanums + ">< .+-(),\t\n"))
-    transition    = Group(leftAngBrkt + state + separator + OneOrMore(letter) + separator + taskName + separator + state + rightAngBrkt)
+    transition    = Group(leftAngBrkt + state + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
 
     machineParamSec = machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
     transitionSec   = transitionsKWD + OneOrMore(transition)
