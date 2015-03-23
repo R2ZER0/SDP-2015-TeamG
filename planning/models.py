@@ -105,7 +105,7 @@ class Vector(Coordinate):
         if angle == None or velocity == None:
             raise ValueError('Cannot initialise angle or velocity attributes to None') 
         elif angle < 0 or angle >= (2*pi):
-            raise ValueError('Vector angle initialised outwith range [0,2pi]')
+            raise ValueError('Vector angle initialised outwith range [0,2pi] ' + str(angle))
         elif velocity < 0:
             raise ValueError('Vector velocity initialised outwith range: >= 0')
         else:

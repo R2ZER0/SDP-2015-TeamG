@@ -46,10 +46,17 @@ class Controller:
 		assert our_side in ['left', 'right']
 		assert our_role in ['attacker', 'defender']
 
+		start_time = time.clock()
+
 		self.pitch = pitch
+		self.color = color
+		self.side = our_side
+		self.role = our_role
+		
 
 		# Set up camera for frames
 		self.camera = Camera(port=video_port, pitch=self.pitch)
+		self.calibration = tools.get_colors(self.pitch)
 
 		if comms:
 			self.comm = serial.Serial("/dev/ttyACM0", 115200, timeout=1)
@@ -58,45 +65,86 @@ class Controller:
 			self.comm = None
 
 		self.robot = Action(self.comm)
-		time.sleep(7)
+
+		# Capture first frame and set up vision
+
 		frame = self.camera.get_frame()
 		center_point = self.camera.get_adjusted_center(frame)
 
-		# Set up vision
-		self.calibration = tools.get_colors(self.pitch)
 		self.vision = Vision(
 			pitch=pitch, color=color, our_side=our_side,
 			frame_shape=frame.shape, frame_center=center_point,
 			calibration=self.calibration)
 
-		# Set up postprocessing for vision
+		# Set up pre- and postprocessing for vision
+		self.preprocessing = Preprocessing()
 		self.postprocessing = Postprocessing()
-
-		# Set up world
-		self.world = World(our_side, pitch)
-
-		# Set up main planner
-		self.planner = Planner(world=self.world, robot=self.robot, role=our_role, passing=passing)
 
 		# Set up GUI
 		self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
-		
-		# Set up predictors
-		self.ball_predictor = None
-		self.robot_predictor = None
+
+		self.world = World(our_side, pitch)
+		self.our_robot = self.world.our_attacker if self.role == 'attacker' else self.world.our_defender
+		# start capturing frames to fill up an intial world state
+		counter = 0
+		while time.clock() < start_time + 3:
+				frame = self.camera.get_frame()
+				pre_options = self.preprocessing.options
+				# Apply preprocessing methods toggled in the UI
+				preprocessed = self.preprocessing.run(frame, pre_options)
+				frame = preprocessed['frame']
+				if 'background_sub' in preprocessed:
+					cv2.imshow('bg sub', preprocessed['background_sub'])
+
+				# Find object positions
+				# model_positions have their y coordinate inverted
+				model_positions, regular_positions = self.vision.locate(frame)
+				model_positions = self.postprocessing.analyze(model_positions)
+
+				# Update world state
+				self.world.update_positions(model_positions)
+
+				# Information about the grabbers from the world
+				grabbers = {
+					'our_defender': self.world.our_defender.catcher_area,
+					'our_attacker': self.world.our_attacker.catcher_area
+				}
+
+				# Information about states
+				attackerState = ("NONE", "NONE")
+				defenderState = ("NONE", "NONE")
+
+				attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+				defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+
+				# Use 'y', 'b', 'r' to change color.
+				c = waitKey(2) & 0xFF
+
+				actions = []
+				fps = float(counter) / (time.clock() - start_time)
+				# Draw vision content and actions
+			
+				self.GUI.draw(
+					frame, model_positions, actions, regular_positions, fps, attackerState,
+					defenderState, attacker_actions, defender_actions, grabbers,
+					our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
+				counter += 1
+		# Set up main planner
+		self.planner = Planner(world=self.world, robot=self.robot, role=our_role, passing=passing)
 
 		# Set up our cache of commands for the predictors
 		self.command_cache = [[0,0,0]]*8
 		self.command = [0,0,0]
+		# Set up predictors
+		self.ball_predictor = KalmanBallPredictor(self.world.ball.vector, friction=0)
+		self.robot_predictor = KalmanRobotPredictor(self.world.our_attacker.vector, friction=-10, acceleration=25)
 
-		self.color = color
-		self.side = our_side
-		self.role = our_role
-		self.our_robot = self.world.our_attacker if self.role == 'attacker' else self.world.our_defender
-		
-		self.task = None
 
-		self.preprocessing = Preprocessing()
+
+
+
+
+
 
 	def run(self):
 		'''Main loop of the Controller. Executes a continuous loop doing the following:
@@ -139,24 +187,18 @@ class Controller:
 				# Update world state
 				self.world.update_positions(model_positions)
 
-				if self.ball_predictor is None:
-					self.ball_predictor = KalmanBallPredictor(self.world.ball.vector, friction=0)
-
-				if self.robot_predictor is None:
-					self.robot_predictor = KalmanRobotPredictor(self.world.our_attacker.vector, friction=-10, acceleration=25)
 
 				#: Run planner only every 5ms.
 				if (time.clock() - tracker) > 0.05: 
 				
 					self.command = self.command_cache.pop(0)
 					self.planner.plan()
-					#self.task.execute()
 					self.command_cache.append(self.robot.last_command())
 					tracker = time.clock()
 
 				ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
 				if regular_positions['ball']:
-					regular_positions['ball']['x'] =  self.world.ball.vector.x
+					regular_positions['ball']['x'] = self.world.ball.vector.x
 					regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
 				self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
 
@@ -191,8 +233,10 @@ class Controller:
 			if self.robot is not None:
 				self.robot.stop()
 				self.robot.exit()
-
 			tools.save_colors(self.pitch, self.calibration)
+
+
+
 
 # MAIN
 if __name__ == '__main__':
