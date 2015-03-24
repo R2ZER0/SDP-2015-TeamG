@@ -112,12 +112,12 @@ class Planner:
 					y = their_goal.y + 20
 				else:
 					y = their_goal.y - 20
-			#	self._current_task = KickToPoint(world, robot, role, their_goal.x, y)
-			#	self._current_task.execute()
-			#if isinstance(self._current_task, KickToPoint) and self._current_task.complete:
-			#	robot.stop()
-			#	self._current_state = self.INITIAL
-			#	self._current_task = None
+				self._current_task = KickToPoint(world, robot, role, their_goal.x, y)
+				self._current_task.execute()
+			if isinstance(self._current_task, KickToPoint) and self._current_task.complete:
+				robot.stop()
+				self._current_state = self.INITIAL
+				self._current_task = None
 
 		else:
 			robot.stop()

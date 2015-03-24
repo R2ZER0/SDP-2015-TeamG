@@ -185,6 +185,49 @@ class MirrorObject(MoveToPoint, TurnToObject):
         else:
             self.y = self.pitch_object.y
             MoveToPoint.execute(self)
+
+class KickToPoint(TurnToPoint):
+    '''Generic kick to point task. Rotate to face the point (x,y) and kick.'''
+
+    #: Assigned True when the Task has kicked the ball
+    kicked = False
+
+    #: The action handle from kicking
+    catch_handle = None
+    kick_handle = None
+
+    def __init__(self,world,robot,role,x,y):
+        TurnToPoint.__init__(self, world, robot, role, x, y);
+
+    def execute(self):
+
+        if self.kicked:
+            return
+
+        # Turn if we still have to
+        if TurnToPoint.turn(self):
+            TurnToPoint.execute(self)
+        else:
+
+            # Open catcher
+            if self.catch_handle is None:
+                catch_handle = self.robot.open_catcher()
+
+            # Kick
+            elif catch_handle.finished and kick_handle is None:
+                kick_handle = self.robot.kick()
+
+            # Wait for kick to complete
+            elif kick_handle.finished:
+                kicked = True
+
+class Shoot(KickToPoint):
+    '''Simple Shoot task. Rotates the robot to face the goal and then kicks.'''
+    
+    def __init__(self,world,robot,role):
+        x = world.their_goal.x
+        y = world.their_goal.y
+        KickToPoint.__init__(world,robot,role,x,y)
         
 class AcquireBall(MoveToPoint, TurnToPoint):
 
