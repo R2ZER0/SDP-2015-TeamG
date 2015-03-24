@@ -19,7 +19,7 @@ const int MOTOR[] = { MOTOR_MOTOR1, MOTOR_MOTOR2, MOTOR_MOTOR3, MOTOR_MOTOR4 };
 #define KI 0.0
 #define KD 0.0
 
-#define SETPOINT 60.0
+#define SETPOINT 80.0
 
 void runMotor(int motor, int motor_speed)
 {
@@ -53,7 +53,7 @@ PID* wheel_pids[NUM_MOTORS] = { 0 };
 /* Motor movement sensors stuff */
 unsigned long next_pid_time = 0L;
 
-const int sample_time_ms = 1000;
+const int sample_time_ms = 250;
 
 void * operator new (size_t size, void * ptr) { return ptr; }
 
@@ -82,6 +82,12 @@ void setup() {
 //     while(Serial.available() > 0) { Serial.read(); }
 }
 
+double signof(double a) {
+    if(a < 0) { return -1; }
+    else if(a > 0) { return 1; }
+    else { return 0; }
+}
+
 void loop() {
     
     // Request motor position deltas from rotary slave board
@@ -101,20 +107,25 @@ void loop() {
         
         /* Computes new PID expected values for desired speeds and update motors. */
         for (int i = 0; i < NUM_MOTORS; i++) {
-            PID *pid = wheel_pids[i];
+           /* PID *pid = wheel_pids[i];
 
             if (desired_speeds[i] < 0) {
                 pid->SetOutputLimits(-100, -30);
             } else {
                 pid->SetOutputLimits(30, 100);
-            }
-
-            pid->Compute();
+            }*/
+            double delta = KP * (desired_speeds[i] - wheel_speeds[i]);
+            motor_powers[i] += delta;
+            
+            if(abs(motor_powers[i]) > 100) { motor_powers[i] = signof(motor_powers[i]) * 100; }
+            if(abs(motor_powers[i]) < 30)  { motor_powers[i] = signof(motor_powers[i]) * 30; }
+            
+            //pid->Compute();
         }
 
         // Run motors at these values
         for(int i = 0; i < NUM_MOTORS; ++i) {
-            runMotor(MOTOR[i], motor_powers[i]);
+            runMotor(MOTOR[i], (int)motor_powers[i]);
         }
         
         Serial.print("\tTarget: ");
