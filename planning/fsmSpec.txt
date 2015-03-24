@@ -1,0 +1,19 @@
+machineParams
+name 			controlFSM
+inAlph			ballInZone, ballNotInZone, partnerHasBall
+states s0, s1
+initialState	s0
+finalState		s1
+
+transitions
+<s0, ballInZone, [MoveToPoint, world, robot, role, predict_y_intersection(world, 2, robot), 4], s1>
+<s0, ballInZone,[EXISTING], s1>
+<s0, ballNotInZone, [AcquireBall, world, robot, role], s0>
+
+lambdaConditions
+"ballInZone" : lambda world : True
+"ballNotInZone" : lambda world : False
+
+
+
+
