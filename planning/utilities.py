@@ -34,7 +34,10 @@ def createFSM(parsedInput):
     return fsm
 
 def createConfigGrammar():
-    # FSM grammar
+    """Here, we define the PyParsing grammar to use when executing a parse run of an FSM
+    input specification script"""
+
+    # Define the keywords
     inAlphKWD     = Literal("inAlph")
     finalSKWD     = Literal("finalState")
     statesKWD     = Literal("states")
@@ -44,12 +47,11 @@ def createConfigGrammar():
     machineSecKWD = Literal("machineParams")
     transitionsKWD= Literal("transitions")
     lambdaKWD     = Literal("lambda ")
-    worldKWD  = Literal("world")
-    exisitingKWD = Literal("EXISTING")
-    plannerKWD = Literal("planner")
+    worldKWD      = Literal("world")
+    exisitingKWD  = Literal("EXISTING")
+    plannerKWD    = Literal("planner")
 
-    
-
+    # Define the various single-character tokens we wish to recognise
     separator     = Literal(",")
     leftAngBrkt   = Literal("<")
     rightAngBrkt  = Literal(">")
@@ -59,14 +61,13 @@ def createConfigGrammar():
     leftRndBrkt   = Literal("(")
     rightRndBrkt  = Literal(")")
     leftSqBrkt    = Literal("[")
-    rightSqBrkt    = Literal("]")
+    rightSqBrkt   = Literal("]")
 
-    arg = Word(alphanums)
-    argList = leftRndBrkt + Optional(Word(alphanums) + ZeroOrMore(separator + Word(alphanums+"_"))) + rightRndBrkt
-
-
+    # A 'state' is an alphanumeric 'word'
     state         = Word(alphanums)
-    taskInvocation     = Group(exisitingKWD) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + Word(alphanums+"_()")) + rightSqBrkt)
+
+    # A task invocation is either the key
+    taskInvocation= Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + Word(alphanums+"_()")) + rightSqBrkt)
     conditionName = Word(alphas)
     name          = Word(alphanums) 
     letter        = Word(alphanums)
@@ -80,11 +81,11 @@ def createConfigGrammar():
     lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-(),\t\n"))
     transition    = Group(leftAngBrkt + state + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
 
-    machineParamSec = machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
-    transitionSec   = transitionsKWD + OneOrMore(transition)
-    lambdaSec     = lambdaSecKWD + OneOrMore(lambdaStmt)
+    machineParamSec= machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
+    transitionSec  = transitionsKWD + OneOrMore(transition)
+    lambdaSec      = lambdaSecKWD + OneOrMore(lambdaStmt)
 
-    config          = Group(machineParamSec) + Group(transitionSec) + Group(lambdaSec)
+    config         = Group(machineParamSec) + Group(transitionSec) + Group(lambdaSec)
 
     return config
 
