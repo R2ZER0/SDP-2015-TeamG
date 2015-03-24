@@ -13,8 +13,8 @@
 #define MOTOR_MOTOR3 0
 #define MOTOR_MOTOR4 5
 
-#define ATUNE_STEP 5
-#define ATUNE_NOISE 11
+#define ATUNE_STEP 20
+#define ATUNE_NOISE 5
 
 void runMotor(int motor, int motor_speed)
 {
@@ -51,7 +51,7 @@ PID_ATune atune(&(wheel_speeds[0]), &(motor_powers[0]));
 /* Motor movement sensors stuff */
 unsigned long next_pid_time = 0L;
 
-const int sample_time_ms = 200;
+const int sample_time_ms = 1000;
 
 void * operator new (size_t size, void * ptr) { return ptr; }
 
@@ -82,9 +82,9 @@ void setup() {
 //     while(Serial.available() == 0);
 //     while(Serial.available() > 0) { Serial.read(); }
     
-    desired_speeds[0] = 60;
-    wheel_speeds[0] = 60;
-    motor_powers[0] = 60;
+    //desired_speeds[0] = 60;
+    wheel_speeds[0] = 50;
+    motor_powers[0] = 70;
 }
 
 void loop() {
@@ -117,15 +117,20 @@ void loop() {
 //             pid->Compute();
 //         }
         
-        int res = atune.Runtime();
+        int res = 0;
+        
+        static int count = 0;
+        if(count++ > 10) {
+            res = atune.Runtime();
+        } else {
+            Serial.println("Wait...");
+        }
             
         if(res != 0) {
             Serial.print("Kp="); Serial.print(atune.GetKp());
             Serial.print("\tKi="); Serial.print(atune.GetKi());
             Serial.print("\tKd="); Serial.print(atune.GetKd());
             Serial.println();
-        } else {
-            Serial.println("Tuning");
         }
 
         // Run motors at these values
