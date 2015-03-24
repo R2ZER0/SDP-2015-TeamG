@@ -100,7 +100,7 @@ void setup_movement()
         PID *pid = new PID(&(wheel_speeds[i]), &(motor_powers[i]), &(desired_speeds[i]), 
                                 0.5, 0.0, 0.25, DIRECT);
         pid->SetMode(AUTOMATIC);
-        pid->SetSampleTime(1000);
+        pid->SetSampleTime(sample_time_ms);
 
         wheel_pids[i] = pid;
     }
