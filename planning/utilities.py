@@ -66,7 +66,6 @@ def createConfigGrammar():
 
     state         = Word(alphanums)
     taskInvocation     = Group(exisitingKWD) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + Word(alphanums+"_()")) + rightSqBrkt)
-    # taskInvocation     = Group(exisitingKWD) ^ Group(Word(alphas) + leftRndBrkt + Word(alphanums + ", ()_") + rightRndBrkt)
     conditionName = Word(alphas)
     name          = Word(alphanums) 
     letter        = Word(alphanums)
