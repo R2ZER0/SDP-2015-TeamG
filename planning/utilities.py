@@ -46,6 +46,7 @@ def createConfigGrammar():
     lambdaKWD     = Literal("lambda ")
     worldKWD  = Literal("world")
     exisitingKWD = Literal("EXISTING")
+    plannerKWD = Literal("planner")
 
     
 
@@ -76,7 +77,7 @@ def createConfigGrammar():
     initialSDef   = Group(initSKWD + state)
     finalSDef     = Group(finalSKWD + state)
 
-    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + worldKWD + colon + Word(alphanums + ">< .+-(),\t\n"))
+    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-(),\t\n"))
     transition    = Group(leftAngBrkt + state + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
 
     machineParamSec = machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
