@@ -17,7 +17,7 @@ const int MOTOR[] = { MOTOR_MOTOR1, MOTOR_MOTOR2, MOTOR_MOTOR3, MOTOR_MOTOR4 };
 
 #define KP 1.0
 #define KI 0.0
-#define KD 0.0
+#define KD 0.5
 
 #define SETPOINT 80.0
 
@@ -49,6 +49,8 @@ double motor_powers[NUM_MOTORS] = { 0 };
 
 // Set up PID controllers for each wheel
 PID* wheel_pids[NUM_MOTORS] = { 0 };
+
+double wheel_prev_error[NUM_MOTORS] = { 0.0 };
 
 /* Motor movement sensors stuff */
 unsigned long next_pid_time = 0L;
@@ -88,6 +90,8 @@ double signof(double a) {
     else { return 0; }
 }
 
+double prev_error = 0.0;
+
 void loop() {
     
     // Request motor position deltas from rotary slave board
@@ -114,7 +118,14 @@ void loop() {
             } else {
                 pid->SetOutputLimits(30, 100);
             }*/
-            double delta = KP * (desired_speeds[i] - wheel_speeds[i]);
+           
+           
+            double error = (desired_speeds[i] - wheel_speeds[i]);
+           
+            double d_error = error - wheel_prev_error[i];
+            wheel_prev_error[i] = error;
+            
+            double delta = KP * error + KD * d_error;
             motor_powers[i] += delta;
             
             if(abs(motor_powers[i]) > 100) { motor_powers[i] = signof(motor_powers[i]) * 100; }
