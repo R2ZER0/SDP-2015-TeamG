@@ -13,8 +13,8 @@
 #define MOTOR_MOTOR3 0
 #define MOTOR_MOTOR4 5
 
-#define ATUNE_STEP 20
-#define ATUNE_NOISE 5
+#define ATUNE_STEP 10
+#define ATUNE_NOISE 2
 
 void runMotor(int motor, int motor_speed)
 {
@@ -73,7 +73,7 @@ void setup() {
     atune.SetNoiseBand(ATUNE_NOISE);
     atune.SetOutputStep(ATUNE_STEP);
     atune.SetControlType(1);
-    atune.SetLookbackSec(2);
+    atune.SetLookbackSec(24);
     
 //     while(Serial.available() > 0) { Serial.read(); }
 //     
