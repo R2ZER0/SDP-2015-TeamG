@@ -32,7 +32,7 @@ class Controller:
 	Processing and Planning to move the Robot.
 	''' 
 
-	def __init__(self, passing, pitch=0, color='yellow', our_side='left', our_role='attacker', video_port=0, comms=True):
+	def __init__(self, pitch=0, color='yellow', our_side='left', our_role='attacker', video_port=0, comms=True):
 		'''Initialises the main controller. Constructs all necessary elements; doesn't start until
 		run is called.
 
@@ -133,8 +133,9 @@ class Controller:
 					defenderState, attacker_actions, defender_actions, grabbers,
 					our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
 				counter += 1
+
 		# Set up main planner
-		self.planner = Planner(world=self.world, robot=self.robot, role=our_role, passing=passing)
+		self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
 
 		# Set up our cache of commands for the predictors
 		self.command_cache = [[0,0,0]]*8
@@ -251,12 +252,9 @@ if __name__ == '__main__':
     parser.add_argument(
         "-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
 
-    parser.add_argument("--passing", dest='passing', help="Signals us as the passing robot.", action="store_true")
-    parser.add_argument("--receiving", dest='passing', help="Signals us as the receigin robot.", action="store_false")
-
     args = parser.parse_args()
 
     if args.nocomms:
-        Controller(args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False).run()
+        Controller(pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False).run()
     else:
-        Controller(args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role).run()
+        Controller(pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role).run()
