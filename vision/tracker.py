@@ -3,7 +3,7 @@ import numpy as np
 import math
 from collections import namedtuple
 import warnings
-
+import pdb
 # Turning on KMEANS fitting:
 KMEANS = False
 
@@ -189,47 +189,35 @@ class RobotTracker(Tracker):
         return self.get_contour_corners(self.join_contours(contours))
 
     def find_dot(self, frame, x_offset, y_offset, angle=None):
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        gray = cv2.equalizeHist(gray)
-        gray = cv2.blur(frame, (3, 3))
-
-        x = cv2.Sobel(gray, cv2.cv.CV_16S, 1, 0, 3)
-        x = cv2.convertScaleAbs(x, x)
-
-        y = cv2.Sobel(gray, cv2.cv.CV_16S, 0, 1, 3)
-        y = cv2.convertScaleAbs(y, y)
-
-        total = cv2.addWeighted(x,0.5,y,0.5,0)
-
-        params = cv2.SimpleBlobDetector_Params()
-
-        detector = cv2.SimpleBlobDetector() 
-        # Detect blobs.
+        #pdb.set_trace()
+        detector = cv2.SimpleBlobDetector()
         kp = detector.detect(frame)
-        r = 6
-        scores = []
-        height, width, channel = frame.shape
-        if len(kp) == 0:
-            sift = cv2.SIFT(nfeatures = 5)
-            kp = sift.detect(total,None)
-        for p in kp:
-            x = p.pt[0]
-            y = p.pt[1]
-            mask_frame = np.zeros((height,width,3), np.uint8)
-            screen_frame = frame.copy()
-            cv2.circle(mask_frame, (x, y), r, (255, 255, 255), -1)
-            # Mask the original image
-            mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
-            c = cv2.bitwise_and(screen_frame, screen_frame, mask=mask_frame)
-            adjustment = self.calibration['dot']
-            contours = self.join_contours(self.get_contours(c, adjustment))
-            if contours is not None and len(contours) > 0 and cv2.contourArea(contours) > 10:
-                area = cv2.contourArea(contours)
-                scores.append(((x,y), area))
+        if len(kp) == 1:
+            return Center(kp[0].pt[0] + x_offset, kp[0].pt[1] + y_offset)
+        elif len(kp) > 1:
+            height = frame.shape[0]
+            width= frame.shape[1]
+            r = 6
+            scores = []
+            for p in kp:
+                x = p.pt[0]
+                y = p.pt[1]
+                mask_frame = np.zeros((height,width,3), np.uint8)
+                screen_frame = frame.copy()
+                cv2.circle(mask_frame, (x, y), r, (255, 255, 255), -1)
+                # Mask the original image
+                mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
+                c = cv2.bitwise_and(screen_frame, screen_frame, mask=mask_frame)
+                adjustment = self.calibration['dot']
+                contours = self.get_contours(screen_frame, adjustment)
+                if contours and len(contours) > 0:
+                    # Take the largest contour
+                    contour = self.get_largest_contour(contours)
+                    contour_area = cv2.contourArea(contour)
+                    scores.append(((x,y), contour_area))
             if len(scores) > 0:
-                print scores
                 scores.sort(key=lambda x: x[1], reverse=True)
-                return Center(scores[0][0][0] + x_offset,scores[0][0][1] + y_offset)
+                return Center(int(scores[0][0][0] + x_offset), int(scores[0][0][1] + y_offset))
         return None
 
 
@@ -255,17 +243,32 @@ class RobotTracker(Tracker):
             y += offset_y
 
             # (2) Trim to create a smaller frame
-            plate_frame = self.crop_to(frame.copy(), x, y, 40)
-            offset_x = int(max(0, x - 20))
-            offset_y = int(max(0, y - 20))
+            plate_frame = self.crop_to(frame.copy(), x, y, 50)
+            offset_x = int(max(0, x - 25))
+            offset_y = int(max(0, y - 25))
             # (3) Search for the dot
             
             # Pass in corners of the plate for dot estimation
             dot = self.find_dot(plate_frame, offset_x, offset_y, angle=old_angle)
 
+            if dot is None:
+                gray = cv2.cvtColor(plate_frame, cv2.COLOR_BGR2GRAY)
+                gray = cv2.equalizeHist(gray)
+                dot = self.find_dot(gray, offset_x, offset_y, angle = old_angle)
+            if dot is None:
+                x_edge = cv2.Sobel(gray, cv2.cv.CV_16S, 1, 0, 3)
+                x_edge = cv2.convertScaleAbs(x_edge, x_edge)
+
+                y_edge = cv2.Sobel(gray, cv2.cv.CV_16S, 0, 1, 3)
+                y_edge = cv2.convertScaleAbs(y_edge, y_edge)
+
+                total = cv2.addWeighted(x_edge,0.5,y_edge,0.5,0)
+                dot = self.find_dot(total, offset_x, offset_y, angle = old_angle)
+
             if dot is not None:
                 angle = math.atan2(y - dot.y, x - dot.x)
-            elif old_angle is None:
+
+            else:
                 side_A = math.hypot(colour[0][0] - colour[1][0], colour[0][1] - colour[1][1])
                 side_B = math.hypot(colour[1][0] - colour[2][0], colour[1][1] - colour[2][1])
                 # find the longer edge
@@ -273,8 +276,6 @@ class RobotTracker(Tracker):
                     angle = math.atan2(colour[0][1] - colour[1][1], colour[1][0] - colour[0][0])
                 else:
                     angle = math.atan2(colour[1][1] - colour[2][1], colour[2][0] - colour[1][0])
-            else:
-                angle =  old_angle
             while angle < 0:
                 angle += 2 * math.pi
             while angle > 2 * math.pi:
