@@ -1,28 +1,32 @@
+from cv2 import waitKey
+import time
+
+import cv2
+import serial
+import warnings
+
 from action import Action
-from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint, MirrorObject
 from planning.planner import Planner
-from planning.models import World
+from planning.tasks import AcquireBall
 from vision.vision import Vision, Camera, GUI
 import vision.tools as tools
 from prediction.Prediction import KalmanBallPredictor, KalmanRobotPredictor
 from preprocessing.preprocessing import Preprocessing
 from postprocessing.postprocessing import Postprocessing
-from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
-from cv2 import waitKey
-import cv2
-import math
-import serial
-import warnings
-import time
 from planning.models import World
-from simulator.simulator import Simulator, SimulatedAction, SimulatedCamera
+
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
 class MyError(Exception):
-	     def __init__(self, value):
-	         self.value = value
-	     def __str__(self):
-	         return repr(self.value)
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
 class Controller:
 	'''Main controller for the Robot. Pulls together all modules and executes our Vision, 
 	Processing and Planning to move the Robot.
@@ -202,26 +206,27 @@ class Controller:
 
 # MAIN
 if __name__ == '__main__':
-	import argparse
-	parser = argparse.ArgumentParser()
+    import argparse
 
-	parser.add_argument('-p', '--pitch', type=int, default=0, help="[0] Main pitch (Default), [1] Secondary pitch")
-	parser.add_argument('-s', '--side', default='left', help="Our team's side ['left', 'right'] allowed. [Default: left]")
-	parser.add_argument(
-		'-r', '--role', default='attacker', help="Our controlled robot's role ['attacker', 'defender'] allowed. [Default: attacker]")
-	parser.add_argument(
-		'-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
-	parser.add_argument(
-		"-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
-	
-	parser.add_argument("--passing", dest='passing', help="Signals us as the passing robot.", action="store_true")
-	parser.add_argument("--receiving", dest='passing', help="Signals us as the receigin robot.", action="store_false")
-	
-	args = parser.parse_args()
+    parser = argparse.ArgumentParser()
 
-	if args.nocomms:
-		c = Controller(
-			args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False).run()
-	else:
-		c = Controller(
-			args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role).run()
+    parser.add_argument('-p', '--pitch', type=int, default=0, help="[0] Main pitch (Default), [1] Secondary pitch")
+    parser.add_argument('-s', '--side', default='left',
+                        help="Our team's side ['left', 'right'] allowed. [Default: left]")
+    parser.add_argument(
+        '-r', '--role', default='attacker',
+        help="Our controlled robot's role ['attacker', 'defender'] allowed. [Default: attacker]")
+    parser.add_argument(
+        '-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
+    parser.add_argument(
+        "-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
+
+    parser.add_argument("--passing", dest='passing', help="Signals us as the passing robot.", action="store_true")
+    parser.add_argument("--receiving", dest='passing', help="Signals us as the receigin robot.", action="store_false")
+
+    args = parser.parse_args()
+
+    if args.nocomms:
+        Controller(args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role, comms=False).run()
+    else:
+        Controller(args.passing, pitch=args.pitch, color=args.color, our_side=args.side, our_role=args.role).run()
