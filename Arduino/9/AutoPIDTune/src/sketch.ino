@@ -73,7 +73,7 @@ void setup() {
     atune.SetNoiseBand(ATUNE_NOISE);
     atune.SetOutputStep(ATUNE_STEP);
     atune.SetControlType(1);
-    atune.SetLookbackSec(1);
+    atune.SetLookbackSec(2);
     
 //     while(Serial.available() > 0) { Serial.read(); }
 //     
@@ -82,7 +82,8 @@ void setup() {
 //     while(Serial.available() == 0);
 //     while(Serial.available() > 0) { Serial.read(); }
     
-    desired_speeds[0] = 50;
+    desired_speeds[0] = 60;
+    wheel_speeds[0] = 60;
     motor_powers[0] = 60;
 }
 
@@ -116,13 +117,15 @@ void loop() {
 //             pid->Compute();
 //         }
         
-        byte res = atune.Runtime();
+        int res = atune.Runtime();
             
-        if(res == 1) {
+        if(res != 0) {
             Serial.print("Kp="); Serial.print(atune.GetKp());
             Serial.print("\tKi="); Serial.print(atune.GetKi());
             Serial.print("\tKd="); Serial.print(atune.GetKd());
             Serial.println();
+        } else {
+            Serial.println("Tuning");
         }
 
         // Run motors at these values
