@@ -193,7 +193,7 @@ void rotary_update_positions() {
     if(millis() > next_print_time) {
 
         for (int i = 0; i < NUM_MOTORS; i++) {
-            wheel_speeds[i] = (float) (wheel_movement[i]) * (1000/sample_time_ms);
+            wheel_speeds[i] = (float) (wheel_movement[i]) * (1000.0/sample_time_ms);
             wheel_movement[i] = 0;
         }
         
