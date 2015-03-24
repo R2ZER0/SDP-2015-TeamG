@@ -7,134 +7,134 @@ import signal
 import math
 
 class ActionHandle(object):
-	"""A handle on the result of commands"""
-	def __init__(self, idx, cmd):
-		self._finished = False
-		self._completed = False
-		self._running = False
-		self.idx = idx
-		self.cmd = cmd
+    """A handle on the result of commands"""
+    def __init__(self, idx, cmd):
+        self._finished = False
+        self._completed = False
+        self._running = False
+        self.idx = idx
+        self.cmd = cmd
 
-	@property
-	def finished(self):
-		return self._finished
-	
-	@property
-	def completed(self):
-		return self._completed
-	
-	@property
-	def running(self):
-		return self._running
-	
-	# Helpers to update the state of this handle
-	def _onCancel(self):
-		self._completed = True
-		self._running = False
-		
-	def _onComplete(self):
-		self._finished = True
-		self._running = False
-		self._completed = True
-		
-	def _onRunning(self):
-		self._running = True
-		
-	def _onNextCommand(self):
-		self._running = False
-		if(not self._completed):
-			self._onCancel()
-			
+    @property
+    def finished(self):
+        return self._finished
+    
+    @property
+    def completed(self):
+        return self._completed
+    
+    @property
+    def running(self):
+        return self._running
+    
+    # Helpers to update the state of this handle
+    def _onCancel(self):
+        self._completed = True
+        self._running = False
+        
+    def _onComplete(self):
+        self._finished = True
+        self._running = False
+        self._completed = True
+        
+    def _onRunning(self):
+        self._running = True
+        
+    def _onNextCommand(self):
+        self._running = False
+        if(not self._completed):
+            self._onCancel()
+            
 class MovementActionHandle(ActionHandle):
-	"""A handle to a movement-related command"""
-	def __init__(self, idx, cmd, dir, spd):
-		super(MovementActionHandle, self).__init__(idx, cmd)
-		self.dir = dir
-		self.spd = spd
-		
+    """A handle to a movement-related command"""
+    def __init__(self, idx, cmd, dir, spd):
+        super(MovementActionHandle, self).__init__(idx, cmd)
+        self.dir = dir
+        self.spd = spd
+        
 class KickerActionHandle(ActionHandle):
-	"""A handle to kicker commands"""
-	def __init__(self, idx, cmd, spd):
-		super(KickerActionHandle, self).__init__(idx, cmd)
-		self.spd = spd
-		
+    """A handle to kicker commands"""
+    def __init__(self, idx, cmd, spd):
+        super(KickerActionHandle, self).__init__(idx, cmd)
+        self.spd = spd
+        
 class CatcherActionHandle(ActionHandle):
-	"""A handle to catcher commands"""
-	def __init__(self, idx, cmd, spd):
-		super(CatcherActionHandle, self).__init__(idx, cmd)
-		self.spd = spd
+    """A handle to catcher commands"""
+    def __init__(self, idx, cmd, spd):
+        super(CatcherActionHandle, self).__init__(idx, cmd)
+        self.spd = spd
 
 # A simple (approx) encoding for floats
 def i2f(i):
-	return float(i)/1024.0
+    return float(i)/1024.0
 
 def f2i(f):
-	return int(f*1024)
+    return int(f*1024)
 
 def mkangle(a):
-	while a > math.pi:
-		a -= 2.0*math.pi
-	while a <= (0 - math.pi):
-		a += 2.0*math.pi
-	return a
+    while a > math.pi:
+        a -= 2.0*math.pi
+    while a <= (0 - math.pi):
+        a += 2.0*math.pi
+    return a
 
 class Action():
-	"""Deals directly with the robot, to cater for all your robot commanding needs"""
-	
-	# Regex for parsing state messages
-	msg_re = re.compile('\((\d+) ([SMT]) (-?\d+) (1|0) (\d+) ([KI]) (1|0) (\d+) ([CRI]) (1|0) (-?\d+)\)')
-	
-	def __init__(self, comm):
-		self.comm = comm    
-		
-		# Command handles
-		self.move_handle = MovementActionHandle(100, 'S', 0, 0)
-		self.kick_handle = KickerActionHandle(100, 'I', 0)
-		self.catch_handle = CatcherActionHandle(100, 'I', 0)
-		
-		# Last known MPU output
-		self.curr_dir = 0.0
-		
-		# Number of messages received
-		self.num_messages_recvd = 0
-		
-		if self.comm:
-			# Comms threads
-			self._exit = False
-			def set_exit():
-				self._exit = True
-			atexit.register(set_exit)
-			
-			self.prev_handler = None
-			def handler(signum, frame):
-				self._exit = True
-				self.prev_handler(signum, frame)
-			self.prev_handler = signal.signal(2, handler)
-			
-			self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
-			self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
-			
-			self.recv_thread.start()
-			self.send_thread.start()
-	
-	def exit(self):
-		self._exit = True
+    """Deals directly with the robot, to cater for all your robot commanding needs"""
+    
+    # Regex for parsing state messages
+    msg_re = re.compile('\((\d+) ([SMT]) (-?\d+) (1|0) (\d+) ([KI]) (1|0) (\d+) ([CRI]) (1|0) (-?\d+)\)')
+    
+    def __init__(self, comm):
+        self.comm = comm    
+        
+        # Command handles
+        self.move_handle = MovementActionHandle(100, 'S', 0, 0)
+        self.kick_handle = KickerActionHandle(100, 'I', 0)
+        self.catch_handle = CatcherActionHandle(100, 'I', 0)
+        
+        # Last known MPU output
+        self.curr_dir = 0.0
+        
+        # Number of messages received
+        self.num_messages_recvd = 0
+        
+        if self.comm:
+            # Comms threads
+            self._exit = False
+            def set_exit():
+                self._exit = True
+            atexit.register(set_exit)
+            
+            self.prev_handler = None
+            def handler(signum, frame):
+                self._exit = True
+                self.prev_handler(signum, frame)
+            self.prev_handler = signal.signal(2, handler)
+            
+            self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
+            self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
+            
+            self.recv_thread.start()
+            self.send_thread.start()
+    
+    def exit(self):
+        self._exit = True
 
-	def last_command(self):
-		if self.move_handle.cmd == 'M':
-			dx = math.cos(self.move_handle.dir)*self.move_handle.spd
-			dy = math.sin(self.move_handle.dir)*self.move_handle.spd
-			return [dx,dy,0]
-		elif self.move_handle.cmd == 'T':
-			return [0,0,self.move_handle.spd]
-		else:
-			return [0,0,0]
-		
-	# Movement commands
-	def _cmd_movement(self, cmd, angle, scale):
-		self.move_handle._onNextCommand()
-		self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
-		return self.move_handle
+    def last_command(self):
+        if self.move_handle.cmd == 'M':
+            dx = math.cos(self.move_handle.dir)*self.move_handle.spd
+            dy = math.sin(self.move_handle.dir)*self.move_handle.spd
+            return [dx,dy,0]
+        elif self.move_handle.cmd == 'T':
+            return [0,0,self.move_handle.spd]
+        else:
+            return [0,0,0]
+        
+    # Movement commands
+    def _cmd_movement(self, cmd, angle, scale):
+        self.move_handle._onNextCommand()
+        self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
+        return self.move_handle
 
 
     def move(self, angle, scale=64):
@@ -223,25 +223,25 @@ class Action():
     def run_state_processor(self):
         """Processes incoming state messages"""
         while not self._exit:
-	
-			self.comm.timeout = 0.1
-			line = self.comm.readline()
-			line = line.rstrip()
-		#if not line.startswith('dist'):
-		#	print line
-			if line != "":
-				self.process_message(line)
-			
-	def run_state_sender(self):
-		"""Sends out state messages"""
-		while not self._exit:
-			time.sleep(0.120)
-			
-			if self.num_messages_recvd > 10:
-				message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
-					self.move_handle.idx, self.move_handle.cmd, f2i(self.move_handle.dir), self.move_handle.spd,
-					self.kick_handle.idx, self.kick_handle.cmd, self.kick_handle.spd,
-					self.catch_handle.idx, self.catch_handle.cmd, self.catch_handle.spd
-				)
-				
-				self.comm.write(message)
+    
+            self.comm.timeout = 0.1
+            line = self.comm.readline()
+            line = line.rstrip()
+        #if not line.startswith('dist'):
+        #    print line
+            if line != "":
+                self.process_message(line)
+            
+    def run_state_sender(self):
+        """Sends out state messages"""
+        while not self._exit:
+            time.sleep(0.120)
+            
+            if self.num_messages_recvd > 10:
+                message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
+                    self.move_handle.idx, self.move_handle.cmd, f2i(self.move_handle.dir), self.move_handle.spd,
+                    self.kick_handle.idx, self.kick_handle.cmd, self.kick_handle.spd,
+                    self.catch_handle.idx, self.catch_handle.cmd, self.catch_handle.spd
+                )
+                
+                self.comm.write(message)
