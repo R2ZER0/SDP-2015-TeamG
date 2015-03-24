@@ -1,11 +1,11 @@
 import pdb
 from math import tan, pi, hypot, log
-from pyparsing import *
+#from pyparsing import *
 from planning.models import Robot, FSM
 from Polygon import *
 from Polygon.Utils import pointList
 
-
+'''
 def createFSM(parsedInput):
 
     alphabet = [x for x in parsedInput[0][2][1] if x != ","]
@@ -120,6 +120,12 @@ def checkAlphabet(alphabet, lambdas):
     if not len(alphabet) == len(lambdas):
         print "Parse warning: There are some FSM alphabet letters which do not have corresponding lambda condition triggers."
 
+# Test fsm condition table
+t = { 'isBallInZone' : lambda world : world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y)}
+
+trans = [(start, 'isBallInZone', getBall)]
+
+'''
 
 
 '''
@@ -146,11 +152,6 @@ BALL_ANGLE_THRESHOLD = pi/20
 MAX_DISPLACEMENT_SPEED = 690
 MAX_ANGLE_SPEED = 50
 BALL_VELOCITY = 3
-
-# Test fsm condition table
-t = { 'isBallInZone' : lambda world : world.pitch.zones[our_attacker.zone].isInside(ball.x, ball.y)}
-
-trans = [(start, 'isBallInZone', getBall)]
 
 def is_shot_blocked(world, our_robot, their_robot):
     '''Convenience function for checking if one robot's shot is blocked

@@ -9,7 +9,7 @@ class Task(object):
     DEFENDER = 'defender'
 
     #: Default value of motor speed to start at
-    BASE_MOTOR_SPEED = 70
+    BASE_MOTOR_SPEED = 100
 
     #: Gets assigned True once the Robot has rotated to the angle within accepted range.
     complete = False
@@ -43,7 +43,7 @@ class MoveToPoint(Task):
     """
 
     #: Distance threshold to the point before considering ourselves done
-    DISPLACEMENT_TOLERANCE = 15
+    DISPLACEMENT_TOLERANCE = 30
 
     #: Specified x-position to travel to
     x = 0
@@ -58,7 +58,7 @@ class MoveToPoint(Task):
     motionHandle = None
 
     def __init__(self, world, robot, role, x, y, tolerance=15):
-        super(MoveToPoint, self).__init__(world, robot, role)
+        Task.__init__(self, world, robot, role)
         self.x = x
         self.y = y
         self.DISPLACEMENT_TOLERANCE = tolerance
@@ -158,9 +158,34 @@ class TurnToObject(TurnToPoint):
         self.x = self.pitch_object.x
         self.y = self.pitch_object.y
         self.complete = False
-        
-    
 
+    def turn(self):
+        if (self.pitch_object.x != self.x or self.pitch_object.y != self.y):
+            self.update()
+
+        return TurnToPoint.turn(self)
+
+class MirrorObject(MoveToPoint, TurnToObject):
+
+    def __init__(self, world, robot, role, pitch_object):
+        TurnToObject.__init__(self, world, robot, role, pitch_object)
+        MoveToPoint.__init__(self, world, robot, role, pitch_object.x, pitch_object.y)
+
+    def update(self):
+        
+        # Update turn to object and moving point
+        TurnToObject.update(self)
+        self.y = self.pitch_object.y
+
+    def execute(self):
+        self.update()
+
+        if (TurnToObject.turn(self)):
+            TurnToObject.execute(self)
+        else:
+            self.y = self.pitch_object.y
+            MoveToPoint.execute(self)
+        
 class AcquireBall(MoveToPoint, TurnToPoint):
 
     def __init__(self, world, robot, role, displacement_tolerance=30, rotation_tolerance=0.2):
