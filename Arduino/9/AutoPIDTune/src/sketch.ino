@@ -1,7 +1,5 @@
 #include <Wire.h>
 #include <SDPArduino.h>
-#include <PID_v1.h>
-#include <PID_AutoTune_v0.h>
 
 #define ROTARY_SLAVE_ADDRESS 5
 #define ROTARY_COUNT 6
@@ -47,9 +45,6 @@ double wheel_speeds[NUM_MOTORS] = { 0 };
 // PID Calculated output for motor powers
 double motor_powers[NUM_MOTORS] = { 0 };
 
-// Set up PID controllers for each wheel
-PID* wheel_pids[NUM_MOTORS] = { 0 };
-
 double wheel_prev_error[NUM_MOTORS] = { 0.0 };
 
 /* Motor movement sensors stuff */
@@ -65,23 +60,9 @@ void setup() {
     
     motorAllStop();
     
-    for (int i = 0; i < NUM_MOTORS; i++) {
-        PID *pid = new PID(&(wheel_speeds[i]), &(motor_powers[i]),
-                           &(desired_speeds[i]), KP, KI, KD, DIRECT);
-        pid->SetMode(AUTOMATIC);
-        pid->SetSampleTime(sample_time_ms);
-        
-        wheel_pids[i] = pid;
-        
+    for (int i = 0; i < NUM_MOTORS; i++) {        
         desired_speeds[i] = SETPOINT;
     }
-    
-//     while(Serial.available() > 0) { Serial.read(); }
-//     
-//     Serial.println("Ready! Send a key to continue...");
-//     
-//     while(Serial.available() == 0);
-//     while(Serial.available() > 0) { Serial.read(); }
 }
 
 double signof(double a) {
@@ -89,8 +70,6 @@ double signof(double a) {
     else if(a > 0) { return 1; }
     else { return 0; }
 }
-
-double prev_error = 0.0;
 
 void loop() {
     
@@ -110,15 +89,7 @@ void loop() {
         }
         
         /* Computes new PID expected values for desired speeds and update motors. */
-        for (int i = 0; i < NUM_MOTORS; i++) {
-           /* PID *pid = wheel_pids[i];
-
-            if (desired_speeds[i] < 0) {
-                pid->SetOutputLimits(-100, -30);
-            } else {
-                pid->SetOutputLimits(30, 100);
-            }*/
-           
+        for (int i = 0; i < NUM_MOTORS; i++) {           
            
             double error = (desired_speeds[i] - wheel_speeds[i]);
            
@@ -130,8 +101,6 @@ void loop() {
             
             if(abs(motor_powers[i]) > 100) { motor_powers[i] = signof(motor_powers[i]) * 100; }
             if(abs(motor_powers[i]) < 30)  { motor_powers[i] = signof(motor_powers[i]) * 30; }
-            
-            //pid->Compute();
         }
 
         // Run motors at these values
@@ -147,8 +116,6 @@ void loop() {
         Serial.print(motor_powers[0]);
         Serial.println();
         
-        
-
         next_pid_time = millis() + sample_time_ms;
         
     }
