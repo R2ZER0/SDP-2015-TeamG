@@ -42,7 +42,6 @@ double motor_powers[NUM_MOTORS] = { 0 };
 PID* wheel_pids[NUM_MOTORS] = { 0 };
 
 /* Motor movement sensors stuff */
-unsigned long next_print_time = 0L;
 unsigned long next_pid_time = 0L;
 
 const int sample_pid_ms = 100;
@@ -57,22 +56,14 @@ void rotary_update_positions() {
         wheel_movement[i] -= (int8_t) Wire.read();  // Must cast to signed 8-bit type    
     }
   
-    if(millis() > next_print_time) {
+    if(millis() > next_pid_time) {
 
         for (int i = 0; i < NUM_MOTORS; i++) {
-            wheel_speeds[i] = (float) (wheel_movement[i]) * (1000.0/sample_time_ms);
+            wheel_speeds[i] = (double) (wheel_movement[i]) * (1000.0/(double)sample_time_ms);
             wheel_movement[i] = 0;
         }
         
-        next_print_time = millis() + sample_time_ms;
-    }
-}
-
-/* Computes new PID expected values for desired speeds and update motors. */
-void compute_pid() {
-
-    if(millis() > next_pid_time) {
-
+        /* Computes new PID expected values for desired speeds and update motors. */
         for (int i = 0; i < NUM_MOTORS; i++) {
             PID *pid = wheel_pids[i];
 
@@ -90,8 +81,16 @@ void compute_pid() {
         runMotor(MOTOR_MOTOR2, motor_powers[1]);
         runMotor(MOTOR_MOTOR3, motor_powers[2]);
         runMotor(MOTOR_MOTOR4, motor_powers[3]);
+        
+        Serial.print("Motor1");
+        Serial.print("\tSpeed: ");
+        Serial.print(wheel_speeds[0]);
+        Serial.print("\tPower: ");
+        Serial.print(motor_powers[0]);
+        Serial.println();
 
         next_pid_time = millis() + sample_pid_ms;
+        
     }
 }
 
@@ -107,6 +106,13 @@ void setup() {
         pid->SetMode(AUTOMATIC);
         pid->SetSampleTime(sample_time_ms);
     }
+    
+    while(Serial.available() > 0) { Serial.read(); }
+    
+    Serial.println("Ready! Send a key to continue...");
+    
+    while(Serial.available() == 0);
+    while(Serial.available() > 0) { Serial.read(); }    
 }
 
 void loop()
