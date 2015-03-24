@@ -50,7 +50,7 @@ double wheel_prev_error[NUM_MOTORS] = { 0.0 };
 /* Motor movement sensors stuff */
 unsigned long next_pid_time = 0L;
 
-const int sample_time_ms = 250;
+const int sample_time_ms = 200;
 
 void * operator new (size_t size, void * ptr) { return ptr; }
 
