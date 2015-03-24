@@ -36,10 +36,10 @@ void rotary_update_positions() {
 }
 
 
-#define MOTOR_MOTOR1  1
-#define MOTOR_MOTOR2  3
-#define MOTOR_MOTOR3  0
-#define MOTOR_MOTOR4  2
+#define MOTOR_MOTOR1 2
+#define MOTOR_MOTOR2 3
+#define MOTOR_MOTOR3 0
+#define MOTOR_MOTOR4 5
 
 void setup() {
     SDPsetup();
