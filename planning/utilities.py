@@ -6,30 +6,53 @@ from Polygon.Utils import pointList
 
 
 def createFSM(parsedInput):
+    """Takes the results of a successful parse and builds and returns an FSM object adhering to 
+    the specs in the given config file."""
 
+    # parsedInput[0][2][1] contains the string read which represents the machine alphabet
+    # We create a list, with useless characters like "," stripped
     alphabet = [x for x in parsedInput[0][2][1] if x != ","]
+
+    # parsedInput[0][1][1] contains the string read which represents the machine name
     name = parsedInput[0][1][1]
+
+    # parsedInput[0][4][1] contains the string read which represents the machine start state
     startState = parsedInput[0][4][1]
+
+    # parsedInput[0][5][1] contains the string read which represents the machine final state
     finalState = parsedInput[0][5][1]
+
+    # Create the list which we'll populate with transition tuples of the form
+    # (currState, letter1, letter2,..., [TaskName, arg1,arg2,..], newState)
     transitions = []
 
+    # parsedInput[1][1:] contains the raw transitions. "x.asList() if type(x) == ParseResults else x" is
+    # necessary because of the way PyParsing returns parse results. We want things as a list, so we call
+    # asList()
     for trans in parsedInput[1][1:]:
         t = tuple([(x.asList() if type(x) == ParseResults else x) for x in trans if x != "<" and x != ">" and x != ","])
         transitions.append(t)
     
+    # parsedInput[0][3][1] contains the raw state list
+    # We create a tuple of the form (state1, state2,...), filtering out useless chars like
+    # ","
     states = tuple([x for x in parsedInput[0][3][1] if x != ","])
 
+    # Create the string we'll use to contain the lambdas found during the parse
     lambdas = []
     for lambdaStmt in parsedInput[2][1:]:
         t = ''.join(map(str, lambdaStmt))
         lambdas.append(t)
 
+    # Build the actual letter:lambda dictionary
     dic = consumeLambdas(lambdas)
 
+    # Perform sanity checks on what we've read 
     checkAlphabet(alphabet, lambdas)
     checkTransitions(alphabet, transitions)
     checkLambdas(alphabet, dic)
 
+    # If we're here, everything is valid and we can go ahead and create the FSM
     fsm = FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
     return fsm
 
@@ -66,30 +89,53 @@ def createConfigGrammar():
     # A 'state' is an alphanumeric 'word'
     state         = Word(alphanums)
 
-    # A task invocation is either the key
+    # A task invocation is either of the form '[EXISTING]' or '[TaskName, arg1, arg2, ...]'
     taskInvocation= Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + Word(alphanums+"_()")) + rightSqBrkt)
-    conditionName = Word(alphas)
+
+    # An FSM name is an alphanumeric 'word'
     name          = Word(alphanums) 
+
+    # A letter in an FSM alphabet is an alphanumeric 'word'
     letter        = Word(alphanums)
 
+    # A name definition is of the form 'name identifier'
     nameDef       = Group(nameKWD + name)
+
+    # An alphabet definition is of the form  'inAlph letter1,...'
     inAlphabetDef = Group(inAlphKWD + Group(letter + ZeroOrMore(separator + letter)))
+
+    # A states definition list is of the form  'states state1,...'
     statesDef     = Group(statesKWD + Group(state + ZeroOrMore(separator + state)))
+
+    # An initial state definition is of the form  'initialState state1,...'
     initialSDef   = Group(initSKWD + state)
+
+    # A final state definition is of the form  'finalState stateName'
     finalSDef     = Group(finalSKWD + state)
 
+    # A lambda statement is of the form '"alphabetLetter" : lambda planner : code', where code is an alphanumeric 'word', with >< .+-(),\t\n characters
     lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-(),\t\n"))
+
+    # A transition is of the form '<stateName, letter1, letter2,..., [TaskName, arg1, arg2,...], newState>'
     transition    = Group(leftAngBrkt + state + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
 
     machineParamSec= machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
     transitionSec  = transitionsKWD + OneOrMore(transition)
     lambdaSec      = lambdaSecKWD + OneOrMore(lambdaStmt)
 
+    # Config is the 'root' of the parse
     config         = Group(machineParamSec) + Group(transitionSec) + Group(lambdaSec)
 
     return config
 
 def consumeLambdas(text):
+    """This function takes python code representing key:value pairs in string form,
+    and for each pair, packages them up into code that will update the dictionay letter-condition
+    map.
+
+    Once we have the dictionary update code for each lambda, we cause Python to execute this code_obj
+    using exec and return the resulting dictionary
+    """
     strippedNewlines = [line.strip("\n") for line in text]
 
     code = ""
@@ -103,14 +149,20 @@ def consumeLambdas(text):
     return dictionary
 
 def checkTransitions(alphabet, transitions):
+    """Ensures there are no transitions which reference letters which are not recognised, that is,
+    those that have not been speficied in the machine specification. If we enounter an error, we 
+    inform the use and terminate."""
     for transition in transitions:
-        lettersAppearingInTrans = transition[1:len(transition)-2]
+        lettersAppearingInTrans = transition[1:len(transition)-2]   # Extract the letters appearing in a transition table entry
         for candidateLetter in lettersAppearingInTrans:
+            """Check each letter valid"""
             if not candidateLetter in alphabet:
                 print "Parse error: Found a transition statement which is inconsistent with the FSM alphabet definition - namely '" + str(transition) + "'"
                 quit()
 
 def checkLambdas(alphabet, lambdas):
+    """Ensures the letter:lambda pairs do not refer to a non-existent FSM letter. If we encounter an
+    error, we inform the use and then terminate"""
     for lambdaStmt, code in lambdas.iteritems():
         if not lambdaStmt in alphabet:
             print "Parse error: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + lambdaStmt + "'"
@@ -118,6 +170,7 @@ def checkLambdas(alphabet, lambdas):
 
 def checkAlphabet(alphabet, lambdas):
     if not len(alphabet) == len(lambdas):
+        """Hacky ^ they might be the same length but still differ"""
         print "Parse warning: There are some FSM alphabet letters which do not have corresponding lambda condition triggers."
 
 
