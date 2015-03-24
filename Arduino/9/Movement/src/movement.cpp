@@ -178,8 +178,8 @@ void service_movement()
 unsigned long next_print_time = 0L;
 unsigned long next_pid_time = 0L;
 
-const int sample_pid_ms = 1000;
-const int sample_time_ms = 1000;
+const int sample_pid_ms = 100;
+const int sample_time_ms = 100;
 
 void rotary_update_positions() {
     // Request motor position deltas from rotary slave board
