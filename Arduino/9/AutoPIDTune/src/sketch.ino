@@ -7,16 +7,19 @@
 #define ROTARY_COUNT 6
 #define SAMPLE_TIME 1000
 
-#define NUM_MOTORS 4
+#define NUM_MOTORS 1
 #define MOTOR_MOTOR1 2
 #define MOTOR_MOTOR2 3
 #define MOTOR_MOTOR3 0
 #define MOTOR_MOTOR4 5
 
+const int MOTOR[] = { MOTOR_MOTOR1, MOTOR_MOTOR2, MOTOR_MOTOR3, MOTOR_MOTOR4 };
+
 #define KP 1.0
 #define KI 0.0
 #define KD 0.0
 
+#define SETPOINT 60.0
 
 void runMotor(int motor, int motor_speed)
 {
@@ -67,6 +70,8 @@ void setup() {
         pid->SetSampleTime(sample_time_ms);
         
         wheel_pids[i] = pid;
+        
+        desired_speeds[i] = SETPOINT;
     }
     
 //     while(Serial.available() > 0) { Serial.read(); }
@@ -75,10 +80,6 @@ void setup() {
 //     
 //     while(Serial.available() == 0);
 //     while(Serial.available() > 0) { Serial.read(); }
-    
-    //desired_speeds[0] = 60;
-    wheel_speeds[0] = 50;
-    motor_powers[0] = 70;
 }
 
 void loop() {
@@ -112,12 +113,10 @@ void loop() {
         }
 
         // Run motors at these values
-        runMotor(MOTOR_MOTOR1, motor_powers[0]);
-        runMotor(MOTOR_MOTOR2, motor_powers[1]);
-        runMotor(MOTOR_MOTOR3, motor_powers[2]);
-        runMotor(MOTOR_MOTOR4, motor_powers[3]);
+        for(int i = 0; i < NUM_MOTORS; ++i) {
+            runMotor(MOTOR[i], motor_powers[i]);
+        }
         
-        Serial.print("Motor1");
         Serial.print("\tTarget: ");
         Serial.print(desired_speeds[0]);
         Serial.print("\tSpeed: ");
