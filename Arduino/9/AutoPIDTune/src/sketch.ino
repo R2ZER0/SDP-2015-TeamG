@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <SDPArduino.h>
 #include <PID_v1.h>
+#include <PID_AutoTune_v0.h>
 
 #define ROTARY_SLAVE_ADDRESS 5
 #define ROTARY_COUNT 6
@@ -11,6 +12,9 @@
 #define MOTOR_MOTOR2 3
 #define MOTOR_MOTOR3 0
 #define MOTOR_MOTOR4 5
+
+#define ATUNE_STEP 5
+#define ATUNE_NOISE 11
 
 void runMotor(int motor, int motor_speed)
 {
@@ -41,13 +45,49 @@ double motor_powers[NUM_MOTORS] = { 0 };
 // Set up PID controllers for each wheel
 PID* wheel_pids[NUM_MOTORS] = { 0 };
 
+PID_ATune* wheel_atunes[NUM_MOTORS] = { 0 };
+
 /* Motor movement sensors stuff */
 unsigned long next_pid_time = 0L;
 
-const int sample_pid_ms = 100;
 const int sample_time_ms = 100;
 
-void rotary_update_positions() {
+void setup() {
+    Serial.begin(9600);
+    SDPsetup();
+    Serial.begin(9600);
+    
+    motorAllStop();
+    
+    for (int i = 0; i < NUM_MOTORS; i++) {
+        PID *pid = new PID(&(wheel_speeds[i]), &(motor_powers[i]), &(desired_speeds[i]), 
+                                0.5, 0.0, 0.25, DIRECT);
+        pid->SetMode(AUTOMATIC);
+        pid->SetSampleTime(sample_time_ms);
+        
+        PID_ATune* atune = new PID_ATune(&(wheel_speeds[i]), &(motor_powers[i]));
+        atune->SetNoiseBand(ATUNE_NOISE);
+        atune->SetOutputStep(ATUNE_STEP);
+        atune->SetControlType(1);
+        atune->SetLookbackSec(1);
+        
+        
+        wheel_pids[i] = pid;
+        wheel_atunes[i] = atune;
+    }
+    
+    while(Serial.available() > 0) { Serial.read(); }
+    
+    Serial.println("Ready! Send a key to continue...");
+    
+    while(Serial.available() == 0);
+    while(Serial.available() > 0) { Serial.read(); }
+    
+    desired_speeds[0] = 50;
+}
+
+void loop() {
+    
     // Request motor position deltas from rotary slave board
     Wire.requestFrom(ROTARY_SLAVE_ADDRESS, NUM_MOTORS);
     
@@ -66,6 +106,7 @@ void rotary_update_positions() {
         /* Computes new PID expected values for desired speeds and update motors. */
         for (int i = 0; i < NUM_MOTORS; i++) {
             PID *pid = wheel_pids[i];
+            PID_ATune* atune = wheel_atunes[i];
 
             if (desired_speeds[i] < 0) {
                 pid->SetOutputLimits(-100, -30);
@@ -74,48 +115,32 @@ void rotary_update_positions() {
             }
 
             pid->Compute();
+            byte res = atune->Runtime();
+            
+            if(res == 1) {
+                Serial.print("Kp="); Serial.print(atune->GetKp());
+                Serial.print("\tKi="); Serial.print(atune->GetKi());
+                Serial.print("\tKd="); Serial.print(atune->GetKd());
+                Serial.println();
+            }
         }
 
         // Run motors at these values
         runMotor(MOTOR_MOTOR1, motor_powers[0]);
-        runMotor(MOTOR_MOTOR2, motor_powers[1]);
-        runMotor(MOTOR_MOTOR3, motor_powers[2]);
-        runMotor(MOTOR_MOTOR4, motor_powers[3]);
+//         runMotor(MOTOR_MOTOR2, motor_powers[1]);
+//         runMotor(MOTOR_MOTOR3, motor_powers[2]);
+//         runMotor(MOTOR_MOTOR4, motor_powers[3]);
         
         Serial.print("Motor1");
+        Serial.print("\tTarget: ");
+        Serial.print(desired_speeds[0]);
         Serial.print("\tSpeed: ");
         Serial.print(wheel_speeds[0]);
         Serial.print("\tPower: ");
         Serial.print(motor_powers[0]);
         Serial.println();
 
-        next_pid_time = millis() + sample_pid_ms;
+        next_pid_time = millis() + sample_time_ms;
         
     }
-}
-
-void setup() {
-    SDPsetup();
-    digitalWrite(8, HIGH);  // Radio on
-    Serial.begin(115200);  // Serial at given baudrate
-    Wire.begin();  // Master of the I2C bus
-    
-    for (int i = 0; i < NUM_MOTORS; i++) {
-        PID *pid = new PID(&(wheel_speeds[i]), &(motor_powers[i]), &(desired_speeds[i]), 
-                                0.5, 0.0, 0.25, DIRECT);
-        pid->SetMode(AUTOMATIC);
-        pid->SetSampleTime(sample_time_ms);
-    }
-    
-    while(Serial.available() > 0) { Serial.read(); }
-    
-    Serial.println("Ready! Send a key to continue...");
-    
-    while(Serial.available() == 0);
-    while(Serial.available() > 0) { Serial.read(); }    
-}
-
-void loop()
-{
-    rotary_update_positions();
 }
