@@ -53,9 +53,8 @@ unsigned long next_pid_time = 0L;
 const int sample_time_ms = 100;
 
 void setup() {
-    Serial.begin(9600);
     SDPsetup();
-    Serial.begin(9600);
+    Serial.println("STARTING");
     
     motorAllStop();
     
@@ -76,12 +75,12 @@ void setup() {
         wheel_atunes[i] = atune;
     }
     
-    while(Serial.available() > 0) { Serial.read(); }
-    
-    Serial.println("Ready! Send a key to continue...");
-    
-    while(Serial.available() == 0);
-    while(Serial.available() > 0) { Serial.read(); }
+//     while(Serial.available() > 0) { Serial.read(); }
+//     
+//     Serial.println("Ready! Send a key to continue...");
+//     
+//     while(Serial.available() == 0);
+//     while(Serial.available() > 0) { Serial.read(); }
     
     desired_speeds[0] = 50;
 }
