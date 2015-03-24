@@ -23,6 +23,11 @@
 // Currently set to +/- 1.5 degrees
 #define TURN_ACCEPTABLE_RANGE (0.017453*1.5)
 
+// Motor PID parameters
+#define KP 1.0
+#define KI 0.0
+#define KD 0.5
+
 #define NUM_MOTORS 4
 #define MOTOR_MOTOR1 2
 #define MOTOR_MOTOR2 3

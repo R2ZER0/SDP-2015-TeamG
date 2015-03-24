@@ -11,7 +11,6 @@
 #include "motor.h"
 #include "MPU.h"
 #include <Wire.h>
-#include <PID_v1.h>
 
 // The desired speeds for motors are set here, and the PID controller attempts
 // to match these on each loop
@@ -26,8 +25,8 @@ double wheel_speeds[NUM_MOTORS] = { 0 };
 // PID Calculated output for motor powers
 double motor_powers[NUM_MOTORS] = { 0 };
 
-// Set up PID controllers for each wheel
-PID* wheel_pids[NUM_MOTORS] = { 0 };
+// Remember the previous errors for D component
+double wheel_prev_error[NUM_MOTORS] = { 0.0 };
 
 char current_command = MOVEMENT_COMMAND_STOP;
 
@@ -95,15 +94,6 @@ void movement_on_new_command(char cmd, float dir, int spd)
 void setup_movement()
 {
     motorAllStop();
-
-    for (int i = 0; i < NUM_MOTORS; i++) {
-        PID *pid = new PID(&(wheel_speeds[i]), &(motor_powers[i]), &(desired_speeds[i]), 
-                                0.5, 0.0, 0.25, DIRECT);
-        pid->SetMode(AUTOMATIC);
-        pid->SetSampleTime(sample_time_ms);
-
-        wheel_pids[i] = pid;
-    }
 }
 
 void rotary_update_positions();
@@ -178,8 +168,8 @@ void service_movement()
 unsigned long next_print_time = 0L;
 unsigned long next_pid_time = 0L;
 
-const int sample_pid_ms = 100;
-const int sample_time_ms = 100;
+const int sample_pid_ms = 200;
+const int sample_time_ms = 200;
 
 void rotary_update_positions() {
     // Request motor position deltas from rotary slave board
@@ -201,6 +191,12 @@ void rotary_update_positions() {
     }
 }
 
+double signof(double a) {
+    if(a < 0) { return -1; }
+    else if(a > 0) { return 1; }
+    else { return 0; }
+}
+
 /* Computes new PID expected values for desired speeds and update motors. */
 void compute_pid() {
 
@@ -211,15 +207,16 @@ void compute_pid() {
     if(millis() > next_pid_time) {
 
         for (int i = 0; i < NUM_MOTORS; i++) {
-            PID *pid = wheel_pids[i];
-
-            if (desired_speeds[i] < 0) {
-                pid->SetOutputLimits(-100, -30);
-            } else {
-                pid->SetOutputLimits(30, 100);
-            }
-
-            pid->Compute();
+            double error = (desired_speeds[i] - wheel_speeds[i]);
+           
+            double d_error = error - wheel_prev_error[i];
+            wheel_prev_error[i] = error;
+            
+            double delta = KP * error + KD * d_error;
+            motor_powers[i] += delta;
+            
+            if(abs(motor_powers[i]) > 100) { motor_powers[i] = signof(motor_powers[i]) * 100; }
+            if(abs(motor_powers[i]) < 30)  { motor_powers[i] = signof(motor_powers[i]) * 30; }
         }
 
         // Run motors at these values
