@@ -1,3 +1,4 @@
+import pdb
 import cv2
 import numpy as np
 import math
@@ -312,6 +313,7 @@ class RobotTracker(Tracker):
                     Center(front_centre[0], front_centre[1]),
                     Center(back_centre[0], back_centre[1])
             )        
+
             queue.put({
                 'x': x, 'y': y,
                 'name': self.name,

@@ -185,8 +185,8 @@ class Controller:
 				self.world.update_positions(model_positions)
 
 				#: Run planner only every 5ms.
-				if (time.clock() - tracker) > 0.05 and time.clock() - start > 1: 
-					
+				if (time.clock() - tracker) > 0.05: 
+				
 					self.command = self.command_cache.pop(0)
 					self.planner.plan()
 					self.command_cache.append(self.robot.last_command())

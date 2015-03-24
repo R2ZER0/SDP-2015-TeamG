@@ -1,3 +1,4 @@
+import pdb
 import cv2
 import tools
 from tracker import BallTracker, RobotTracker
@@ -192,6 +193,7 @@ class Vision:
         Returns:
             [5-tuple] positions     - locations of the robots and the ball
         """
+
 
         queues = [Queue() for i in range(5)]
         objects = [self.us[0], self.us[1], self.opponents[0], self.opponents[1], self.ball_tracker]
