@@ -142,8 +142,6 @@ void service_movement()
 /* Motor movement sensors stuff */
 int32_t wheel_movement[ROTARY_COUNT] = { 0 };
 
-unsigned long next_print_time = 0L;
-
 void rotary_update_positions() {
     // Request motor position deltas from rotary slave board
     Wire.requestFrom(ROTARY_SLAVE_ADDRESS, ROTARY_COUNT);
@@ -151,15 +149,5 @@ void rotary_update_positions() {
     // Update the recorded motor positions
     for (int i = 0; i < ROTARY_COUNT; i++) {
         wheel_movement[i] += (int8_t) Wire.read();  // Must cast to signed 8-bit type
-    }
-  
-    if(millis() > next_print_time) {
-        Serial.print("Wheels: ");
-        Serial.print(wheel_movement[0]); Serial.print(' ');
-        Serial.print(wheel_movement[1]); Serial.print(' ');
-        Serial.print(wheel_movement[2]); Serial.print(' ');
-        Serial.println(wheel_movement[3]);
-        
-        next_print_time = millis() + 100;
     }
 }
