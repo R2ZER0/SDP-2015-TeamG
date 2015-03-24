@@ -591,45 +591,73 @@ class World(object):
 
 
 class FSM:
-
+"""Class representing planner finite state machines"""
     def __init__(self, name, inAlph, states, initState, finalState, transTable, lambdaDict, lambdaDescs):
         self._alph = inAlph
         self._states = states
         self._initState = initState
         self._finalState = finalState
-        self._lambdas = lambdaDict
-        self._lambdaDescs = lambdaDescs
+        self._lambdas = lambdaDict      # The {letter : lambda} dictionary used in actual computation
+        self._lambdaDescs = lambdaDescs # This is a print-friendly form of self._lambdas
 
-        self._transTable = transTable
+        self._transTable = transTable   # Table representing transition function
         self._name = name
 
         self._currentState = self._initState
-        self._currentTask = AcquireBall(world,robot,"attacker")  #HACK
-        # self._currentTask = None
+        # self._currentTask = AcquireBall(world,robot,"attacker")  #HACK
+        self._currentTask = None
 
     def consumeInput(self, inp, world, robot, role):
-        assert set(inp) <= set(self._alph)
-        
+        """Takes a set of FSM letters and checks to see what transition should be executed by consulting
+        the transition table. The code considers the current state, the letters that are to be consumed and
+        the task invocation. 
+
+        Once the appropriate transition is identified, we change the current state, and execute the 
+        specified task, or continue executing the existing one if EXISTING is given"""
+
+        # To ensure the set of letters we've been supplied with is in fact valid, we check the given set is 
+        # a subset of the alphabet the machine recognises
+        assert set(inp) <= set(self._alph) 
+
+        # Consider each possible transition
         for tran in self._transTable:
             if tran[0] == self._currentState and inp == list(tran[1:len(tran)-2]):
-                self._currentState = tran[len(tran) - 1]
+                """Transitions are of the form (currState, listOfLetters, [taskName, taskArgs...], newState)
+                So, we check to see if the current state matches the first entry in the transition we're 
+                currently examining, as well as list of letters supplied to the function matches. 
+                If this is the case, we've found the right transition to invoke."""
+
+                # If we've found the right transition update the current state to the new one
+                # specified in the transition tuple.
+                self._currentState = tran[len(tran) - 1] 
+
+
                 if tran[len(tran) - 2][1] == "EXISTING":
+                    """tran[len(tran) - 2][1] contains the name of the task the input file
+                    specifies to execute when leaving the current state. If EXISITING has 
+                    been given, it is desired the current task continues executing."""
                     print "Executing exisiting task"
                     self._currentTask.execute()
                     return
                 else:
+                    """If we have something other than EXISTING, a task name with arguments has
+                    been given. So, we create a list of relevant information, filtering out detritus 
+                    characters such as ',' and '[', and then extract the task name ( t[0] ), and set of task
+                    args ( ','.join(t[1:]) - this builds a string of form ['a1,a2,a3,...']).
+
+                    Finally, we package these pieces of data into valid code representing
+                    the creation of a task object with supplied contructor arguments, and cause 
+                    Python to evaulate this text as code using eval()."""
+
                     print "Changing to execute new task"
-                    # print tran[len(tran) - 2]
                     t=[x for x in tran[len(tran) - 2] if x != "," and x != "[" and x != "]"]
-                    # print t
                     code = t[0] + "(" + ','.join(t[1:]) + ")"
-                    # print code
-                    # quit()
-                    # self._currentTask = eval(''.join(tran[len(tran) - 2]))#(world, robot, role)
                     self._currentTask = eval(code)
-                    # quit()
                     self._currentTask.execute()
                     return
+                    
+        # If we get here, we looped through the entire set of transitions and didn't find any that applied
+        # in the current situation.
         print "No transition entry for current state " + self._currentState + " and input '" + str(inp) + "'"
 
     def getStates(self):
