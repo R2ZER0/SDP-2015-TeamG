@@ -45,12 +45,15 @@ double motor_powers[NUM_MOTORS] = { 0 };
 // Set up PID controllers for each wheel
 PID* wheel_pids[NUM_MOTORS] = { 0 };
 
-PID_ATune* wheel_atunes[NUM_MOTORS] = { 0 };
+
+PID_ATune atune(&(wheel_speeds[0]), &(motor_powers[0]));
 
 /* Motor movement sensors stuff */
 unsigned long next_pid_time = 0L;
 
-const int sample_time_ms = 100;
+const int sample_time_ms = 200;
+
+void * operator new (size_t size, void * ptr) { return ptr; }
 
 void setup() {
     SDPsetup();
@@ -64,16 +67,13 @@ void setup() {
         pid->SetMode(AUTOMATIC);
         pid->SetSampleTime(sample_time_ms);
         
-        PID_ATune* atune = new PID_ATune(&(wheel_speeds[i]), &(motor_powers[i]));
-        atune->SetNoiseBand(ATUNE_NOISE);
-        atune->SetOutputStep(ATUNE_STEP);
-        atune->SetControlType(1);
-        atune->SetLookbackSec(1);
-        
-        
         wheel_pids[i] = pid;
-        wheel_atunes[i] = atune;
     }
+    
+    atune.SetNoiseBand(ATUNE_NOISE);
+    atune.SetOutputStep(ATUNE_STEP);
+    atune.SetControlType(1);
+    atune.SetLookbackSec(1);
     
 //     while(Serial.available() > 0) { Serial.read(); }
 //     
@@ -83,6 +83,7 @@ void setup() {
 //     while(Serial.available() > 0) { Serial.read(); }
     
     desired_speeds[0] = 50;
+    motor_powers[0] = 60;
 }
 
 void loop() {
@@ -103,25 +104,25 @@ void loop() {
         }
         
         /* Computes new PID expected values for desired speeds and update motors. */
-        for (int i = 0; i < NUM_MOTORS; i++) {
-            PID *pid = wheel_pids[i];
-            PID_ATune* atune = wheel_atunes[i];
-
-            if (desired_speeds[i] < 0) {
-                pid->SetOutputLimits(-100, -30);
-            } else {
-                pid->SetOutputLimits(30, 100);
-            }
-
-            pid->Compute();
-            byte res = atune->Runtime();
+//         for (int i = 0; i < NUM_MOTORS; i++) {
+//             PID *pid = wheel_pids[i];
+// 
+//             if (desired_speeds[i] < 0) {
+//                 pid->SetOutputLimits(-100, -30);
+//             } else {
+//                 pid->SetOutputLimits(30, 100);
+//             }
+// 
+//             pid->Compute();
+//         }
+        
+        byte res = atune.Runtime();
             
-            if(res == 1) {
-                Serial.print("Kp="); Serial.print(atune->GetKp());
-                Serial.print("\tKi="); Serial.print(atune->GetKi());
-                Serial.print("\tKd="); Serial.print(atune->GetKd());
-                Serial.println();
-            }
+        if(res == 1) {
+            Serial.print("Kp="); Serial.print(atune.GetKp());
+            Serial.print("\tKi="); Serial.print(atune.GetKi());
+            Serial.print("\tKd="); Serial.print(atune.GetKd());
+            Serial.println();
         }
 
         // Run motors at these values
@@ -138,6 +139,8 @@ void loop() {
         Serial.print("\tPower: ");
         Serial.print(motor_powers[0]);
         Serial.println();
+        
+        
 
         next_pid_time = millis() + sample_time_ms;
         
