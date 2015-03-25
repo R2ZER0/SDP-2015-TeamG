@@ -26,20 +26,31 @@ class Planner:
         truths=self.checkTrueConditions(world)
         self._fsm.consumeInput(truths, self._world, self._robot, self._role)
 
-    def __init__(self, world, robot, role, fsmSpecFilePath):
+    def __init__(self, world, robot, role, fsmSpecFilePaths):
 
         
         grammar = createConfigGrammar()  # Build the grammar used to parse input config files
+        self._fsmList = []
 
-        inFile = open(fsmSpecFilePath, 'r')
-        inputText = inFile.read()
+        # filelist = []
+        for pathStr in fsmSpecFilePaths:
+            fileObj.append(open(pathStr, 'r'))
+            inputText = fileObj.read()
+            parseRes = grammar.parseString(inputText)
+            inFile.close()      # We're done reading files, so close them
+            self._fsmList.append(createFSM(parseRes))
 
-        parseRes = grammar.parseString(inputText)    # Using PyParsing, initiate a parse run of the input config file
+        # inFile = open(fsmSpecFilePath, 'r')
+        # inputText = inFile.read()
+
+        # parseRes = grammar.parseString(inputText)    # Using PyParsing, initiate a parse run of the input config file
     
-        inFile.close()      # We're done reading files, so close them
+        # inFile.close()      # We're done reading files, so close them
 
-        self._fsm = createFSM(parseRes) # Create the finite state machine object which the planner will use
+        # self._fsm = createFSM(parseRes) # Create the finite state machine object which the planner will use
         self._world = world
         self._robot=robot
         self._role = role
-        self._fsm.show()
+        # self._fsm.show()
+        for fsm in self._fsmList:
+            fsm.show()
