@@ -98,17 +98,19 @@ class Action():
         # Number of messages received
         self.num_messages_recvd = 0
         
-    if self.comm:
-        # Comms threads
-        self._exit = False
-        def set_exit():
-            self._exit = True
+        if self.comm:
+            # Comms threads
+            self._exit = False
+            
+    def set_exit():
+        self._exit = True
         atexit.register(set_exit)
         
         self.prev_handler = None
-        def handler(signum, frame):
-            self._exit = True
-            self.prev_handler(signum, frame)
+        
+    def handler(signum, frame):
+        self._exit = True
+        self.prev_handler(signum, frame)
         self.prev_handler = signal.signal(2, handler)
         
         self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
@@ -127,14 +129,14 @@ class Action():
         return self.move_handle
 
     def last_command(self):
-    if self.move_handle.cmd == 'M':
-        dx = math.cos(self.move_handle.dir)*self.move_handle.spd
-        dy = math.sin(self.move_handle.dir)*self.move_handle.spd
-        return [dx,dy,0]
-    elif self.move_handle.cmd == 'T':
-        return [0,0,self.move_handle.spd]
-    else:
-        return [0,0,0]
+        if self.move_handle.cmd == 'M':
+            dx = math.cos(self.move_handle.dir)*self.move_handle.spd
+            dy = math.sin(self.move_handle.dir)*self.move_handle.spd
+            return [dx,dy,0]
+        elif self.move_handle.cmd == 'T':
+            return [0,0,self.move_handle.spd]
+        else:
+            return [0,0,0]
 
     def move(self, angle, scale=64):
         return self._cmd_movement('M', angle+math.pi/2, scale*0.85)
