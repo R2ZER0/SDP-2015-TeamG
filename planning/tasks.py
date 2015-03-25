@@ -9,7 +9,7 @@ class Task(object):
     DEFENDER = 'defender'
 
     #: Default value of motor speed to start at
-    BASE_MOTOR_SPEED = 100
+    BASE_MOTOR_SPEED = 70
 
     #: Gets assigned True once the Robot has rotated to the angle within accepted range.
     complete = False
@@ -57,11 +57,12 @@ class MoveToPoint(Task):
     #: Tracks the last speeds we sent to the Robot to check for sending more values
     motionHandle = None
 
-    def __init__(self, world, robot, role, x, y, tolerance=15):
+    def __init__(self, world, robot, role, x, y, tolerance=30):
         Task.__init__(self, world, robot, role)
         self.x = x
         self.y = y
         self.DISPLACEMENT_TOLERANCE = tolerance
+	self.displacement = 0
 
     def move(self):
         """Updates this Task's motionHandle to move toward a new point."""
@@ -69,16 +70,16 @@ class MoveToPoint(Task):
             self.robot.stop()
             return True
         else:
+            if self.motionHandle is None:
 		self.angle = self.angle_to_point(self.x, self.y)
 		self.angle = int(self.angle / (math.pi / 4)) * math.pi / 4  # round to nearest 45 degrees
 		self.motionHandle = self.robot.move(self.angle, scale=self.get_movement_speed())
-            #if self.motionHandle is None:
-    		#print "New with " + str(self.angle) + " "+ str(self.get_movement_speed())
-            #else:
-		#print self.motionHandle.completed
-                #if self.motionHandle.completed or self.motionHandle.finished:
-		    #pass
-		    #self.motionHandle = None
+            else:
+                if self.motionHandle.completed or self.motionHandle.finished:
+			if self.displacement < self.get_displacement():
+			    self.motionHandle = None
+			else:
+			    self.displacement = self.get_displacement()
             	return False
 
     def check_displacement(self):
@@ -90,10 +91,9 @@ class MoveToPoint(Task):
         return self.displacement_to_point(self.x, self.y)
 
     def get_movement_speed(self):
-        return min(self.BASE_MOTOR_SPEED, max(0, self.BASE_MOTOR_SPEED))
+        return min(self.BASE_MOTOR_SPEED, max(self.get_displacement(), 35))
 
     def execute(self):
-	print "Executing"
         if self.complete:
             return
 
@@ -168,23 +168,23 @@ class TurnToObject(TurnToPoint):
 
         return TurnToPoint.turn(self)
 
-class MirrorObject(MoveToPoint, TurnToObject):
+class MirrorObject(MoveToPoint, TurnToPoint):
 
     def __init__(self, world, robot, role, pitch_object):
-        TurnToObject.__init__(self, world, robot, role, pitch_object)
+	Task.__init__(self, world, robot, role)
+        TurnToPoint.__init__(self, world, robot, role, pitch_object.x, self.robot_info.y, pitch_object)
         MoveToPoint.__init__(self, world, robot, role, self.robot_info.x, pitch_object.y)
+	self.pitch_object = pitch_object
 
     def update(self):
-        
         # Update turn to object and moving point
-        TurnToObject.update(self)
         self.y = self.pitch_object.y
 
     def execute(self):
         self.update()
 
-        if (not TurnToObject.turn(self)):
-            TurnToObject.execute(self)
+        if (not TurnToPoint.turn(self)):
+            TurnToPoint.execute(self)
         else:
             self.y = self.pitch_object.y
             MoveToPoint.execute(self)

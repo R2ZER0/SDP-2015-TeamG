@@ -136,7 +136,7 @@ class Controller:
 
 		# Set up main planner
 		self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
-		self.task = MoveToPoint(self.world, self.robot, self.role, self.our_robot.x, self.our_robot.y - 50)
+		self.task = MirrorObject(self.world, self.robot, self.role, self.world.ball)
 		# Set up our cache of commands for the predictors
 		self.command_cache = [[0,0,0]]*8
 		self.command = [0,0,0]
@@ -194,11 +194,11 @@ class Controller:
 					self.command_cache.append(self.robot.last_command())
 					tracker = time.clock()
 
-				#ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
-				#if regular_positions['ball']:
-				#	regular_positions['ball']['x'] = self.world.ball.vector.x
-				#	regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
-				#self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
+				ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
+				if regular_positions['ball']:
+					regular_positions['ball']['x'] = self.world.ball.vector.x
+					regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
+				self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 4)
 
 				# Information about the grabbers from the world
 				grabbers = {
