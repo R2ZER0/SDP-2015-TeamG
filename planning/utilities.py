@@ -5,7 +5,7 @@ from Polygon import *
 from Polygon.Utils import pointList
 
 
-def createFSM(parsedInput):
+def createFSM(parsedInput, sourceFilePath):
     """Takes the results of a successful parse and builds and returns an FSM object adhering to 
     the specs in the given config file."""
 
@@ -52,9 +52,19 @@ def createFSM(parsedInput):
     checkTransitions(alphabet, transitions)
     checkLambdas(alphabet, dic)
 
+    parseError = False
+    parseError = checkAlphabet(alphabet, lambdas, sourceFilePath)
+    parseError = checkTransitions(alphabet, transitions, sourceFilePath)
+    parseError = checkLambdas(alphabet, dic, sourceFilePath)
+
+    if parseError:
+        return False
+    else:
+        return FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
+
     # If we're here, everything is valid and we can go ahead and create the FSM
-    fsm = FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
-    return fsm
+    # fsm = FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
+    # return fsm
 
 def createConfigGrammar():
     """Here, we define the PyParsing grammar to use when executing a parse run of an FSM
@@ -147,28 +157,32 @@ def consumeLambdas(text):
     return dictionary
 
 def checkTransitions(alphabet, transitions):
-    """Ensures there are no transitions which reference letters which are not recognised, that is,
+    """Ensures there are no transitions which reference unrecognised letters, that is,
     those that have not been speficied in the machine specification. If we enounter an error, we 
-    inform the use and terminate."""
+    inform the user and terminate."""
     for transition in transitions:
         lettersAppearingInTrans = transition[1:len(transition)-2]   # Extract the letters appearing in a transition table entry
         for candidateLetter in lettersAppearingInTrans:
             """Check each letter valid"""
             if not candidateLetter in alphabet:
-                print "Parse error: Found a transition statement which is inconsistent with the FSM alphabet definition - namely '" + str(transition) + "'"
-                quit()
+                print
+                print "Parse error: Found a transition statement which is inconsistent with the FSM alphabet definition - namely:\n'" + str(transition) + "'\nin " + str(sourceFilePath)
+                print
+                return True
 
 def checkLambdas(alphabet, lambdas):
     """Ensures the letter:lambda pairs do not refer to a non-existent FSM letter. If we encounter an
-    error, we inform the use and then terminate"""
+    error, we inform the user and then terminate"""
     for lambdaStmt, code in lambdas.iteritems():
         if not lambdaStmt in alphabet:
-            print "Parse error: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + lambdaStmt + "'"
-            quit()
+            print "Parse error: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + lambdaStmt + "' in " + str(sourceFilePath)
+            print
+            return True
 
 def checkAlphabet(alphabet, lambdas):
     if not len(alphabet) == len(lambdas):
-        print "Parse warning: There are some FSM alphabet letters which do not have corresponding lambda condition triggers."
+        print "Parse warning: There are some FSM alphabet letters which do not have corresponding lambda condition triggers in spec file " + str(sourceFilePath)
+        print
 
 
 
