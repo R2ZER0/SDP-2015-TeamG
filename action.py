@@ -141,7 +141,7 @@ class Action():
             return [0,0,0]
 
     def move(self, angle, scale=64):
-        return self._cmd_movement('M', angle+math.pi/2, scale*0.85)
+        return self._cmd_movement('M', angle+math.pi/2, int(scale*0.8))
         
     def turnBy(self, angle, scale=64):
         target = mkangle(self.curr_dir + angle)
