@@ -134,7 +134,7 @@ void service_movement()
         
         if(current_distance < 0.2) {
             turnSpeedA = 60;
-            turnSpeedB = -40;
+            turnSpeedB = -10;
         
         } else if(current_distance < 1.5) {
             turnSpeedB = 50;
