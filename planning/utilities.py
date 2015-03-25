@@ -168,7 +168,6 @@ def checkLambdas(alphabet, lambdas):
 
 def checkAlphabet(alphabet, lambdas):
     if not len(alphabet) == len(lambdas):
-        """Hacky ^ they might be the same length but still differ"""
         print "Parse warning: There are some FSM alphabet letters which do not have corresponding lambda condition triggers."
 
 
