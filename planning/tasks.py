@@ -43,7 +43,7 @@ class MoveToPoint(Task):
     """
 
     #: Distance threshold to the point before considering ourselves done
-    DISPLACEMENT_TOLERANCE = 30
+    DISPLACEMENT_TOLERANCE = 0
 
     #: Specified x-position to travel to
     x = 0
@@ -73,9 +73,11 @@ class MoveToPoint(Task):
                 self.angle = self.angle_to_point(self.x, self.y)
                 self.angle = int(self.angle / (math.pi / 4)) * math.pi / 4  # round to nearest 45 degrees
                 self.motionHandle = self.robot.move(self.angle, scale=self.get_movement_speed())
+		print "New with " + str(self.angle) + " "+ str(self.get_movement_speed())
             else:
+		print self.motionHandle.completed
                 if self.motionHandle.completed or self.motionHandle.finished:
-                    self.motionHandle = None
+		    self.motionHandle = None
             return False
 
     def check_displacement(self):
@@ -83,12 +85,14 @@ class MoveToPoint(Task):
         return self.get_displacement() <= self.DISPLACEMENT_TOLERANCE
 
     def get_displacement(self):
+	print self.displacement_to_point(self.x, self.y)
         return self.displacement_to_point(self.x, self.y)
 
     def get_movement_speed(self):
-        return min(self.BASE_MOTOR_SPEED, max(self.get_displacement(), 40))
+        return min(self.BASE_MOTOR_SPEED, max(0, self.BASE_MOTOR_SPEED))
 
     def execute(self):
+	print "Executing"
         if self.complete:
             return
 
@@ -97,6 +101,7 @@ class MoveToPoint(Task):
 
 
 class TurnToPoint(Task):
+
     ROTATION_TOLERANCE = 0.2
 
     x = 0
@@ -104,7 +109,7 @@ class TurnToPoint(Task):
 
     motionHandle = None
 
-    def __init__(self, world, robot, role, x, y, tolerance=0.2):
+    def __init__(self, world, robot, role, x, y, tolerance=0.1):
         super(TurnToPoint, self).__init__(world, robot, role)
         self.x = x
         self.y = y
@@ -112,14 +117,14 @@ class TurnToPoint(Task):
 
     def turn(self):
         """Updates this Task's motionHandle to move toward a new point."""
-        if self.check_rotation():
+	if self.check_rotation() and self.motionHandle is not None and self.motionHandle.completed:
             return True
         else:
             if self.motionHandle is None:
                 rotation = self.get_rotation()
-                self.motionHandle = self.robot.turnBy(rotation, scale=self.get_rotation_speed())
+                self.motionHandle = self.robot.turnBy(rotation)
             else:
-                if self.motionHandle.completed or self.motionHandle.finished:
+                if (self.motionHandle.completed and not self.check_rotation()) or self.motionHandle.finished:
                     self.motionHandle = None
             return False
 
@@ -134,9 +139,6 @@ class TurnToPoint(Task):
 
     def get_rotation(self):
         return self.angle_to_point(self.x, self.y)
-
-    def get_rotation_speed(self):
-        return min(self.BASE_MOTOR_SPEED, max(abs(self.get_rotation()) / (math.pi/2) * 100, 40))
 
     def execute(self):
         if self.complete:
@@ -169,7 +171,7 @@ class MirrorObject(MoveToPoint, TurnToObject):
 
     def __init__(self, world, robot, role, pitch_object):
         TurnToObject.__init__(self, world, robot, role, pitch_object)
-        MoveToPoint.__init__(self, world, robot, role, pitch_object.x, pitch_object.y)
+        MoveToPoint.__init__(self, world, robot, role, self.robot_info.x, pitch_object.y)
 
     def update(self):
         
@@ -180,7 +182,7 @@ class MirrorObject(MoveToPoint, TurnToObject):
     def execute(self):
         self.update()
 
-        if (TurnToObject.turn(self)):
+        if (not TurnToObject.turn(self)):
             TurnToObject.execute(self)
         else:
             self.y = self.pitch_object.y

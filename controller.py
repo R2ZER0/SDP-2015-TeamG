@@ -7,7 +7,7 @@ import warnings
 
 from action import Action
 from planning.planner import Planner
-from planning.tasks import AcquireBall, TurnToPoint, TurnToObject
+from planning.tasks import MoveToPoint, AcquireBall, TurnToPoint, TurnToObject, MirrorObject
 from vision.vision import Vision, Camera, GUI
 import vision.tools as tools
 from prediction.Prediction import KalmanBallPredictor, KalmanRobotPredictor
@@ -136,7 +136,7 @@ class Controller:
 
 		# Set up main planner
 		self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
-
+		self.task = TurnToPoint(self.world, self.robot, self.role, self.our_robot.x, self.our_robot.y - 50)
 		# Set up our cache of commands for the predictors
 		self.command_cache = [[0,0,0]]*8
 		self.command = [0,0,0]
@@ -185,19 +185,20 @@ class Controller:
 				# Update world state
 				self.world.update_positions(model_positions)
 
-				#: Run planner only every 5ms.
+				#: Run planner only every 50ms.
 				if (time.clock() - tracker) > 0.05: 
 				
 					self.command = self.command_cache.pop(0)
-					self.planner.plan()
+					#self.planner.plan()
+					self.task.execute()
 					self.command_cache.append(self.robot.last_command())
 					tracker = time.clock()
 
-				ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
-				if regular_positions['ball']:
-					regular_positions['ball']['x'] = self.world.ball.vector.x
-					regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
-				self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
+				#ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
+				#if regular_positions['ball']:
+				#	regular_positions['ball']['x'] = self.world.ball.vector.x
+				#	regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
+				#self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
 
 				# Information about the grabbers from the world
 				grabbers = {
