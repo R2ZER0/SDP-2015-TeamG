@@ -38,7 +38,12 @@ class Planner:
             inputText = fileObj.read()
             parseRes = grammar.parseString(inputText)
             inFile.close()      # We're done reading files, so close them
-            self._fsmList.append(createFSM(parseRes))
+            self._fsmList.append(createFSM(parseRes, pathStr))
+
+        if False in fsmList:
+            print "Terminating due to parse errors detailed above..."
+            print
+            quit()
 
         # inFile = open(fsmSpecFilePath, 'r')
         # inputText = inFile.read()
