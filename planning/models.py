@@ -636,8 +636,9 @@ class FSM:
                     """tran[len(tran) - 2][1] contains the name of the task the input file
                     specifies to execute when leaving the current state. If EXISITING has 
                     been given, it is desired the current task continues executing."""
-                    print "Executing exisiting task"
+                    print "FSM '"+ self._name + "' executing exisiting task"
                     self._currentTask.execute()
+                    print
                     return
                 else:
                     """If we have something other than EXISTING, a task name with arguments has
@@ -649,16 +650,19 @@ class FSM:
                     the creation of a task object with supplied contructor arguments, and cause 
                     Python to evaulate this text as code using eval()."""
 
-                    print "Changing to execute new task"
                     t=[x for x in tran[len(tran) - 2] if x != "," and x != "[" and x != "]"]
                     code = t[0] + "(" + ','.join(t[1:]) + ")"
+
+                    print "FSM '" + self._name + "' changing to execute new task - " + str(t[0]) + " with args " + "(" + ','.join(t[1:]) + ")"
                     self._currentTask = eval(code)
                     self._currentTask.execute()
+                    print
+
                     return
                     
         # If we get here, we looped through the entire set of transitions and didn't find any that applied
         # in the current situation.
-        print "No transition entry for current state " + self._currentState + " and input '" + str(inp) + "'"
+        print "FSM '" + self._name + " reports there is no transition entry for current state " + self._currentState + " and input '" + str(inp) + "'"
 
     def getStates(self):
         return self._states
