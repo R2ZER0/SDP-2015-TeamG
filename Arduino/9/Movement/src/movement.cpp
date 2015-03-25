@@ -74,7 +74,10 @@ void movement_on_new_command(char cmd, float dir, int spd)
 
         // Set desired motor speeds
         for (int i = 0; i < NUM_MOTORS; i++) {
+            motor_powers[i] = speeds[i];
             desired_speeds[i] = (double) speeds[i];
+            wheel_prev_error[i] = 0;
+            wheel_movement[i] = 0;
         }
 
         command_finished_movement();        
