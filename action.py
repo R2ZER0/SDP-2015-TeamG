@@ -102,22 +102,24 @@ class Action():
             # Comms threads
             self._exit = False
             
-    def set_exit():
-        self._exit = True
-        atexit.register(set_exit)
-        
-        self.prev_handler = None
-        
-    def handler(signum, frame):
-        self._exit = True
-        self.prev_handler(signum, frame)
-        self.prev_handler = signal.signal(2, handler)
-        
-        self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
-        self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
-        
-        self.recv_thread.start()
-        self.send_thread.start()
+            def set_exit():
+                self._exit = True
+                
+            atexit.register(set_exit)
+                
+            self.prev_handler = None
+                
+            def handler(signum, frame):
+                self._exit = True
+            
+                self.prev_handler(signum, frame)
+                self.prev_handler = signal.signal(2, handler)
+            
+            self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
+            self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
+            
+            self.recv_thread.start()
+            self.send_thread.start()
     
     def exit(self):
         self._exit = True
