@@ -69,16 +69,17 @@ class MoveToPoint(Task):
             self.robot.stop()
             return True
         else:
-            if self.motionHandle is None:
-                self.angle = self.angle_to_point(self.x, self.y)
-                self.angle = int(self.angle / (math.pi / 4)) * math.pi / 4  # round to nearest 45 degrees
-                self.motionHandle = self.robot.move(self.angle, scale=self.get_movement_speed())
-		print "New with " + str(self.angle) + " "+ str(self.get_movement_speed())
-            else:
-		print self.motionHandle.completed
-                if self.motionHandle.completed or self.motionHandle.finished:
-		    self.motionHandle = None
-            return False
+		self.angle = self.angle_to_point(self.x, self.y)
+		self.angle = int(self.angle / (math.pi / 4)) * math.pi / 4  # round to nearest 45 degrees
+		self.motionHandle = self.robot.move(self.angle, scale=self.get_movement_speed())
+            #if self.motionHandle is None:
+    		#print "New with " + str(self.angle) + " "+ str(self.get_movement_speed())
+            #else:
+		#print self.motionHandle.completed
+                #if self.motionHandle.completed or self.motionHandle.finished:
+		    #pass
+		    #self.motionHandle = None
+            	return False
 
     def check_displacement(self):
         """Check if the robot is within DISPLACEMENT_TOLERANCE units of self.x, self.y"""

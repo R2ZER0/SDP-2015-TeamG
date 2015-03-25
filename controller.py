@@ -136,7 +136,7 @@ class Controller:
 
 		# Set up main planner
 		self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
-		self.task = TurnToPoint(self.world, self.robot, self.role, self.our_robot.x, self.our_robot.y - 50)
+		self.task = MoveToPoint(self.world, self.robot, self.role, self.our_robot.x, self.our_robot.y - 50)
 		# Set up our cache of commands for the predictors
 		self.command_cache = [[0,0,0]]*8
 		self.command = [0,0,0]
