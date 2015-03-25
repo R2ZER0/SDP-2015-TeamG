@@ -81,8 +81,6 @@ def createConfigGrammar():
     assign        = Literal("=")
     sMark         = Literal("\"")
     colon         = Literal(":")
-    leftRndBrkt   = Literal("(")
-    rightRndBrkt  = Literal(")")
     leftSqBrkt    = Literal("[")
     rightSqBrkt   = Literal("]")
 
