@@ -17,7 +17,6 @@ char current_command = MOVEMENT_COMMAND_STOP;
 float targetAngle = 0.0; // in radians, +PI to -PI
 int turnSpeed = 100;
 bool finishedTurn = true;
-float lastDistance = PI;
 
 float normalise_angle(float a) {
     while(a > PI) { a -= 2.0*PI; }
@@ -67,9 +66,6 @@ void movement_on_new_command(char cmd, float dir, int spd)
         targetAngle = normalise_angle(dir);
         turnSpeed = spd;
         finishedTurn = false;
-        //lastDistance = angular_distance(getAngle(), targetAngle);
-        
-        // Now, we wait...
     }
 }
 
