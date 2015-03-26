@@ -3,9 +3,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "motor.h"
 #include <SDPArduino.h>
+#include "config.h"
+
+static int prev_motor_speed[NUM_MOTORS] = { 0 };
 
 void runMotor(int motor, int motor_speed)
-{
+{    
+    if(motor_speed == prev_motor_speed[motor]) { return; }
+    
     if(motor_speed == 0) {
         motorStop(motor);
         

@@ -23,19 +23,27 @@
 // Currently set to +/- 1.5 degrees
 #define TURN_ACCEPTABLE_RANGE (0.017453*1.5)
 
+// Motor PID parameters
+#define KP 1.0
+#define KI 0.0
+#define KD 0.5
+
 #define NUM_MOTORS 4
-#define MOTOR_MOTOR1  1
-#define MOTOR_MOTOR2  3
-#define MOTOR_MOTOR3  0
-#define MOTOR_MOTOR4  2
-#define MOTOR_KICKER  4
-#define MOTOR_CATCHER 5
+#define MOTOR_MOTOR1 2
+#define MOTOR_MOTOR2 3
+#define MOTOR_MOTOR3 0
+#define MOTOR_MOTOR4 5
+#define MOTOR_KICKER 4
+#define MOTOR_CATCHER 1
 
 #define KICKER_RUNNING_TIME  (400)
 #define KICKER_RETURNING_TIME (800)
 #define KICKER_DEFAULT_SCALE (100)
 
-#define CATCHER_RUNNING_TIME  (400)
+#define CATCHER_RUNNING_TIME  (550)
 #define CATCHER_DEFAULT_SCALE (100)
+
+#define ROTARY_SLAVE_ADDRESS 5
+#define ROTARY_COUNT 6
 
 #endif /* _CONFIG_H_ */

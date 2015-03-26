@@ -10,6 +10,23 @@
 #include "math.h"
 #include "motor.h"
 #include "MPU.h"
+#include <Wire.h>
+
+// The desired speeds for motors are set here, and the PID controller attempts
+// to match these on each loop
+double desired_speeds[NUM_MOTORS] = { 0 };
+
+// Tracks the wheel encoder values
+int32_t wheel_movement[NUM_MOTORS] = { 0 };
+
+// The calculated wheel speeds, in encodings/second
+double wheel_speeds[NUM_MOTORS] = { 0 };
+
+// PID Calculated output for motor powers
+double motor_powers[NUM_MOTORS] = { 0 };
+
+// Remember the previous errors for D component
+double wheel_prev_error[NUM_MOTORS] = { 0.0 };
 
 char current_command = MOVEMENT_COMMAND_STOP;
 
@@ -35,6 +52,12 @@ void calc_motor_speeds(float angle, int scale, int* speed) {
 void movement_on_new_command(char cmd, float dir, int spd)
 {
     if(cmd == MOVEMENT_COMMAND_STOP) {
+
+        // Reset desired speeds down to 0
+        for (int i = 0; i < NUM_MOTORS; i++) {
+            desired_speeds[i] = 0;
+        }
+
         current_command = cmd;
         motorStop(MOTOR_MOTOR1);
         motorStop(MOTOR_MOTOR2);
@@ -48,11 +71,15 @@ void movement_on_new_command(char cmd, float dir, int spd)
         // Set motors
         int speeds[4];
         calc_motor_speeds(dir, spd, (int*)&speeds);
-        runMotor(MOTOR_MOTOR1, speeds[0]);
-        runMotor(MOTOR_MOTOR2, speeds[1]);
-        runMotor(MOTOR_MOTOR3, speeds[2]);
-        runMotor(MOTOR_MOTOR4, speeds[3]);
-        
+
+        // Set desired motor speeds
+        for (int i = 0; i < NUM_MOTORS; i++) {
+            motor_powers[i] = speeds[i];
+            desired_speeds[i] = (double) speeds[i];
+            wheel_prev_error[i] = 0;
+            wheel_movement[i] = 0;
+        }
+
         command_finished_movement();        
         
     } else if(cmd == MOVEMENT_COMMAND_TURN) {
@@ -71,6 +98,9 @@ void setup_movement()
 {
     motorAllStop();
 }
+
+void rotary_update_positions();
+void compute_pid();
 
 //float acw_distance(float a, float b) { return  }
 //float  cw_distance(float a, float b) { return abs(normalise_angle(b - a)); }
@@ -105,30 +135,104 @@ void service_movement()
         int turnSpeedA = turnSpeed;
         int turnSpeedB = turnSpeed;
         
-        if(current_distance < 0.2) {
-            turnSpeedA = 60;
-            turnSpeedB = -40;
+        if(current_distance < 0.5) {
+            turnSpeedA = 40;
+            turnSpeedB = 0;
         
         } else if(current_distance < 1.5) {
-            turnSpeedB = 50;
-            turnSpeedA = 0;
+            turnSpeedA = 40;
+            turnSpeedB = 0;
+            
         } else {
-            turnSpeedA = 0;
-            turnSpeedB = 60;
+            turnSpeedA = 50;
+            turnSpeedB = 0;
         }
         
-        if(acw_dist < cw_dist) {
+        Serial.print(current_distance);
+        Serial.print('\t');
+        Serial.println(turnSpeedA);
+        
+        if(acw_dist > cw_dist) {
             runMotor(MOTOR_MOTOR1, turnSpeedA);
             runMotor(MOTOR_MOTOR2, turnSpeedB);
             runMotor(MOTOR_MOTOR3, turnSpeedA);
-            runMotor(MOTOR_MOTOR4, turnSpeedB);            
+            runMotor(MOTOR_MOTOR4, turnSpeedB);
         } else {
-            runMotor(MOTOR_MOTOR1, 0-turnSpeedA);
-            runMotor(MOTOR_MOTOR2, 0-turnSpeedB);
-            runMotor(MOTOR_MOTOR3, 0-turnSpeedA);
-            runMotor(MOTOR_MOTOR4, 0-turnSpeedB);
+            runMotor(MOTOR_MOTOR1, -turnSpeedA);
+            runMotor(MOTOR_MOTOR2, -turnSpeedB);
+            runMotor(MOTOR_MOTOR3, -turnSpeedA);
+            runMotor(MOTOR_MOTOR4, -turnSpeedB);
         }
         
-        Serial.print("dist="); Serial.println(current_distance);
+        //Serial.print("dist="); Serial.println(current_distance);
+    }
+    
+    rotary_update_positions();
+    compute_pid();
+}
+
+
+/* Motor movement sensors stuff */
+unsigned long next_print_time = 0L;
+unsigned long next_pid_time = 0L;
+
+const int sample_pid_ms = 200;
+const int sample_time_ms = 200;
+
+void rotary_update_positions() {
+    // Request motor position deltas from rotary slave board
+    Wire.requestFrom(ROTARY_SLAVE_ADDRESS, NUM_MOTORS);
+    
+    // Update the recorded motor positions
+    for (int i = 0; i < NUM_MOTORS; i++) {
+        wheel_movement[i] -= (int8_t) Wire.read();  // Must cast to signed 8-bit type    
+    }
+  
+    if(millis() > next_print_time) {
+
+        for (int i = 0; i < NUM_MOTORS; i++) {
+            wheel_speeds[i] = (float) (wheel_movement[i]) * (1000.0/sample_time_ms);
+            wheel_movement[i] = 0;
+        }
+        
+        next_print_time = millis() + sample_time_ms;
+    }
+}
+
+double signof(double a) {
+    if(a < 0) { return -1; }
+    else if(a > 0) { return 1; }
+    else { return 0; }
+}
+
+/* Computes new PID expected values for desired speeds and update motors. */
+void compute_pid() {
+
+    if (current_command != MOVEMENT_COMMAND_MOVE) {
+        return;
+    }
+
+    if(millis() > next_pid_time) {
+
+        for (int i = 0; i < NUM_MOTORS; i++) {
+            double error = (desired_speeds[i] - wheel_speeds[i]);
+           
+            double d_error = error - wheel_prev_error[i];
+            wheel_prev_error[i] = error;
+            
+            double delta = KP * error + KD * d_error;
+            motor_powers[i] += delta;
+            
+            if(abs(motor_powers[i]) > 100) { motor_powers[i] = signof(motor_powers[i]) * 100; }
+            if(abs(motor_powers[i]) < 30)  { motor_powers[i] = signof(motor_powers[i]) * 30; }
+        }
+
+        // Run motors at these values
+        runMotor(MOTOR_MOTOR1, motor_powers[0]);
+        runMotor(MOTOR_MOTOR2, motor_powers[1]);
+        runMotor(MOTOR_MOTOR3, motor_powers[2]);
+        runMotor(MOTOR_MOTOR4, motor_powers[3]);
+
+        next_pid_time = millis() + sample_pid_ms;
     }
 }
