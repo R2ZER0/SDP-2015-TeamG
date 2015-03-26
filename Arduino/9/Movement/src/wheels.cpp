@@ -1,4 +1,9 @@
 /* wheels.cpp - attempting to control the speed of the wheels */
+#include <Arduino.h>
+#include <Wire.h>
+#include "wheels.h"
+#include "motor.h"
+#include "config.h"
 
 struct wheel_control {
     double target_speed;
@@ -8,6 +13,7 @@ struct wheel_control {
     double prev_error;
 };
 
+/* Motor lookup table */
 static const int8_t MOTOR[NUM_MOTORS] = {
     MOTOR_MOTOR1,
     MOTOR_MOTOR2,
@@ -15,7 +21,11 @@ static const int8_t MOTOR[NUM_MOTORS] = {
     MOTOR_MOTOR4
 };
 
+/* A controller instance for each wheel */
 static struct wheel_control wheels[NUM_MOTORS] = { {0} };
+
+/* Timeout variable used to know if we need to recalculate the motor powers */
+static unsigned long next_update_time = 0L;
 
 /* Reset the controller and set the desired speed */
 void wheels_set_target_speeds(double* speeds)
@@ -57,9 +67,6 @@ static void wheel_control_calculate(struct wheel_control* wheel)
     }
 }
 
-/* Timeout variable used to know if we need to recalculate the motor powers */
-static unsigned long next_update_time = 0L;
-
 void setup_wheels() {}
 void service_wheels()
 {
@@ -77,7 +84,7 @@ void service_wheels()
             struct wheel_control* wheel = &wheels[i];
             
             /* Calculate average wheel speed since last update */
-            wheel->speed = (float) (wheel_movement[i]) * (1000.0/WHEELS_UPDATE_INTERVAL);
+            wheel->speed = (float) (wheel->movement) * (1000.0/WHEELS_UPDATE_INTERVAL);
             wheel->movement = 0;
             
             /* Update the controller */
