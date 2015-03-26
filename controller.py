@@ -23,6 +23,7 @@ class MyError(Exception):
              self.value = value
          def __str__(self):
              return repr(self.value)
+
 class Controller:
     '''Main controller for the Robot. Pulls together all modules and executes our Vision, 
     Processing and Planning to move the Robot.
@@ -44,6 +45,8 @@ class Controller:
         assert pitch in [0, 1]
         assert color in ['yellow', 'blue']
         assert our_side in ['left', 'right']
+
+        start_time = time.clock()
 
         self.pitch = pitch
 
@@ -75,6 +78,7 @@ class Controller:
             calibration=self.calibration)
 
         # Set up postprocessing for vision
+        self.preprocessing = Preprocessing()
         self.postprocessing = Postprocessing()
 
         # Set up world
@@ -97,7 +101,58 @@ class Controller:
         self.color = color
         self.side = our_side
 
-        self.preprocessing = Preprocessing()
+        # start capturing frames to fill up an intial world state
+		counter = 0
+		while time.clock() < start_time + 3:
+				frame = self.camera.get_frame()
+				pre_options = self.preprocessing.options
+				# Apply preprocessing methods toggled in the UI
+				preprocessed = self.preprocessing.run(frame, pre_options)
+				frame = preprocessed['frame']
+				if 'background_sub' in preprocessed:
+					cv2.imshow('bg sub', preprocessed['background_sub'])
+
+				# Find object positions
+				# model_positions have their y coordinate inverted
+				model_positions, regular_positions = self.vision.locate(frame)
+				model_positions = self.postprocessing.analyze(model_positions)
+
+				# Update world state
+				self.world.update_positions(model_positions)
+
+				# Information about the grabbers from the world
+				grabbers = {
+					'our_defender': self.world.our_defender.catcher_area,
+					'our_attacker': self.world.our_attacker.catcher_area
+				}
+
+				# Information about states
+				attackerState = ("NONE", "NONE")
+				defenderState = ("NONE", "NONE")
+
+				attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+				defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+
+				# Use 'y', 'b', 'r' to change color.
+				c = waitKey(2) & 0xFF
+
+				actions = []
+				fps = float(counter) / (time.clock() - start_time)
+				# Draw vision content and actions
+			
+				self.GUI.draw(
+					frame, model_positions, actions, regular_positions, fps, attackerState,
+					defenderState, attacker_actions, defender_actions, grabbers,
+					our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
+				counter += 1
+		
+		# Set up our cache of commands for the predictors
+		self.command_cache = [[0,0,0]]*8
+		self.command = [0,0,0]
+
+		# Set up predictors (need to do this for both robots!)
+		self.ball_predictor = KalmanBallPredictor(self.world.ball.vector, friction=0)
+		self.robot_predictor = KalmanRobotPredictor(self.world.our_attacker.vector, friction=-10, acceleration=25)
 
     def run(self):
         '''Main loop of the Controller. Executes a continuous loop doing the following:
@@ -161,6 +216,13 @@ class Controller:
                     'our_attacker': self.world.our_attacker.catcher_area
                 }
 
+                # Information about states
+				attackerState = (self.planner._current_state, self.planner._current_state)
+				defenderState = (self.planner._current_state, self.planner._current_state)
+
+				attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+				defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
+
                 # Use 'y', 'b', 'r' to change color.
                 c = waitKey(2) & 0xFF
 
@@ -188,22 +250,6 @@ class Controller:
 
             tools.save_colors(self.pitch, self.calibration)
 
-# MAIN
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('-p', '--pitch', type=int, default=0, help="[0] Main pitch (Default), [1] Secondary pitch")
-    parser.add_argument('-s', '--side', default='left', help="Our team's side ['left', 'right'] allowed. [Default: left]")
-    parser.add_argument(
-        '-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
-    parser.add_argument(
-        "-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
-    
-    
-    args = parser.parse_args()
-
-        c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, comms=(not args.nocomms)).run()
 
 class Arduino:
 
@@ -298,3 +344,20 @@ class Robot_Controller(object):
     def shutdown(self, comm):
         comm.write('RUN_ENG %d %d\r' % (0, 0))
         time.sleep(1)
+
+# MAIN
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-p', '--pitch', type=int, default=0, help="[0] Main pitch (Default), [1] Secondary pitch")
+    parser.add_argument('-s', '--side', default='left', help="Our team's side ['left', 'right'] allowed. [Default: left]")
+    parser.add_argument(
+        '-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
+    parser.add_argument(
+        "-n", "--nocomms", help="Disables sending commands to the robot.", action="store_true")
+    
+    
+    args = parser.parse_args()
+
+    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, comms=(not args.nocomms)).run()

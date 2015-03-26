@@ -65,6 +65,6 @@ class Planner:
         self._world = world
         self._robot=robot
         self._role = role
-        # self._fsm.show()
+
         for fsm in self._fsmList:
             fsm.show()

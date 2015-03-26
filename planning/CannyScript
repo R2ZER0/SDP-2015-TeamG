@@ -1,0 +1,38 @@
+import cv2
+import numpy as np
+import math
+
+from vision.vision import Camera
+import vision.tools as tools
+
+camera = Camera(port=0, pitch=0)
+img = camera.get_frame()
+
+img2 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+th2 = cv2.adaptiveThreshold(img2,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,2)
+images = [img2, th2]
+
+img2 = cv2.blur(img2, (5, 5))
+img2 = cv2.equalizeHist(img2)
+images.append(img2)
+th3 = cv2.adaptiveThreshold(img2,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11,2)
+images.append(th3)
+for i in range(20):
+	edges = cv2.Canny(img2,0+25*i,0+50*i)
+	output = img.copy()
+	contours,h = cv2.findContours(edges,1,2)
+	for cnt in contours:
+		approx = cv2.approxPolyDP(cnt,0.01*cv2.arcLength(cnt,True),True)
+		if len(approx) > 6:
+			cv2.drawContours(output,[cnt],0,(0,255,255),-1)
+	images.append(edges)
+	images.append(output)
+
+for i in range(len(images)):
+	#print type(images[i])
+	#contours, hierarchy = cv2.findContours( images[i], cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+	#c = (0,0,255)
+	#cv2.drawContours(images[i], contours, 0, c)
+	cv2.imshow('image', images[i])
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
