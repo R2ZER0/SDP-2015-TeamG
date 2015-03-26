@@ -81,16 +81,6 @@ void setup_movement()
     motorAllStop();
 }
 
-void rotary_update_positions();
-void compute_pid();
-
-//float acw_distance(float a, float b) { return  }
-//float  cw_distance(float a, float b) { return abs(normalise_angle(b - a)); }
-
-//float acw_distance(float x, float y) { return normalise_angle( atan2(cos(y), sin(y)) - atan2(cos(x), sin(y)) ); }
-//float acw_distance(float x, float y) { return PI - abs(abs(x - y) - PI); }
-//float  cw_distance(float x, float y) { return 2.0*PI - acw_distance(x, y); }
-
 float acw_distance(float a, float b) { return (b-a)<0 ? (b - a + PI*2.0) : (b - a); }
 float  cw_distance(float a, float b) { return (a-b)<0 ? (a - b + PI*2.0) : (a - b); }
 
@@ -100,16 +90,12 @@ void service_movement()
         float acw_dist = acw_distance(getAngle(), targetAngle);
         float  cw_dist =  cw_distance(getAngle(), targetAngle);
         float current_distance = (acw_dist < cw_dist) ? acw_dist : cw_dist;
-        
-//         Serial.print(getAngle()); Serial.print(" --> "); Serial.print(targetAngle);
-//         Serial.print(" = "); Serial.println(current_distance);
-//         
+
         if(current_distance <= TURN_ACCEPTABLE_RANGE) {
             // We've probably finished!
             motorAllStop();
             finishedTurn = true;
             command_finished_movement();
-            Serial.println("Finished turn!");
             return;
         }
         
