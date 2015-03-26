@@ -28,6 +28,13 @@ double wheels_get_speed(int wheel) {
     return wheels[wheel].speed;
 }
 
+/* Return the sign of a number */
+static double signof(double a) {
+    if(a < 0) { return -1; }
+    else if(a > 0) { return 1; }
+    else { return 0; }
+}
+
 /* Calculate the next step of the PD controller */
 static void wheel_control_calculate(struct wheel_control* wheel)
 {

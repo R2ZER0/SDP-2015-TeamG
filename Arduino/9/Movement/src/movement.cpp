@@ -135,9 +135,3 @@ void service_movement()
         //Serial.print("dist="); Serial.println(current_distance);
     }
 }
-
-double signof(double a) {
-    if(a < 0) { return -1; }
-    else if(a > 0) { return 1; }
-    else { return 0; }
-}
