@@ -18,9 +18,12 @@ static const int8_t MOTOR[NUM_MOTORS] = {
 static struct wheel_control wheels[NUM_MOTORS] = { {0} };
 
 /* Reset the controller and set the desired speed */
-void wheels_set_target_speed(int wheel, double speed)
+void wheels_set_target_speeds(double* speeds)
 {
-    wheels[wheel].target_speed = speed;
+    for(int i = 0; i < NUM_MOTORS; ++i) {
+        wheels[i].target_speed = speeds[i];
+    }
+    next_update_time = 0L;
 }
 
 /* Get the last known speed of this wheel */

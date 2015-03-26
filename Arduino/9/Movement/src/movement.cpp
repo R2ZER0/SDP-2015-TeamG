@@ -26,11 +26,11 @@ float normalise_angle(float a) {
     return a;
 }
 
-void calc_motor_speeds(float angle, int scale, int* speed) {
+void calc_motor_speeds(float angle, int scale, double* speed) {
     static const float motor_angle[NUM_MOTORS] = {PI/4.0, PI*3.0/4.0, PI*5.0/4.0, PI*7.0/4.0};
     
     for(int i = 0; i < NUM_MOTORS; ++i) {
-        speed[i] = (int)( (float)scale * (cos(angle) * cos(motor_angle[i]) - sin(angle) * sin(motor_angle[i])) );
+        speed[i] = (double)( (float)scale * (cos(angle) * cos(motor_angle[i]) - sin(angle) * sin(motor_angle[i])) );
     }
 }
 
@@ -39,9 +39,8 @@ void movement_on_new_command(char cmd, float dir, int spd)
     if(cmd == MOVEMENT_COMMAND_STOP) {
 
         // Reset desired speeds down to 0
-        for (int i = 0; i < NUM_MOTORS; i++) {
-            desired_speeds[i] = 0;
-        }
+        double speeds[NUM_MOTORS] = { 0.0, 0.0, 0.0, 0.0 };
+        wheels_set_target_speeds(&speeds);
 
         current_command = cmd;
         motorStop(MOTOR_MOTOR1);
@@ -54,14 +53,13 @@ void movement_on_new_command(char cmd, float dir, int spd)
         current_command = cmd;
         
         // Set motors
-        int speeds[4];
+        double speeds[NUM_MOTORS];
         calc_motor_speeds(dir, spd, (int*)&speeds);
 
         // Set desired motor speeds
-        for (int i = 0; i < NUM_MOTORS; i++) {
-            wheels_set_target_speed(i, (double) speeds[i]);
-        }
+        wheels_set_target_speeds(speeds);
 
+        // We are done! (?)
         command_finished_movement();        
         
     } else if(cmd == MOVEMENT_COMMAND_TURN) {

@@ -2,7 +2,7 @@
 #ifndef _WHEELS_H_
 #define _WHEELS_H_
 
-void wheels_set_target_speed(int wheel, double speed);
+void wheels_set_target_speeds(double* speed);
 double wheels_get_speed(int wheel);
 
 void setup_wheels();
