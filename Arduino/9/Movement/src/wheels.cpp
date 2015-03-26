@@ -8,3 +8,6 @@ void wheels_set_target_speed(int wheel, double speed)
 double wheels_get_speed(int wheel) {
     /* TODO */
 }
+
+void setup_wheels() {}
+void service_wheels() {}
