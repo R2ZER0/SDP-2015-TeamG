@@ -2,7 +2,6 @@
 // Movement
 ////////////////////////////////////////////////////////////////////////////////
 #include "movement.h"
-#include "Angle.h"
 #include <Arduino.h>
 #include <SDPArduino.h>
 #include "config.h"
