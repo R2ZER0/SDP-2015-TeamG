@@ -23,12 +23,16 @@
 // Currently set to +/- 1.5 degrees
 #define TURN_ACCEPTABLE_RANGE (0.017453*1.5)
 
-// Motor PID parameters
-#define KP 1.0
-#define KI 0.0
-#define KD 0.5
+// Wheel PID parameters
+#define WHEELS_UPDATE_INTERVAL (200)
+#define WHEELS_KP 1.0
+#define WHEELS_KI 0.0
+#define WHEELS_KD 0.5
+#define WHEELS_POWER_MAX (100)
+#define WHEELS_POWER_MIN (30)
 
 #define NUM_MOTORS 4
+#define NUM_WHEELS NUM_MOTORS
 #define MOTOR_MOTOR1 2
 #define MOTOR_MOTOR2 3
 #define MOTOR_MOTOR3 0
