@@ -39,7 +39,7 @@ void movement_on_new_command(char cmd, float dir, int spd)
 
         // Reset desired speeds down to 0
         double speeds[NUM_MOTORS] = { 0.0, 0.0, 0.0, 0.0 };
-        wheels_set_target_speeds(&speeds);
+        wheels_set_target_speeds(speeds);
 
         current_command = cmd;
         motorStop(MOTOR_MOTOR1);
@@ -53,7 +53,7 @@ void movement_on_new_command(char cmd, float dir, int spd)
         
         // Set motors
         double speeds[NUM_MOTORS];
-        calc_motor_speeds(dir, spd, (int*)&speeds);
+        calc_motor_speeds(dir, spd, speeds);
 
         // Set desired motor speeds
         wheels_set_target_speeds(speeds);
