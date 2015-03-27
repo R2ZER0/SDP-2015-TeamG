@@ -94,9 +94,13 @@ class Controller:
 
 		c = True
 
+		move_handle = None
+		kick_handle = None
+		catch_handle = None
+
 		while c != 27:  # the ESC key
 
-			#Move the ball with TFGH
+			# Huge array of shortcut keys for testing various movements
 			if c == ord('t'):
 				self.simulator.ball.body.velocity = Vec2d(0,1)
 			elif c == ord('f'):
@@ -106,21 +110,21 @@ class Controller:
 			elif c == ord('h'):
 				self.simulator.ball.body.velocity = Vec2d(1,0)
 			elif c == ord('i'):
-				self.robot.open_catcher()
+				catch_handle = self.robot.open_catcher()
 			elif c == ord('j'):
-				self.robot.catch()
+				catch_handle = self.robot.catch()
 			elif c == ord('k'):
-				self.robot.kick()
+				kick_handle = self.robot.kick()
 			elif c == ord('l'):
-				self.robot.turnBy(3.14)
+				move_hadnle = self.robot.turnBy(3.14)
 			elif c == ord('z'):
-				self.robot.move(-math.pi/2,100)
+				move_handle = self.robot.move(-math.pi/2,100)
 			elif c == ord('x'):
-				self.robot.move(math.pi/2, 100)
+				move_handle = self.robot.move(math.pi/2, 100)
 			elif c == ord('c'):
-				self.robot.move(math.pi, 100)
+				move_handle = self.robot.move(math.pi, 100)
 			elif c == ord('v'):
-				self.robot.move(0, 100)
+				move_handle = self.robot.move(0, 100)
 
 			self.simulator.update(1)
 
