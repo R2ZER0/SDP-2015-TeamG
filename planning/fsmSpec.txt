@@ -1,17 +1,30 @@
 machineParams
-name 			controlFSM
-inAlph			ballInZone, ballNotInZone, partnerHasBall
-states s0, s1
-initialState	s0
-finalState		s1
+name 			simpleAttackerFSM
+inAlph			ballInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete
+states 			initial, acquiringBall, movingToPoint, shooting
+initialState	initial
+finalState		unnec
 
 transitions
-<s0, ballInZone, [PrintTask, world, robot, role, 'Ball in Zone'], s1>
-<s1, ballInZone, [EXISTING], s1>
+<inital, ballInZone,	TODO	, acquiringBall>
+
+<acquiringBall, gotBall,	TODO	, movingToPoint>
+<acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
+
+<movingToPoint, atPoint,	TODO	, shooting>
+<movingToPoint, notAtPoint, [EXISTING], movingToPoint>
+
+<shooting, shotComplete,	TODO	, initial>
+<shooting, stillShooting, [EXISTING], shooting>
 
 lambdaConditions
 "ballInZone" : lambda planner : planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
-"ballNotInZone" : lambda planner : not planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"notGotBallYet" : lambda planner :	TODO
+"gotBall" : lambda planner :	TODO
+"atPoint" : lambda planner :	TODO
+"notAtPoint" : lambda planner :	TODO
+"stillShooting" : lambda planner :	TODO
+"shotComplete" : lambda planner :	TODO
 
 
 
