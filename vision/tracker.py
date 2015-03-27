@@ -204,7 +204,7 @@ class RobotTracker(Tracker):
                 y = p.pt[1]
                 mask_frame = np.zeros((height,width,3), np.uint8)
                 screen_frame = frame.copy()
-                cv2.circle(mask_frame, (x, y), r, (255, 255, 255), -1)
+                cv2.circle(mask_frame, (int(x), int(y)), int(r), (255, 255, 255), -1)
                 # Mask the original image
                 mask_frame = cv2.cvtColor(mask_frame, cv2.COLOR_BGR2GRAY)
                 c = cv2.bitwise_and(screen_frame, screen_frame, mask=mask_frame)

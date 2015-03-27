@@ -129,7 +129,7 @@ class Vision:
         from the center of the lens.
         """
         plane_height = 250.0
-        robot_height = 15.0 #FIXME
+        robot_height = 0.0 #FIXME
         coefficient = robot_height/plane_height
 
         x = point[0]
@@ -415,8 +415,8 @@ class GUI(object):
             cv2.polylines(frame, [np.array(position_dict['box'])], True, BGR_COMMON[color], 2)
 
         if position_dict['front']:
-            p1 = (position_dict['front'][0][0], position_dict['front'][0][1])
-            p2 = (position_dict['front'][1][0], position_dict['front'][1][1])
+            p1 = (int(position_dict['front'][0][0]), int(position_dict['front'][0][1]))
+            p2 = (int(position_dict['front'][1][0]), int(position_dict['front'][1][1]))
             cv2.circle(frame, p1, 3, BGR_COMMON['white'], -1)
             cv2.circle(frame, p2, 3, BGR_COMMON['white'], -1)
             cv2.line(frame, p1, p2, BGR_COMMON['red'], 2)
@@ -427,9 +427,10 @@ class GUI(object):
                 4, BGR_COMMON['black'], -1)
 
         if position_dict['direction']:
-            cv2.line(
-                frame, position_dict['direction'][0], position_dict['direction'][1],
-                BGR_COMMON['orange'], 2)
+            p1 = (int(position_dict['direction'][0][0]), int(position_dict['direction'][0][1]))
+            p2 = (int(position_dict['direction'][1][0]), int(position_dict['direction'][1][1]))
+            
+            cv2.line(frame, p1, p2, BGR_COMMON['orange'], 2)
 
     def draw_line(self, frame, points, thickness=2):
         if points is not None:

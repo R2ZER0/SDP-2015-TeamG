@@ -19,7 +19,7 @@ from pymunk.constraint import PivotJoint, GearJoint
 from pymunk import Vec2d
 
 from entities import SimulatedRobot, SimulatedBall, SimulatedPitch
-
+from action import *
 import numpy as np
 import cv2
 
@@ -30,9 +30,6 @@ class SimulatedAction:
 	to a SimulatedRobot updating the motors.
 	'''
 
-	#: A reference to our SimulatedRobot for passing messages
-	robot = None
-
 	def __init__(self, robot):
 		'''Initialises this Action instance. Uses the passed robot as the object to pass messages
 		to. 
@@ -42,21 +39,59 @@ class SimulatedAction:
 		assert robot is not None
 		self.robot = robot
 
-	def move(self, angle, speed):
+		# Command handles
+		self.move_handle = MovementActionHandle(100, 'S', 0, 0)
+		self.kick_handle = KickerActionHandle(100, 'I', 0)
+		self.catch_handle = CatcherActionHandle(100, 'I', 0)
+
+	def _cmd_movement(self, cmd, angle, scale):
+		self.move_handle._onNextCommand()
+		self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
+		return self.move_handle
+
+	def exit(self):
+		pass
+
+	def last_command(self):
+		current_handle = self.robot.move_handle
+
+		if current_handle is None:
+			return [0,0,0]
+		elif current_handle.cmd == 'M':
+			dx = math.cos(self.robot.move_handle.dir)*self.robot.move_handle.spd
+			dy = math.sin(self.robot.move_handle.dir)*self.robot.move_handle.spd
+			return [dx,dy,0]
+		elif current_handle.cmd == 'T':
+			return [0,0,self.robot.move_handle.spd]
+		else:
+			return [0,0,0]
+
+	def move(self, angle, scale=64):
 		'''Move the robot in the angle (radians) from the front, with speed -1 to +1'''
-		self.robot.move(speed, angle)
+		self.move_handle = self._cmd_movement('M', angle, scale)
+		self.robot.move(self.move_handle)
+
+		return self.move_handle
   
-	def turn(self, speed):
+	def turnBy(self, angle, scale=64):
 		'''Moves the robot in the given direction.
 
 		:param speed: A value to turn, with positive being clockwise, in the range [-100,100]
 		'''
-		self.robot.turn(speed)
+		# Make new angle target
+		target = mkangle(self.robot.body.angle+angle)
+		self.move_handle = self._cmd_movement('T', target, scale)
+		self.robot.turn(self.move_handle)
+
+		return self.move_handle
   
 	def stop(self):
 		'''Sends 0 to all Robot's motors to stop the movement.
 		'''
-		self.robot.stop()
+		self.move_handle = self._cmd_movement('S', 0, 0)
+		self.robot.stop(self.move_handle)
+
+		return self.move_handle
   
 	# Kicking
 	def kick(self, scale=100):
@@ -68,7 +103,15 @@ class SimulatedAction:
 
 		:param scale: Defaults to 100, the kicking power.
 		'''
-		self.robot.kick()
+		self.kick_handle._onNextCommand()
+		self.kick_handle = KickerActionHandle(self.kick_handle.idx+1, 'K', scale)
+		self.robot.kick(self.kick_handle)
+		return self.kick_handle
+
+	def _cmd_catcher(self, cmd, scale):
+		self.catch_handle._onNextCommand()
+		self.catch_handle = CatcherActionHandle(self.catch_handle.idx+1, cmd, scale)
+		return self.catch_handle
 
 	def catch(self, scale=100):
 		'''Attempts to catch using the catcher. Makes no check as to kicker/catcher being open/closed.
@@ -79,7 +122,9 @@ class SimulatedAction:
 
 		:param scale: Defaults to 100, the catching power.
 		'''
-		self.robot.close_catcher()
+		catch_handle = self._cmd_catcher('C', scale)
+		self.robot.close_catcher(catch_handle)
+		return catch_handle
 
 	def open_catcher(self, scale=100):
 		'''Attempts to open the catcher.
@@ -90,7 +135,9 @@ class SimulatedAction:
 
 		:param scale: Defaults to 100, speed to open.
 		'''
-		self.robot.open_catcher()
+		catch_handle = self._cmd_catcher('R', scale)
+		self.robot.open_catcher(catch_handle)
+		return catch_handle
 
 class SimulatedCamera():
 

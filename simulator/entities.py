@@ -227,7 +227,7 @@ class SimulatedRobot:
 	KICKER_MULTIPLIER = 0.15
 
 	#: The base power for the motors; is multiplied by seconds and speed to receive final vlaue.
-	MOVE_POWER, TURN_POWER = 0.005, 0.0002
+	MOVE_POWER, TURN_POWER = 0.04, 0.0004
 
 	#: Ensure all shapes for the Robot are kept in the same group to prevent collisions
 	ROBOT_GROUP, ROBOT_LAYER = 10, 1
@@ -261,9 +261,10 @@ class SimulatedRobot:
 	#: Catcher and Kicker states are one of: open, closed, opening, closing
 	catcher_state, kicker_state = 'closed', 'closed'
 
-	#: Stores last assigned speeds, used each update to decide on next movement
-	rotate_speed, move_speed = 0, 0
-	move_direction = 0
+	#: Stores movement, and rotation action handles
+	move_handle = None
+	kick_handle = None
+	catch_handle = None
 
 	def __init__(self, space, center, color='yellow', scale=1):
 		'''Constructs a new SimulatedRobot, centered on the given position. Allows a scale
@@ -352,22 +353,51 @@ class SimulatedRobot:
 		far simpler cases.
 		'''
 
-		if self.rotate_speed == 0:
+		if self.move_handle is None:
 			self.body.angular_velocity = 0
+			self.body.velocity = Vec2d(0,0)
+			return
 
-                if self.move_speed == 0:
-                        self.body.velocity = Vec2d(0,0)
+		self.move_handle._onRunning()
 
-		# Handle turning first
-		if self.rotate_speed != 0:
-			self.body.angular_velocity = self.rotate_speed * self.TURN_POWER
+		#: We have a turning command
+		if self.move_handle.cmd == 'S':
+			#: Set our move handle as completed if it's a stop
+			self.move_handle._onComplete()
 
-		# Handle movement speed by assigning velocity directly
-		if self.move_speed != 0:
-			dx = self.move_speed * math.cos(self.move_direction + self.body.angle) * self.MOVE_POWER
-			dy = self.move_speed * math.sin(self.move_direction + self.body.angle) * self.MOVE_POWER
+			self.body.angular_velocity = 0
+			self.body.velocity = Vec2d(0,0)
+		
+		elif self.move_handle.cmd == 'T':
 
-			self.body.velocity = Vec2d(dx,dy)
+			target = self.move_handle.dir
+			our = self.body.angle
+
+			acw_dist = (our-target+math.pi*2) if (our-target) < 0 else our-target
+			cw_dist = (target-our + math.pi*2) if (target-our) < 0 else target-our
+
+			dist = min(acw_dist, cw_dist)
+
+			if dist < 0.01:
+				self.body.angular_velocity = 0.0
+				self.move_handle._onComplete()
+				self.move_handle = None
+			elif dist < 0.5:
+				self.body.angular_velocity = 90*self.TURN_POWER
+			elif dist < 1.5:
+				self.body.angular_velocity = 95*self.TURN_POWER
+			else:
+				self.body.angular_velocity = 100*self.TURN_POWER
+
+		elif self.move_handle.cmd == 'M':
+			#: Set our move handle as completed if it's just a move
+			self.move_handle._onComplete()
+
+			dir = self.move_handle.dir + self.body.angle
+			speed = self.move_handle.spd*self.MOVE_POWER
+
+			self.body.angular_velocity = 0
+			self.body.velocity = Vec2d(speed*math.cos(dir), speed*math.sin(dir))
 
 	def _update_catcher(self, dt):
 		'''Updates the catcher, moving it further closed / open based upon our state and the given
@@ -377,6 +407,8 @@ class SimulatedRobot:
 		'''
 		if self.catcher_state == 'closed' or self.catcher_state == 'open': 
 			return
+
+		self.catch_handle._onRunning()
 
 		# Positive will move the catcher away from the robot
 		change = self.CATCHER_SPEED if self.catcher_state == 'opening' else -self.CATCHER_SPEED
@@ -388,9 +420,11 @@ class SimulatedRobot:
 		if self.catcher_joint.distance == 2 and self.catcher_state == 'closing':
 			self.catcher_state = 'closed'
 			self._change_catcher_group(self.CATCHER_GROUP)
+			self.catch_handle._onComplete()
 		elif self.catcher_joint.distance == self.CATCHER_LENGTH and self.catcher_state == 'opening':
 			self.catcher_state = 'open' 
 			self._change_catcher_group(SimulatedBall.BALL_GROUP)
+			self.catch_handle._onComplete()
 
 	def _update_kicker(self, dt):
 		'''Updates the kicker, moving it further open / closed based upon our state and the given time
@@ -400,6 +434,8 @@ class SimulatedRobot:
 		'''
 		if self.kicker_state == 'closed':
 			return
+
+		self.kick_handle._onRunning()
 
 		# Positive will move the kicker away from the robot
 		change = self.KICKER_SPEED if self.kicker_state == 'opening' else -self.KICKER_SPEED
@@ -416,52 +452,60 @@ class SimulatedRobot:
 		# Check for termination states
 		if self.kicker_joint.distance == 0 and self.kicker_state == 'closing':
 			self.kicker_state = 'closed'
+			self.kick_handle._onComplete()
 		elif self.kicker_joint.distance == self.KICKER_LENGTH and self.kicker_state == 'opening':
 			self.kicker_state = 'closing'
 
-	def kick(self):
+	def kick(self, handle):
 		'''Attempts to kick, performs no check to determine if this should occur or not.
 		'''
+		if self.kick_handle != None:
+			self.kick_handle._onNextCommand()
+
 		self.kicker_state = 'opening'
+		self.kick_handle = handle
 
-	def open_catcher(self):
-		'''Attempts to open the catcher, performs no check to determine if this should occur or not.
+	def open_catcher(self, handle):
+		'''Attempts to open the catcher. Replaces current catcher handle with this one.
 		'''
-		self.catcher_state = 'opening'
+		if self.catch_handle != None:
+			self.catch_handle._onNextCommand()
 
-	def close_catcher(self):
+		self.catcher_state = 'opening'
+		self.catch_handle = handle
+
+	def close_catcher(self, handle):
 		'''Attempts to close the catcher, performs no check to determine if this should occur or not.
 		'''
-		self.catcher_state = 'closing'
+		if self.catch_handle != None:
+			self.catch_handle._onNextCommand()
 
-	def turn(self, speed):
+		self.catcher_state = 'closing'
+		self.catch_handle = handle
+
+	def turn(self, handle):
 		'''Simulates a rotation request to the Robot.
 
 		:param speed: The power of this turn, in the range [-100,100]
 		'''
-		self.rotate_speed = speed
+		if self.move_handle != None:
+			self.move_handle._onNextCommand()
 
-		#: Turning should override moving, and vice-versa (connected to same motors)
-		if self.move_speed != 0:
-			self.move_speed = 0
+		self.move_handle = handle
 
-	def move(self, speed, angle):
+	def move(self, handle):
 		'''Simulates a movement request to the Robot to travel in the given angle with the supplied speed.
 
-		.. note::
-
-		   To provide compatibility with current usage, specifying 0 will travel in the robot's forward facing
-		   direction and other angles are considered offset to this.
-
-		:param speed: The speed of this movement, should be in the range [-1,1]
+		:param speed: The speed of this movement.
 		:param angle: The direction of travel, relevant to the robot's x-axis, in radians.
 		'''
-		self.move_speed = speed
-		self.move_direction = angle
 
-		#: Moving sohuld override turning, and vice-versa (connected to same motors)
-		if self.rotate_speed != 0:
-			self.rotate_speed = 0
+		#: Ensure we set the previous movement command as stopped
+		if self.move_handle != None:
+			self.move_handle._onNextCommand()
+
+		#: Assign our new movement handle
+		self.move_handle = handle
 
 	def run_motors(self, speeds):
 		'''Sends a sequence of run speeds to the motors of this Robot.
@@ -474,11 +518,13 @@ class SimulatedRobot:
 		'''
 		raise NotImplemented('Error: run_motors hasn''t been implemented!')		
 
-	def stop(self):
+	def stop(self, handle):
 		'''Sends the Stop request to the robot, indicating movement should cease.
 		'''
-		self.move_speed = 0
-		self.rotate_speed = 0
+		if self.move_handle != None:
+			self.move_handle._onNextCommand()
+
+		self.move_handle = handle
 
 	def _to_world(self, point):
 		'''Converts the given point to world coordinates by translating the center of the robot.
