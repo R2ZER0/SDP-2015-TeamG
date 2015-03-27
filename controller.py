@@ -92,7 +92,7 @@ class Controller:
         self.world = World(our_side, pitch)
 
         # Set up main planner
-        #self.planner = Planner(world=self.world, robot=self.robot9)
+        self.planner = Planner(self.world, self.robot9, 'attacker', ['planning/fsmSpec.txt'])
 
         # Set up GUI
         self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
@@ -187,7 +187,7 @@ class Controller:
                 #
                 # TODO: Add Robot 10 prediction here
                 self.command = self.command_cache.pop(0)
-                #self.planner.plan()
+                self.planner.plan()
                 self.command_cache.append(self.robot9.last_command())
 
                 # Predict ball position and replace regular ball position with this
