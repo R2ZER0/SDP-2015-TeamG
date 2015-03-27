@@ -4,6 +4,7 @@ from collisions import *
 from tasks import *
 from utilities import *
 from pyparsing import *
+from planning.fsm import *
 
 class Planner:    
 
@@ -41,15 +42,13 @@ class Planner:
         grammar = createConfigGrammar()  # Build the grammar used to parse input config files
         self._fsmList = []
 
-        # filelist = []
         for pathStr in fsmSpecFilePaths:
-            fileObj.append(open(pathStr, 'r'))
-            inputText = fileObj.read()
-            parseRes = grammar.parseString(inputText)
-            inFile.close()      # We're done reading files, so close them
-            self._fsmList.append(createFSM(parseRes, pathStr))
+            with open(pathStr, 'r') as fileObj:
+                inputText = fileObj.read()
+                parseRes = grammar.parseString(inputText)
+                self._fsmList.append(createFSM(parseRes, pathStr))
 
-        if False in fsmList:
+        if False in self._fsmList:
             print "Terminating due to parse errors detailed above..."
             print
             quit()

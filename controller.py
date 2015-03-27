@@ -187,7 +187,7 @@ class Controller:
                 #
                 # TODO: Add Robot 10 prediction here
                 self.command = self.command_cache.pop(0)
-                self.planner.plan()
+                self.planner.plan(self.world)
                 self.command_cache.append(self.robot9.last_command())
 
                 # Predict ball position and replace regular ball position with this

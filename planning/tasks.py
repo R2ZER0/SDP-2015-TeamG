@@ -26,6 +26,18 @@ class Task(object):
 	def execute(self):
 		pass
 
+class PrintTask(Task):
+
+	def __init__(self, world, robot, role, msg):
+		super(PrintTask, self).__init__(world, robot, role)
+		self.message = msg
+
+	def __repr__(self):
+		return self.message
+
+	def execute(self):
+		print self
+
 class AcquireBall(Task):
 	'''Acquire Ball task. Rotate to face the ball, move to an appropriate
 	distance from it and then attempt to catch it.'''
