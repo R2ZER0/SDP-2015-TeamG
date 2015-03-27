@@ -6,14 +6,11 @@ initialState	initial
 finalState		unnec
 
 transitions
-<inital, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
-
-<acquiringBall, gotBall, [MoveToPoint, world, robot, role, choose_attacker_destination(world)[0], choose_attacker_destination(world)[1]] , movingToPoint>
+<initial, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
+<acquiringBall, gotBall, [MoveToPoint, world, robot, role, 220, 100] , movingToPoint>
 <acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
-
 <movingToPoint, atPoint, [Shoot, world, robot, role] , shooting>
 <movingToPoint, notAtPoint, [EXISTING], movingToPoint>
-
 <shooting, shotComplete, [MoveToPoint, world,robot,role, robot.x, robot.y] , initial>
 <shooting, stillShooting, [EXISTING], shooting>
 
@@ -25,7 +22,3 @@ lambdaConditions
 "notAtPoint" : lambda planner :	    planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and not planner.current_task.complete
 "stillShooting" : lambda planner :	planner.current_task != None and isinstance(planner.current_task, Shoot) and not planner.current_task.complete
 "shotComplete" : lambda planner :	planner.current_task != None and isinstance(planner.current_task, Shoot) and planner.current_task.complete
-
-
-
-

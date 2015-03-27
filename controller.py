@@ -1,5 +1,5 @@
 from action import Action
-from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint, MirrorObject
+from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint
 from planning.planner import Planner
 from planning.models import World
 from vision.vision import Vision, Camera, GUI
@@ -204,8 +204,8 @@ class Controller:
                 }
 
                 # Information about states
-                attackerState = ('', '')#(self.planner._current_state, self.planner._current_state)
-                defenderState = ('', '')#(self.planner._current_state, self.planner._current_state)
+                attackerState = (self.planner.current_state, self.planner.current_state)
+                defenderState = (self.planner.current_state, self.planner.current_state)
 
                 attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
                 defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}

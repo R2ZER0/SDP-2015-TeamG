@@ -73,6 +73,10 @@ class Planner:
         return self._fsmList[0].currentTask
 
     @property
+    def current_state(self):
+        return self._fsmList[0].currentState
+
+    @property
     def world(self):
         '''Returns the world instance held by the Planner.'''
         return self._world

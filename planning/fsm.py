@@ -97,7 +97,7 @@ def createConfigGrammar():
     state         = Word(alphanums)
 
     # A task invocation is either of the form '[EXISTING]' or '[TaskName, arg1, arg2, ...]'
-    taskInvocation= Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + Word(alphanums+" _()'\"")) + rightSqBrkt)
+    taskInvocation= Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + Word(alphanums+" _()'.\"")) + rightSqBrkt)
 
     # An FSM name is an alphanumeric 'word'
     name          = Word(alphanums) 
@@ -121,7 +121,7 @@ def createConfigGrammar():
     finalSDef     = Group(finalSKWD + state)
 
     # A lambda statement is of the form '"alphabetLetter" : lambda planner : code', where code is an alphanumeric 'word', with >< .+-(),\t\n characters
-    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-[]_(),\t\n"))
+    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-[]_!=(),\t\n"))
 
     # A transition is of the form '<stateName, letter1, letter2,..., [TaskName, arg1, arg2,...], newState>'
     transition    = Group(leftAngBrkt + state + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
@@ -206,6 +206,10 @@ class FSM:
         '''Returns the current task instance run by the FSM.'''
         return self._currentTask
 
+    @property
+    def currentState(self):
+        return self._currentState
+
     def consumeInput(self, inp, world, robot, role):
         """Takes a set of FSM letters and checks to see what transition should be executed by consulting
         the transition table. The code considers the current state, the letters that are to be consumed and
@@ -220,7 +224,12 @@ class FSM:
 
         # Consider each possible transition
         for tran in self._transTable:
-            if tran[0] == self._currentState and inp == list(tran[1:len(tran)-2]):
+
+            # Pull list of required true conditions from transition
+            required_truths = list(tran[1:len(tran)-2])
+            missing_truths = list([x for x in required_truths if x not in inp])
+
+            if tran[0] == self._currentState and len(missing_truths) == 0:
                 """Transitions are of the form (currState, listOfLetters, [taskName, taskArgs...], newState)
                 So, we check to see if the current state matches the first entry in the transition we're 
                 currently examining, as well as list of letters supplied to the function matches. 
