@@ -66,7 +66,7 @@ class Controller:
 		self.world = World(our_side, self.SIM_PITCH)
 
 		# Set up main planner
-		self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
+		#self.planner = Planner(world=self.world, robot=self.robot, role=our_role)
 
 		# Set up GUI
 		self.GUI = GUI(calibration=self.calibration, pitch=self.SIM_PITCH)
@@ -96,15 +96,31 @@ class Controller:
 
 		while c != 27:  # the ESC key
 
-                        #Move the ball with TFGH
-                        if c == ord('t'):
-                                self.simulator.ball.body.velocity = Vec2d(0,1)
-                        elif c == ord('f'):
-                                self.simulator.ball.body.velocity = Vec2d(-1,0)
-                        elif c == ord('g'):
-                                self.simulator.ball.body.velocity = Vec2d(0,-1)
-                        elif c == ord('h'):
-                                self.simulator.ball.body.velocity = Vec2d(1,0)
+			#Move the ball with TFGH
+			if c == ord('t'):
+				self.simulator.ball.body.velocity = Vec2d(0,1)
+			elif c == ord('f'):
+				self.simulator.ball.body.velocity = Vec2d(-1,0)
+			elif c == ord('g'):
+				self.simulator.ball.body.velocity = Vec2d(0,-1)
+			elif c == ord('h'):
+				self.simulator.ball.body.velocity = Vec2d(1,0)
+			elif c == ord('i'):
+				self.robot.open_catcher()
+			elif c == ord('j'):
+				self.robot.catch()
+			elif c == ord('k'):
+				self.robot.kick()
+			elif c == ord('l'):
+				self.robot.turnBy(3.14)
+			elif c == ord('z'):
+				self.robot.move(-math.pi/2,100)
+			elif c == ord('x'):
+				self.robot.move(math.pi/2, 100)
+			elif c == ord('c'):
+				self.robot.move(math.pi, 100)
+			elif c == ord('v'):
+				self.robot.move(0, 100)
 
 			self.simulator.update(1)
 
@@ -126,10 +142,7 @@ class Controller:
 			# Update world state
 			self.world.update_positions(model_positions)
 
-			# TEST TASKS
-			if (time.clock() - tracker) > 0.05: 
-				self.planner.plan()
-				tracker = time.clock()
+			#self.planner.plan()
 
 			# Information about the grabbers from the world
 			grabbers = {
@@ -138,8 +151,8 @@ class Controller:
 			}
 
 			# Information about states
-			attackerState = (self.planner._current_state, self.planner._current_state)
-			defenderState = (self.planner._current_state, self.planner._current_state)
+			attackerState = ('','') #(self.planner._current_state, self.planner._current_state)
+			defenderState = ('','') #(self.planner._current_state, self.planner._current_state)
 
 			attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
 			defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
@@ -159,8 +172,6 @@ class Controller:
 		
 		if self.robot is not None:
 			self.robot.stop()
-
-		tools.save_colors(self.pitch, self.calibration)
 
 	def _get_sim_colors(self):
 		'''Retrieves colour calibrations for the Simulator, based upon the colours assigned in :mod:`simulator.simulator`.
