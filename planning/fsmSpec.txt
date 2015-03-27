@@ -6,25 +6,25 @@ initialState	initial
 finalState		unnec
 
 transitions
-<inital, ballInZone,	TODO	, acquiringBall>
+<inital, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
 
-<acquiringBall, gotBall,	TODO	, movingToPoint>
+<acquiringBall, gotBall, [MoveToPoint, world, robot, role, choose_attacker_destination(world)[0], choose_attacker_destination(world)[1]] , movingToPoint>
 <acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
 
-<movingToPoint, atPoint,	TODO	, shooting>
+<movingToPoint, atPoint, [Shoot, world, robot, role] , shooting>
 <movingToPoint, notAtPoint, [EXISTING], movingToPoint>
 
-<shooting, shotComplete,	TODO	, initial>
+<shooting, shotComplete, [MoveToPoint, world,robot,role, robot.x, robot.y] , initial>
 <shooting, stillShooting, [EXISTING], shooting>
 
 lambdaConditions
-"ballInZone" : lambda planner : planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
-"notGotBallYet" : lambda planner :	TODO
-"gotBall" : lambda planner :	TODO
-"atPoint" : lambda planner :	TODO
-"notAtPoint" : lambda planner :	TODO
-"stillShooting" : lambda planner :	TODO
-"shotComplete" : lambda planner :	TODO
+"ballInZone" : lambda planner :     planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"notGotBallYet" : lambda planner :  planner.current_task != None and isinstance(planner.current_task, AcquireBall) and not planner.current_task.complete
+"gotBall" : lambda planner :        planner.current_task != None and isinstance(planner.current_task, AcquireBall) and planner.current_task.complete
+"atPoint" : lambda planner :        planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and planner.current_task.complete
+"notAtPoint" : lambda planner :	    planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and not planner.current_task.complete
+"stillShooting" : lambda planner :	planner.current_task != None and isinstance(planner.current_task, Shoot) and not planner.current_task.complete
+"shotComplete" : lambda planner :	planner.current_task != None and isinstance(planner.current_task, Shoot) and planner.current_task.complete
 
 
 

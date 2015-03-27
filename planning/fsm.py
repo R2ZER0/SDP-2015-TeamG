@@ -201,6 +201,11 @@ class FSM:
         # self._currentTask = AcquireBall(world,robot,"attacker")  #HACK
         self._currentTask = None
 
+    @property
+    def currentTask(self):
+        '''Returns the current task instance run by the FSM.'''
+        return self._currentTask
+
     def consumeInput(self, inp, world, robot, role):
         """Takes a set of FSM letters and checks to see what transition should be executed by consulting
         the transition table. The code considers the current state, the letters that are to be consumed and

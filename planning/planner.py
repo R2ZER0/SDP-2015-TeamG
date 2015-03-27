@@ -8,30 +8,6 @@ from planning.fsm import *
 
 class Planner:    
 
-    def checkTrueConditions(self, fsm):
-        """An FSM accepts a list of letters from it's alphabet which reflect conditions in the world
-        that are currently true. To build this list, we iterate through the lambdas corresponding to 
-        the letters. For each lambda that results in 'True', we know that the associated letter 
-        represents a true condition in the world. We proceed and add this letter to the accumulating 
-        list"""
-        trueCnds = []
-        lambdas = fsm.getLambdaDic()
-        for letter in fsm.getAlpha():
-            if letter in lambdas.keys() and lambdas[letter](self) == True:
-                trueCnds.append(letter)
-        return trueCnds
-
-    def plan(self):
-        """The heart of the planner. For every call, we determing a list of FSM letters which hold
-        in the current world state, and provide this to the machine for consumption"""
-        print "------------ plan step ------------"
-        print
-        for fsm in self._fsmList:
-            truths=self.checkTrueConditions(fsm)    
-            fsm.consumeInput(truths, self._world, self._robot, self._role)
-        print "---------- end plan step ----------"
-        print
-
     def __init__(self, world, robot, role, fsmSpecFilePaths):
 
         print "Using the following finite state machine spec files:"
@@ -67,6 +43,34 @@ class Planner:
         # self._fsm.show()
         for fsm in self._fsmList:
             fsm.show()
+
+    def checkTrueConditions(self, fsm):
+        """An FSM accepts a list of letters from it's alphabet which reflect conditions in the world
+        that are currently true. To build this list, we iterate through the lambdas corresponding to 
+        the letters. For each lambda that results in 'True', we know that the associated letter 
+        represents a true condition in the world. We proceed and add this letter to the accumulating 
+        list"""
+        trueCnds = []
+        lambdas = fsm.getLambdaDic()
+        for letter in fsm.getAlpha():
+            if letter in lambdas.keys() and lambdas[letter](self) == True:
+                trueCnds.append(letter)
+        return trueCnds
+
+    def plan(self):
+        """The heart of the planner. For every call, we determing a list of FSM letters which hold
+        in the current world state, and provide this to the machine for consumption"""
+        print "------------ plan step ------------"
+        print
+        for fsm in self._fsmList:
+            truths=self.checkTrueConditions(fsm)    
+            fsm.consumeInput(truths, self._world, self._robot, self._role)
+        print "---------- end plan step ----------"
+        print
+
+    @property
+    def current_task(self):
+        return self._fsmList[0].currentTask
 
     @property
     def world(self):
