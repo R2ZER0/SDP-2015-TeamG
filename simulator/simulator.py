@@ -106,6 +106,7 @@ class SimulatedAction:
 		self.kick_handle._onNextCommand()
 		self.kick_handle = KickerActionHandle(self.kick_handle.idx+1, 'K', scale)
 		self.robot.kick(self.kick_handle)
+		return self.kick_handle
 
 	def _cmd_catcher(self, cmd, scale):
 		self.catch_handle._onNextCommand()
