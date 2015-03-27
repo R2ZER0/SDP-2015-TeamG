@@ -603,7 +603,7 @@ class World(object):
                 # 
 
 class FSM:
-"""Class representing planner finite state machines"""
+    """Class representing planner finite state machines"""
     def __init__(self, name, inAlph, states, initState, finalState, transTable, lambdaDict, lambdaDescs):
         self._alph = inAlph
         self._states = states
