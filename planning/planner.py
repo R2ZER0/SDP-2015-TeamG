@@ -23,7 +23,7 @@ class Planner:
     def plan(self, world):
         """The heart of the planner. For every call, we determing a list of FSM letters which hold
         in the current world state, and provide this to the machine for consumption"""
-        print "---------- plan step ----------"
+        print "------------ plan step ------------"
         print
         for fsm in self._fsmList:
             truths=self.checkTrueConditions(world, fsm)    
@@ -65,6 +65,6 @@ class Planner:
         self._world = world
         self._robot=robot
         self._role = role
-
+        # self._fsm.show()
         for fsm in self._fsmList:
             fsm.show()
