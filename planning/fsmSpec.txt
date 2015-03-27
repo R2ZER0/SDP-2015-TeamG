@@ -7,13 +7,11 @@ finalState		s1
 
 transitions
 <s0, ballInZone, [PrintTask, world, robot, role, 'Ball in Zone'], s1>
-<s0, ballInZone,[EXISTING], s1>
-<s0, ballNotInZone, [AcquireBall, world, robot, role], s0>
 <s1, ballInZone, [EXISTING], s1>
 
 lambdaConditions
-"ballInZone" : lambda planner : True
-"ballNotInZone" : lambda planner : False
+"ballInZone" : lambda planner : planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"ballNotInZone" : lambda planner : not planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
 
 
 
