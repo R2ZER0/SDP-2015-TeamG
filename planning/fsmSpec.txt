@@ -7,11 +7,11 @@ finalState		unnec
 
 transitions
 <initial, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
-<acquiringBall, gotBall, [MoveToPoint, world, robot, role, 220, 100] , movingToPoint>
+<acquiringBall, gotBall, [MoveToPoint, world, robot, role, 295, 152] , movingToPoint>
 <acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
 <movingToPoint, atPoint, [Shoot, world, robot, role] , shooting>
 <movingToPoint, notAtPoint, [EXISTING], movingToPoint>
-<shooting, shotComplete, [MoveToPoint, world,robot,role, robot.x, robot.y] , initial>
+<shooting, shotComplete, [MoveToPoint, world, robot, role, world.our_attacker.x, world.our_attacker.y] , initial>
 <shooting, stillShooting, [EXISTING], shooting>
 
 lambdaConditions
