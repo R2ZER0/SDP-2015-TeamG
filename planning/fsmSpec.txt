@@ -6,6 +6,12 @@ initialState	initial
 finalState		unnec
 
 transitions
+<*, leavingZoneLeft, [MoveToPoint, world, robot, role, world.pitch.zones[planner.our_robot.zone].center()[0], world.pitch.zones[planner.our_robot.zone].center()[1]], centering>
+<*, leavingZoneRight, [MoveToPoint, world, robot, role, world.pitch.zones[planner.our_robot.zone].center()[0], world.pitch.zones[planner.our_robot.zone].center()[1]], centering>
+
+<centering, notAtPoint, [EXISTING], centering>
+<centering, atPoint, [EXISTING], initial>
+
 <initial, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
 <initial, notBallInZone, [EXISTING], initial>
 <acquiringBall, gotBall, [MoveToPoint, world, robot, role, choose_attacker_destination(world)[0], choose_attacker_destination(world)[1], 10], movingToPoint>
@@ -17,11 +23,19 @@ transitions
 <shooting, stillShooting, [EXISTING], shooting>
 
 lambdaConditions
+"leavingZoneLeft": lambda planner:  (planner.our_robot.x - planner.world.pitch.zones[planner.our_robot.zone].boundingBox[0]) < 5
+"leavingZoneRight": lambda planner: (planner.world.pitch.zones[planner.our_robot.zone].boundingBox[0] - planner.our_robot.x) < 5
+
+"defenderHasBall": lambda planner:  planner.world.pitch.zones[planner.world.our_defender.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+
 "ballInZone" : lambda planner :     planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
 "notBallInZone" : lambda planner :     not planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+
 "notGotBallYet" : lambda planner :  planner.current_task != None and isinstance(planner.current_task, AcquireBall) and not planner.current_task.complete
 "gotBall" : lambda planner :        planner.current_task != None and isinstance(planner.current_task, AcquireBall) and planner.current_task.complete
+
 "atPoint" : lambda planner :        planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and planner.current_task.complete
 "notAtPoint" : lambda planner :	    planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and not planner.current_task.complete
+
 "stillShooting" : lambda planner :	planner.current_task != None and isinstance(planner.current_task, Shoot) and not planner.current_task.complete
 "shotComplete" : lambda planner :	planner.current_task != None and isinstance(planner.current_task, Shoot) and planner.current_task.complete
