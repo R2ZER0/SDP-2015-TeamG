@@ -250,6 +250,9 @@ class FSM:
             elif type(element) == list:
                 t[-1] = t[-1] + '[%s]' % ''.join(element)
 
+            elif element[0] == '.':
+                t[-1] = ''.join([t[-1],element])
+
             # Add normal elements into the list
             else:
                 t.append(element)
