@@ -1,21 +1,24 @@
 machineParams
 name 			simpleAttackerFSM
-inAlph			ballInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete
+inAlph			ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete
 states 			initial, acquiringBall, movingToPoint, shooting
 initialState	initial
 finalState		unnec
 
 transitions
 <initial, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
+<initial, notBallInZone, [EXISTING], initial>
 <acquiringBall, gotBall, [MoveToPoint, world, robot, role, choose_attacker_destination(world)[0], choose_attacker_destination(world)[1], 10], movingToPoint>
 <acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
+<acquiringBall, notBallInZone, [MoveToPoint, world, robot, role, 270, 150, 10], initial>
 <movingToPoint, atPoint, [Shoot, world, robot, role] , shooting>
 <movingToPoint, notAtPoint, [EXISTING], movingToPoint>
-<shooting, shotComplete, [MoveToPoint, world, robot, role, world.our_attacker.x, world.our_attacker.y] , initial>
+<shooting, shotComplete, [MoveToPoint, world, robot, role, 270, 150, 10] , initial>
 <shooting, stillShooting, [EXISTING], shooting>
 
 lambdaConditions
 "ballInZone" : lambda planner :     planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"notBallInZone" : lambda planner :     not planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
 "notGotBallYet" : lambda planner :  planner.current_task != None and isinstance(planner.current_task, AcquireBall) and not planner.current_task.complete
 "gotBall" : lambda planner :        planner.current_task != None and isinstance(planner.current_task, AcquireBall) and planner.current_task.complete
 "atPoint" : lambda planner :        planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and planner.current_task.complete
