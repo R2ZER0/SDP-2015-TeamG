@@ -92,6 +92,7 @@ def createConfigGrammar():
     colon         = Literal(":")
     leftSqBrkt    = Literal("[")
     rightSqBrkt   = Literal("]")
+    anyState      = Literal("*")
 
     # A 'state' is an alphanumeric 'word'
     state         = Word(alphanums)
@@ -124,7 +125,7 @@ def createConfigGrammar():
     lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-[]_!=(),\t\n"))
 
     # A transition is of the form '<stateName, letter1, letter2,..., [TaskName, arg1, arg2,...], newState>'
-    transition    = Group(leftAngBrkt + state + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
+    transition    = Group(leftAngBrkt + (anyState ^ state) + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
 
     machineParamSec= machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
     transitionSec  = transitionsKWD + OneOrMore(transition)
@@ -173,11 +174,11 @@ def checkTransitions(alphabet, transitions, sourceFilePath, states):
                 print
                 print "PARSE ERROR: Encountered a transition statement which refers to unrecognised alphabet letters - namely: '" + str(candidateLetter) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'."
                 errorDiscovered = True
-        if transition[0] not in states:
+        if transition[0] not in list(states) + ["*"]:
             print
             print "PARSE ERORR: Encountered an unrecognised state '" + str(transition[0]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'."
             errorDiscovered = True
-        if transition[len(transition) - 1] not in states:
+        if transition[len(transition) - 1] not in list(states) + ["*"]:
             print
             print "PARSE ERROR: Encountered an unrecognised state '" + str(transition[len(transition) - 1]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'."
             errorDiscovered = True
@@ -227,6 +228,40 @@ class FSM:
     def currentState(self):
         return self._currentState
 
+    def executeExistingTask(self):
+        """tran[len(tran) - 2][1] contains the name of the task the input file
+        specifies to execute when leaving the current state. If EXISITING has 
+        been given, it is desired the current task continues executing."""
+        print "FSM '"+ self._name + "' executing exisiting task"
+        self._currentTask.execute()
+        print
+        return
+
+    def executeNewTask(self, tran, world, robot, role):
+        # Handle list elements that are nested [] brackets
+        t = []
+        for index, element in enumerate(tran[len(tran)-2]):
+
+            # Ignore separator characters
+            if element in [",", "[", "]"]:
+                continue
+
+            # Concatenate nested square bracket elements onto last
+            elif type(element) == list:
+                t[-1] = t[-1] + '[%s]' % ''.join(element)
+
+            # Add normal elements into the list
+            else:
+                t.append(element)
+
+        code = t[0] + "(" + ','.join(t[1:]) + ")"
+        print "FSM '" + self._name + "' changing to execute new task - " + str(t[0]) + " with args " + "(" + ','.join(t[1:]) + ")"
+        self._currentTask = eval(code)
+        self._currentTask.execute()
+        print
+
+        return
+
     def consumeInput(self, inp, world, robot, role):
         """Takes a set of FSM letters and checks to see what transition should be executed by consulting
         the transition table. The code considers the current state, the letters that are to be consumed and
@@ -239,12 +274,23 @@ class FSM:
         # a subset of the alphabet the machine recognises
         assert set(inp) <= set(self._alph) 
 
+
         # Consider each possible transition
-        for tran in self._transTable:
+        for tran in sorted(self._transTable, key=lambda t : 1 if t[0] == "*" else 10):
 
             # Pull list of required true conditions from transition
             required_truths = list(tran[1:len(tran)-2])
             missing_truths = list([x for x in required_truths if x not in inp])
+
+            if tran[0] == "*" and len(missing_truths) == 0:
+                if tran[len(tran) - 2][1] == "EXISTING":
+                    self.executeExistingTask()
+                    self._currentState = tran[len(tran) - 1] 
+                    return
+                else:
+                    self.executeNewTask(tran, world, robot, role)
+                    self._currentState = tran[len(tran) - 1] 
+                    return
 
             if tran[0] == self._currentState and len(missing_truths) == 0:
                 """Transitions are of the form (currState, listOfLetters, [taskName, taskArgs...], newState)
@@ -256,13 +302,16 @@ class FSM:
                 # specified in the transition tuple.
                 self._currentState = tran[len(tran) - 1] 
                 if tran[len(tran) - 2][1] == "EXISTING":
-                    """tran[len(tran) - 2][1] contains the name of the task the input file
-                    specifies to execute when leaving the current state. If EXISITING has 
-                    been given, it is desired the current task continues executing."""
-                    print "FSM '"+ self._name + "' executing exisiting task"
-                    self._currentTask.execute()
-                    print
-                    return
+                    self.executeExistingTask()
+                    self._currentState = tran[len(tran) - 1] 
+                    return 
+                    # """tran[len(tran) - 2][1] contains the name of the task the input file
+                    # specifies to execute when leaving the current state. If EXISITING has 
+                    # been given, it is desired the current task continues executing."""
+                    # print "FSM '"+ self._name + "' executing exisiting task"
+                    # self._currentTask.execute()
+                    # print
+                    # return
                 else:
                     """If we have something other than EXISTING, a task name with arguments has
                     been given. So, we create a list of relevant information, filtering out detritus 
@@ -272,31 +321,33 @@ class FSM:
                     Finally, we package these pieces of data into valid code representing
                     the creation of a task object with supplied contructor arguments, and cause 
                     Python to evaulate this text as code using eval()."""
-
-                    # Handle list elements that are nested [] brackets
-                    t = []
-                    for index, element in enumerate(tran[len(tran)-2]):
-
-                        # Ignore separator characters
-                        if element in [",", "[", "]"]:
-                            continue
-
-                        # Concatenate nested square bracket elements onto last
-                        elif type(element) == list:
-                            t[-1] = t[-1] + '[%s]' % ''.join(element)
-
-                        # Add normal elements into the list
-                        else:
-                            t.append(element)
-
-                    code = t[0] + "(" + ','.join(t[1:]) + ")"
-
-                    print "FSM '" + self._name + "' changing to execute new task - " + str(t[0]) + " with args " + "(" + ','.join(t[1:]) + ")"
-                    self._currentTask = eval(code)
-                    self._currentTask.execute()
-                    print
-
+                    self.executeNewTask(tran, world, robot, role)
+                    self._currentState = tran[len(tran) - 1] 
                     return
+                    # # Handle list elements that are nested [] brackets
+                    # t = []
+                    # for index, element in enumerate(tran[len(tran)-2]):
+
+                    #     # Ignore separator characters
+                    #     if element in [",", "[", "]"]:
+                    #         continue
+
+                    #     # Concatenate nested square bracket elements onto last
+                    #     elif type(element) == list:
+                    #         t[-1] = t[-1] + '[%s]' % ''.join(element)
+
+                    #     # Add normal elements into the list
+                    #     else:
+                    #         t.append(element)
+
+                    # code = t[0] + "(" + ','.join(t[1:]) + ")"
+
+                    # print "FSM '" + self._name + "' changing to execute new task - " + str(t[0]) + " with args " + "(" + ','.join(t[1:]) + ")"
+                    # self._currentTask = eval(code)
+                    # self._currentTask.execute()
+                    # print
+
+                    # return
                     
         # If we get here, we looped through the entire set of transitions and didn't find any that applied
         # in the current situation.
