@@ -30,7 +30,7 @@ class Planner:
                     self._fsmList.append(createFSM(parseRes, pathStr))
 
 
-        if False in fsmList:
+        if False in self._fsmList:
             print
             print "-------- PARSING FAILURE - Terminating due to the parse errors detailed above --------"
             print

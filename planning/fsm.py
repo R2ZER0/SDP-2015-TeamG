@@ -52,7 +52,7 @@ def createFSM(parsedInput, sourceFilePath):
     # checkLambdas(alphabet, dic, sourceFilePath)
 
     
-    checkAlphabet(alphabet, lambdas, sourceFilePath)
+    checkAlphabet(alphabet, dic, sourceFilePath)
     transitionParseError = checkTransitions(alphabet, transitions, sourceFilePath, states)
     lambdaParseError = checkLambdas(alphabet, dic, sourceFilePath)
 
@@ -196,7 +196,7 @@ def checkLambdas(alphabet, lambdas, sourceFilePath):
 
 def checkAlphabet(alphabet, lambdas, sourceFilePath):
     for letter in alphabet:
-        if letter not in lambdaLetterKeys:
+        if letter not in lambdas.keys():
             print
             print "PARSE WARNING: The FSM alphabet letter '" + str(letter) + "' has no corresponding lambda condition trigger in spec file '" + str(sourceFilePath) + "'."
 
