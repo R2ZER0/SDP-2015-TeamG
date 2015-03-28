@@ -95,6 +95,34 @@ class AcquireBall(Task):
 		else:
 			self.complete = True
 
+class MirrorObject(Task):
+	'''Mirrors another PitchObject, matching their y-position to ours.'''
+	
+	def __init__(self,world,robot,role,pitch_object):
+		super(MirrorObject,self).__init__(world,robot,role)
+
+		self.pitch_object = pitch_object
+		self.move_task = None
+
+	def should_move(self):
+		return abs(self.pitch_object.y - self.world.our_attacker.y) > 2
+
+	def execute(self):
+
+		if self.move_task is None:
+			self.move_task = MoveToPoint(self.world, self.robot, self.role, 
+										 self.world.our_attacker.x, self.pitch_object.y)
+
+		elif self.should_move() and self.move_task.y != self.pitch_object.y:
+			self.move_task = MoveToPoint(self.world, self.robot, self.role, 
+										 self.world.our_attacker.x, self.pitch_object.y)
+
+		elif not self.move_task.complete:
+			self.move_task.execute()
+
+		else:
+			self.robot.stop()
+
 class MoveToPoint(Task):
 	'''Movement Task. Rotates our Robot to face the point (x,y) and travels
 	to it within some threshold.
@@ -122,6 +150,8 @@ class MoveToPoint(Task):
 		* Check if our angle is on target; if not, adjust by rotating.
 		* Otherwise, we're done.
 		'''
+		print 'Executing Move'
+
 		if self.complete:
 			return
 
