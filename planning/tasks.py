@@ -92,7 +92,7 @@ class MoveToPoint(Task):
 		if self.complete:
 			return
 		
-		self.compelete = self.check();
+		self.complete = self.check();
 	
 class TurnToPoint(Task):
 	'''Rotation Task; allows turning of the Robot to face a given point to
@@ -131,6 +131,7 @@ class Shoot(Task):
 		self.x = world.their_goal.x
 		self.y = world.their_goal.y
 		self.DISP_TOLERANCE = 40
+		self.complete = False
 
 	def check(self):
 		return self.robot_info.get_displacement_to_point(self.world.ball.x,self.world.ball.y) > self.DISP_TOLERANCE
@@ -144,4 +145,4 @@ class Shoot(Task):
 		if self.complete:
 			return
 		
-		self.compelete = self.check();
+		self.complete = self.check();
