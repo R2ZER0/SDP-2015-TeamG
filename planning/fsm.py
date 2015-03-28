@@ -47,16 +47,16 @@ def createFSM(parsedInput, sourceFilePath):
     dic = consumeLambdas(lambdas)
 
     # Perform sanity checks on what we've read 
+    # checkAlphabet(alphabet, lambdas, sourceFilePath)
+    # checkTransitions(alphabet, transitions, sourceFilePath)
+    # checkLambdas(alphabet, dic, sourceFilePath)
+
+    
     checkAlphabet(alphabet, lambdas, sourceFilePath)
-    checkTransitions(alphabet, transitions, sourceFilePath)
-    checkLambdas(alphabet, dic, sourceFilePath)
+    transitionParseError = checkTransitions(alphabet, transitions, sourceFilePath, states)
+    lambdaParseError = checkLambdas(alphabet, dic, sourceFilePath)
 
-    parseError = False
-    parseError = checkAlphabet(alphabet, lambdas, sourceFilePath)
-    parseError = checkTransitions(alphabet, transitions, sourceFilePath)
-    parseError = checkLambdas(alphabet, dic, sourceFilePath)
-
-    if parseError:
+    if transitionParseError or lambdaParseError:
         return False
     else:
         return FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
@@ -155,33 +155,50 @@ def consumeLambdas(text):
     exec(code_obj)
     return dictionary
 
-def checkTransitions(alphabet, transitions, sourceFilePath):
+def checkTransitions(alphabet, transitions, sourceFilePath, states):
     """Ensures there are no transitions which reference unrecognised letters, that is,
     those that have not been speficied in the machine specification. If we enounter an error, we 
     inform the user and terminate."""
+    errorDiscovered=False                                                        
+    if transitions[0][len(transitions[0]) - 2 : len(transitions[0]) - 1] == (['[', 'EXISTING', ']'],):
+        print                                                                   # HACKY, CLEAN UP^^
+        print "PARSE ERROR: Attempted invocation of existing task in very first transition in '" + str(sourceFilePath) + "'. Invalid since there won't be an existing task to execute."
+        errorDiscovered = True
+
     for transition in transitions:
-        lettersAppearingInTrans = transition[1:len(transition)-2]   # Extract the letters appearing in a transition table entry
+        lettersAppearingInTrans = transition[1 : len(transition)- 2]   # Extract the letters appearing in a transition table entry
         for candidateLetter in lettersAppearingInTrans:
             """Check each letter valid"""
             if not candidateLetter in alphabet:
                 print
-                print "Parse error: Found a transition statement which is inconsistent with the FSM alphabet definition - namely:\n'" + str(transition) + "'\nin " + str(sourceFilePath)
-                print
-                return True
+                print "PARSE ERROR: Encountered a transition statement which refers to unrecognised alphabet letters - namely: '" + str(candidateLetter) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'."
+                errorDiscovered = True
+        if transition[0] not in states:
+            print
+            print "PARSE ERORR: Encountered an unrecognised state '" + str(transition[0]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'."
+            errorDiscovered = True
+        if transition[len(transition) - 1] not in states:
+            print
+            print "PARSE ERROR: Encountered an unrecognised state '" + str(transition[len(transition) - 1]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'."
+            errorDiscovered = True
+    return errorDiscovered
 
 def checkLambdas(alphabet, lambdas, sourceFilePath):
     """Ensures the letter:lambda pairs do not refer to a non-existent FSM letter. If we encounter an
     error, we inform the user and then terminate"""
-    for lambdaStmt, code in lambdas.iteritems():
-        if not lambdaStmt in alphabet:
-            print "Parse error: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + lambdaStmt + "' in " + str(sourceFilePath)
+    errorDiscovered = False
+    for key, code in lambdas.iteritems():
+        if not key in alphabet:
             print
-            return True
+            print "PARSE ERROR: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + str(key) + "' in file '" + str(sourceFilePath) + "'."
+            errorDiscovered = True
+    return errorDiscovered
 
 def checkAlphabet(alphabet, lambdas, sourceFilePath):
-    if not len(alphabet) == len(lambdas):
-        print "Parse warning: There are some FSM alphabet letters which do not have corresponding lambda condition triggers in spec file " + str(sourceFilePath)
-        print
+    for letter in alphabet:
+        if letter not in lambdaLetterKeys:
+            print
+            print "PARSE WARNING: The FSM alphabet letter '" + str(letter) + "' has no corresponding lambda condition trigger in spec file '" + str(sourceFilePath) + "'."
 
 
 class FSM:
