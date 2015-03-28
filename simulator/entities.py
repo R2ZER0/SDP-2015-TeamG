@@ -39,7 +39,7 @@ class SimulatedPitch:
 	#: The zone polygons for each zone, moving left to right
 	ZONES = [[(0,271),(126,0),(477,0),(477,PITCH_WIDTH),(126,PITCH_WIDTH),(0,869)], \
 			 [(477,0),(1068,0),(1068,PITCH_WIDTH),(477,PITCH_WIDTH)], \
-			 [(1068,0),(1657,0),(1657,PITCH_WIDTH),(1068,0)], \
+			 [(1068,0),(1657,0),(1657,PITCH_WIDTH),(1068,PITCH_WIDTH)], \
 			 [(1657,0),(1992,0),(PITCH_LENGTH,271),(PITCH_LENGTH,869),(1992,PITCH_WIDTH),(1657,PITCH_WIDTH)]]
 
 	#: Draw colours for the Pitch
