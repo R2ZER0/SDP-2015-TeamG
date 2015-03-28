@@ -367,6 +367,8 @@ class SimulatedRobot:
 
 			self.body.angular_velocity = 0
 			self.body.velocity = Vec2d(0,0)
+
+			self.move_handle = None
 		
 		elif self.move_handle.cmd == 'T':
 
@@ -389,7 +391,11 @@ class SimulatedRobot:
 			else:
 				self.body.angular_velocity = 100*self.TURN_POWER
 
+			if acw_dist < cw_dist:
+				self.body.angular_velocity = -self.body.angular_velocity
+
 		elif self.move_handle.cmd == 'M':
+
 			#: Set our move handle as completed if it's just a move
 			self.move_handle._onComplete()
 
