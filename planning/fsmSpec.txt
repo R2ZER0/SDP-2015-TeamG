@@ -7,7 +7,7 @@ finalState		unnec
 
 transitions
 <initial, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
-<acquiringBall, gotBall, [MoveToPoint, world, robot, role, 270, 40, 10] , movingToPoint>
+<acquiringBall, gotBall, [MoveToPoint, world, robot, role, choose_attacker_destination(world)[0], choose_attacker_destination(world)[1], 10], movingToPoint>
 <acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
 <movingToPoint, atPoint, [Shoot, world, robot, role] , shooting>
 <movingToPoint, notAtPoint, [EXISTING], movingToPoint>

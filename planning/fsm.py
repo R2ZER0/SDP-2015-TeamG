@@ -96,8 +96,8 @@ def createConfigGrammar():
     # A 'state' is an alphanumeric 'word'
     state         = Word(alphanums)
 
-    # A task invocation is either of the form '[EXISTING]' or '[TaskName, arg1, arg2, ...]'
-    taskInvocation= Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + Word(alphanums+" _()'.\"")) + rightSqBrkt)
+    # A task invocation is either of the form '[EXISTING]' or '[TaskName, arg1, arg2, ...]']
+    taskInvocation = Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + ZeroOrMore(Word(alphanums+" _()'.\"")^nestedExpr(opener='[', closer=']', content=Word(alphanums+" _()'.\"")))) + rightSqBrkt)
 
     # An FSM name is an alphanumeric 'word'
     name          = Word(alphanums) 
@@ -238,8 +238,6 @@ class FSM:
                 # If we've found the right transition update the current state to the new one
                 # specified in the transition tuple.
                 self._currentState = tran[len(tran) - 1] 
-
-
                 if tran[len(tran) - 2][1] == "EXISTING":
                     """tran[len(tran) - 2][1] contains the name of the task the input file
                     specifies to execute when leaving the current state. If EXISITING has 
@@ -258,7 +256,22 @@ class FSM:
                     the creation of a task object with supplied contructor arguments, and cause 
                     Python to evaulate this text as code using eval()."""
 
-                    t=[x for x in tran[len(tran) - 2] if x != "," and x != "[" and x != "]"]
+                    # Handle list elements that are nested [] brackets
+                    t = []
+                    for index, element in enumerate(tran[len(tran)-2]):
+
+                        # Ignore separator characters
+                        if element in [",", "[", "]"]:
+                            continue
+
+                        # Concatenate nested square bracket elements onto last
+                        elif type(element) == list:
+                            t[-1] = t[-1] + '[%s]' % ''.join(element)
+
+                        # Add normal elements into the list
+                        else:
+                            t.append(element)
+
                     code = t[0] + "(" + ','.join(t[1:]) + ")"
 
                     print "FSM '" + self._name + "' changing to execute new task - " + str(t[0]) + " with args " + "(" + ','.join(t[1:]) + ")"
