@@ -55,6 +55,8 @@ class AcquireBall(Task):
 		#: Becomes True once this Task has caught the ball
 		self.complete = False
 
+		self.last_time = 0
+
 
 	def execute(self):
 		'''Executes another round of this Task. Performs as follows:
@@ -85,6 +87,10 @@ class AcquireBall(Task):
 		elif self.catch_handle2 is None:
 			self.catch_handle2 = self.robot.catch()
 		elif not self.catch_handle2.completed:
+			return
+		elif self.last_time == 0:
+			self.last_time = time.time()
+		elif not (time.time() - self.last_time) > 1:
 			return
 		else:
 			self.complete = True
@@ -121,7 +127,7 @@ class MoveToPoint(Task):
 
 		if self.move_handle is None:
 			angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
-			self.move_handle = self.robot.move(angle, 60)
+			self.move_handle = self.robot.move(angle, 30)
 
 		elif self.check():
 			self.robot.stop()
