@@ -18,16 +18,27 @@ class Planner:
         grammar = createConfigGrammar()  # Build the grammar used to parse input config files
         self._fsmList = []
 
+        print "-------- READING AND PARSING FSM SPEC FILES --------"
         for pathStr in fsmSpecFilePaths:
             with open(pathStr, 'r') as fileObj:
                 inputText = fileObj.read()
-                parseRes = grammar.parseString(inputText)
-                self._fsmList.append(createFSM(parseRes, pathStr))
+                if len(inputText) == 0:
+                    print "FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty."
+                    fsmList.append(False)
+                else: 
+                    parseRes = grammar.parseString(inputText)
+                    self._fsmList.append(createFSM(parseRes, pathStr))
 
-        if False in self._fsmList:
-            print "Terminating due to parse errors detailed above..."
+
+        if False in fsmList:
+            print
+            print "-------- PARSING FAILURE - Terminating due to the parse errors detailed above --------"
             print
             quit()
+        else:
+            print
+            print "-------- SPEC FILE INPUT AND PARSING COMPLETED SUCCESSFULLY --------"
+            print
 
         # inFile = open(fsmSpecFilePath, 'r')
         # inputText = inFile.read()
