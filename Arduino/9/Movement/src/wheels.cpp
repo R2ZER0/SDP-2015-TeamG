@@ -29,8 +29,10 @@ static struct wheel_control wheels[NUM_MOTORS] = { {0} };
 void wheels_set_target_speeds(double* speeds)
 {
     for(int i = 0; i < NUM_MOTORS; ++i) {
-        wheels[i].target_speed = speeds[i];
-        wheels[i].next_update_time = 0L; /* Update immidiately */
+        if(wheels[i].target_speed != speeds[i]) {
+            wheels[i].target_speed = speeds[i];
+            wheels[i].next_update_time = 0L; /* Update immidiately */
+        }
     }
 }
 
