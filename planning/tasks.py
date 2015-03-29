@@ -105,17 +105,17 @@ class MirrorObject(Task):
 		self.move_task = None
 
 	def should_move(self):
-		return abs(self.pitch_object.y - self.world.our_attacker.y) > 2
+		return abs(self.pitch_object.y - self.robot_info.y) > 2
 
 	def execute(self):
 
 		if self.move_task is None:
 			self.move_task = MoveToPoint(self.world, self.robot, self.role, 
-										 self.world.our_attacker.x, self.pitch_object.y)
+										 self.robot_info.x, self.pitch_object.y)
 
-		elif self.should_move() and self.move_task.y != self.pitch_object.y:
+		elif self.should_move() and (self.move_task.complete or abs(self.pitch_object.y - self.move_task.y) > 10):
 			self.move_task = MoveToPoint(self.world, self.robot, self.role, 
-										 self.world.our_attacker.x, self.pitch_object.y)
+										 self.robot_info.x, self.pitch_object.y)
 
 		elif not self.move_task.complete:
 			self.move_task.execute()
