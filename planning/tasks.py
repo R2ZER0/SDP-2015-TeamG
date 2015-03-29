@@ -29,14 +29,14 @@ class Task(object):
 class AcquireBall(Task):
 	'''Acquire Ball task. Rotate to face the ball, move to an appropriate
 	distance from it and then attempt to catch it.'''
-	THRESHOLD = 15
-	#: Becomes True once this Task has caught the ball
-	complete = False
 
-	move_task = None
-	turn_task = None
-	c = None
 	def __init__(self,world,robot,role):
+		self.THRESHOLD = 15
+		#: Becomes True once this Task has caught the ball
+		self.complete = False
+		self.move_task = None
+		self.turn_task = None
+		self.c = None
 		super(AcquireBall,self).__init__(world,robot,role)
 
 	def get_move_task(self):
@@ -135,32 +135,23 @@ class MoveToPoint(Task):
 	'''Movement Task. Rotates our Robot to face the point (x,y) and travels
 	to it within some threshold.
 	'''
-
-	#: Distance threshold to the point before considering ourselves done
-	DISP_TOLERANCE = 20
-	TRAJECTORY_CONTROL = 0.1
-	#: Specified x-position to travel to
-	x = 0
 	
-	#: Specified y-position to travel to
-	y = 0
-
-	#: Tracks the last speeds we sent to the Robot to check for sending more values
-	last_speed = 0
-	base_speed = 70
-	angle = 0
-	motionHandle = None
-	#: Assigned True once we reach the point within the threshold
-	complete = False
-
 	def __init__(self,world,robot,role,x,y, dist = 20):
 		super(MoveToPoint,self).__init__(world,robot,role)
+		#: Specified x-position to travel to
 		self.x = x
+		#: Specified y-position to travel to
 		self.y = y
+		#: Tracks the last speeds we sent to the Robot to check for sending more values
+		base_speed = 70
 		self.last_speed = self.base_speed
 		self.angle = self.new_angle(-self.robot_info.get_rotation_to_point(self.x,self.y))
 		self.motionHandle = None
+		#: Distance threshold to the point before considering ourselves done
 		self.DISP_TOLERANCE = dist
+		self.TRAJECTORY_CONTROL = 0.1
+		#: Assigned True once we reach the point within the threshold
+		self.complete = False
 	def update_position(self, x, y):
 
 		if x == self.x and y == self.y:
@@ -221,24 +212,19 @@ class MirrorObject(Task):
 	'''Mirrors the y-movement of a robot or the ball.
 	'''
 
-	#: Distance threshold to the point before considering ourselves done
-	DISP_TOLERANCE = 30
-	TRAJECTORY_CONTROL = 0.2
-
-	#: obj
-	obj = None
-
-	last_speed = 0
-	#: Assigned True once we reach the point within the threshold
-	complete = False
-
-	turnHandle = None
-
 	def __init__(self,world,robot,role,obj):
 		super(MirrorObject,self).__init__(world,robot,role)
+		#: Distance threshold to the point before considering ourselves done
+		self.DISP_TOLERANCE = 30
+		self.TRAJECTORY_CONTROL = 0.2
+		#: obj
 		self.obj = obj
 		self.angle = self.robot_info.get_rotation_to_point(self.robot_info.x, obj.y)
 		self.motionHandle = None
+		last_speed = 0
+		#: Assigned True once we reach the point within the threshold
+		complete = False
+		turnHandle = None
 
 	def update_position(self, obj):
 		if obj == self.obj:
@@ -287,28 +273,20 @@ class TurnToPoint(Task):
 	within some threshold.
 	'''
 
-	#: Margin of error allowed in this angle, radians.
-	ANGLE_THRESHOLD = 0.1
-	
-	#: Our target x-position
-	x = 0
-	
-	#: Our target y-position
-	y = 0
-
-	#: Tracks the last speeds we sent to the Robot to check for sending more values
-	last_speed = 0
-	motionHandle = None
-	#: Gets assigned True once the Robot has rotated to the angle within accepted range.
-	complete = False
-
-	base_speed = 70
-
 	def __init__(self,world,robot,role,x,y):
 		super(TurnToPoint,self).__init__(world,robot,role)
+		#: Our target x-position
 		self.x = x
+		#: Our target y-position
 		self.y = y
+		#: Tracks the last speeds we sent to the Robot to check for sending more values
+		self.base_speed = 70
 		self.last_speed = self.base_speed
+		self.motionHandle = None
+		#: Margin of error allowed in this angle, radians.
+		self.ANGLE_THRESHOLD = 0.1
+		#: Gets assigned True once the Robot has rotated to the angle within accepted range.
+		self.complete = False
 
 	def update_position(self, x, y):
 
@@ -357,29 +335,21 @@ class TurnToPoint(Task):
 class KickToPoint(Task):
 	'''Generic kick to point task. Rotate to face the point (x,y) and kick.'''
 
-	#: Allowed margin of error between the desired angle and ours.
-	ANGLE_THRESHOLD = 0.1
-	
-	#: The target x-point to kick to.
-	x = 0
-	
-	#: The target y-point to kick to.
-	y = 0
-
-	#: Assigned True when the Task has kicked the ball
-	complete = False
-
-	#: This increases through various values as we perform checks to ensure \
-	#: we're on target to kick accurately.
-	check_state = 0
-
-	turn_task = None
-	kickHandle = None
-	
 	def __init__(self,world,robot,role,x,y):
 		super(KickToPoint,self).__init__(world,robot,role)
+		#: The target x-point to kick to.
 		self.x = x
+		#: The target y-point to kick to.
 		self.y = y
+		#: Allowed margin of error between the desired angle and ours.
+		self.ANGLE_THRESHOLD = 0.1
+		#: Assigned True when the Task has kicked the ball
+		self.complete = False
+		#: This increases through various values as we perform checks to ensure \
+		#: we're on target to kick accurately.
+		self.check_state = 0
+		self.turn_task = None
+		self.kickHandle = None
 
 	def execute(self):
 		'''Executes another round of this Task. Performs as follows:
