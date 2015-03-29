@@ -51,7 +51,8 @@ static double signof(double a) {
 /* Calculate the next step of the PD controller */
 static void wheel_control_calculate(struct wheel_control* wheel)
 {
-    if(wheel->target_speed == 0) {
+    /* Check if the target speed is in the dead zone, i.e. stopped */
+    if(abs(wheel->target_speed) <= WHEELS_DEADZONE_SIZE) {
         wheel->motor_power = 0;
         return;
     }
