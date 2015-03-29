@@ -10,7 +10,7 @@ static int prev_motor_speed[NUM_MOTORS] = { 0 };
 void runMotor(int motor, int motor_speed)
 {    
     if(motor_speed == prev_motor_speed[motor]) {
-        prev_motor_speed[motor] = 0;
+        prev_motor_speed[motor] = motor_speed;
         return;
     }
     
