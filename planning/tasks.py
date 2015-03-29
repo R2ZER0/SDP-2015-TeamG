@@ -72,6 +72,8 @@ class AcquireBall(Task):
 
 		if self.turn_task is None:
 			self.turn_task = TurnToPoint(self.world, self.robot, self.role, self.world.ball.x, self.world.ball.y)
+		elif math.hypot(self.turn_task.x-self.world.ball.x,self.turn_task.y-self.world.ball.y) > 10:
+			self.turn_task = TurnToPoint(self.world, self.robot, self.role, self.world.ball.x, self.world.ball.y)
 		elif not self.turn_task.complete:
 			self.turn_task.execute()
 			return
@@ -80,6 +82,8 @@ class AcquireBall(Task):
 		elif not self.catch_handle.completed:
 			return
 		elif self.move_task is None:
+			self.move_task = MoveToPoint(self.world, self.robot, self.role, self.world.ball.x, self.world.ball.y, 20)
+		elif math.hypot(self.move_task.x-self.world.ball.x,self.move_task.y-self.world.ball.y) > 10:
 			self.move_task = MoveToPoint(self.world, self.robot, self.role, self.world.ball.x, self.world.ball.y, 20)
 		elif not self.move_task.complete:
 			self.move_task.execute()
@@ -92,6 +96,7 @@ class AcquireBall(Task):
 			self.last_time = time.time()
 		elif not (time.time() - self.last_time) > 1:
 			return
+		
 		else:
 			self.complete = True
 
@@ -111,11 +116,11 @@ class MirrorObject(Task):
 
 		if self.move_task is None:
 			self.move_task = MoveToPoint(self.world, self.robot, self.role, 
-										 self.world.our_attacker.x, self.pitch_object.y)
+										 self.world.pitch.zones[self.world.our_attacker.zone].center()[0], self.pitch_object.y)
 
 		elif self.should_move() and self.move_task.y != self.pitch_object.y:
 			self.move_task = MoveToPoint(self.world, self.robot, self.role, 
-										 self.world.our_attacker.x, self.pitch_object.y)
+										 self.world.pitch.zones[self.world.our_attacker.zone].center()[0], self.pitch_object.y)
 
 		elif not self.move_task.complete:
 			self.move_task.execute()
@@ -136,7 +141,7 @@ class MoveToPoint(Task):
 		self.y = y
 		#: Distance threshold to the point before considering ourselves done
 		self.DISP_TOLERANCE = dist
-		#: Assigned True once we reach the point within the threshold
+		#: Assigned True once we reach the point within the threshold  
 		self.complete = False
 
 		self.move_handle = None
