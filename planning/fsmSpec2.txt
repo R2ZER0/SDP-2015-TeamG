@@ -1,0 +1,51 @@
+machineParams
+name            simpleDefenderFSM
+inAlph          ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete, leavingZoneLeft, leavingZoneRight, stateNotBlocking, enemyAttackerHasBall, stateStarting
+states          idle, acquiringBall, shooting, centering, blocking, starting
+initialState    starting
+finalState      unnec
+
+transitions
+<starting, stateStarting, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
+
+<*, leavingZoneLeft, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_defender.zone].center()[0], world.pitch.zones[world.our_defender.zone].center()[1]], centering>
+<*, leavingZoneRight, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_defender.zone].center()[0], world.pitch.zones[world.our_defender.zone].center()[1]], centering>
+
+<*, stateNotBlocking enemyAttackerHasBall, [MirrorObject, world, robot, role, world.ball], blocking>
+
+<blocking, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
+<blocking, enemyAttackerHasBall, [EXISTING], blocking>
+
+<centering, notAtPoint, [EXISTING], centering>
+<centering, atPoint, [EXISTING], idle>
+
+<idle, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
+<idle, notBallInZone, [EXISTING], idle>
+
+<acquiringBall, gotBall, [Shoot, world, robot, role], shooting>
+<acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
+<acquiringBall, notBallInZone, [MoveToPoint, world, robot, role, 270, 150, 10], idle>
+
+<shooting, shotComplete, [MoveToPoint, world, robot, role, 150, 150, 10] , idle>
+<shooting, stillShooting, [EXISTING], shooting>
+
+lambdaConditions
+"stateStarting": lambda planner: planner.current_state == 'starting'
+"stateNotBlocking": lambda planner: planner.current_state != 'blocking'
+
+"leavingZoneLeft": lambda planner:  (planner.our_robot.x - planner.world.pitch.zones[planner.our_robot.zone].boundingBox()[0]) < 5
+"leavingZoneRight": lambda planner: (planner.world.pitch.zones[planner.our_robot.zone].boundingBox()[1] - planner.our_robot.x) < 5
+
+"enemyAttackerHasBall": lambda planner: planner.world.pitch.zones[planner.world.their_attacker.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+
+"ballInZone" : lambda planner :     planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"notBallInZone" : lambda planner :     not planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+
+"notGotBallYet" : lambda planner :  planner.current_task != None and isinstance(planner.current_task, AcquireBall) and not planner.current_task.complete
+"gotBall" : lambda planner :        planner.current_task != None and isinstance(planner.current_task, AcquireBall) and planner.current_task.complete
+
+"atPoint" : lambda planner :        planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and planner.current_task.complete
+"notAtPoint" : lambda planner :     planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and not planner.current_task.complete
+
+"stillShooting" : lambda planner :  planner.current_task != None and isinstance(planner.current_task, Shoot) and not planner.current_task.complete
+"shotComplete" : lambda planner :   planner.current_task != None and isinstance(planner.current_task, Shoot) and planner.current_task.complete

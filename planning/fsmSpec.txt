@@ -1,43 +1,52 @@
 machineParams
 name 			simpleAttackerFSM
-inAlph			ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete, leavingZoneLeft, leavingZoneRight, defenderHasBall, taskIsMirroring, taskNotMirroring
-states 			initial, acquiringBall, movingToPoint, shooting, centering, mirroring
-initialState	initial
+inAlph			ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete, leavingZoneLeft, leavingZoneRight, defenderHasBall, enemyDefenderHasBall, stateNotBlocking, stateNotMirroring, stateStarting
+states 			idle, acquiringBall, movingToPoint, shooting, centering, mirroring, blocking, starting
+initialState	starting
 finalState		unnec
 
 transitions
+<starting, stateStarting, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
+
 <*, leavingZoneLeft, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
 <*, leavingZoneRight, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
 
-<*, taskNotMirroring defenderHasBall, [MirrorObject, world, robot, role, world.our_defender], mirroring>
+<*, stateNotMirroring defenderHasBall, [MirrorObject, world, robot, role, world.ball], mirroring>
+<*, stateNotBlocking enemyDefenderHasBall, [MirrorObject, world, robot, role, world.ball], blocking>
 
 <mirroring, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
 <mirroring, defenderHasBall, [EXISTING], mirroring>
 
-<centering, notAtPoint, [EXISTING], centering>
-<centering, atPoint, [EXISTING], initial>
+<blocking, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
+<blocking, enemyDefenderHasBall, [EXISTING], blocking>
 
-<initial, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
-<initial, notBallInZone, [EXISTING], initial>
+<centering, notAtPoint, [EXISTING], centering>
+<centering, atPoint, [EXISTING], idle>
+
+<idle, ballInZone, [AcquireBall, world, robot, role], acquiringBall>
+<idle, notBallInZone, [EXISTING], idle>
 
 <acquiringBall, gotBall, [MoveToPoint, world, robot, role, choose_attacker_destination(world)[0], choose_attacker_destination(world)[1], 10], movingToPoint>
 <acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
-<acquiringBall, notBallInZone, [MoveToPoint, world, robot, role, 270, 150, 10], initial>
+<acquiringBall, notBallInZone, [MoveToPoint, world, robot, role, 270, 150, 10], idle>
 
 <movingToPoint, atPoint, [Shoot, world, robot, role] , shooting>
 <movingToPoint, notAtPoint, [EXISTING], movingToPoint>
 
-<shooting, shotComplete, [MoveToPoint, world, robot, role, 150, 150, 10] , initial>
+<shooting, shotComplete, [MoveToPoint, world, robot, role, 150, 150, 10] , idle>
 <shooting, stillShooting, [EXISTING], shooting>
 
 lambdaConditions
-"taskIsMirroring": lambda planner: isinstance(planner.current_task, MirrorObject)
-"taskNotMirroring": lambda planner: not isinstance(planner.current_task, MirrorObject)
+"stateStarting": lambda planner: planner.current_state == 'starting'
+
+"stateNotBlocking": lambda planner: planner.current_state != 'blocking'
+"stateNotMirroring": lambda planner: planner.current_state != 'mirroring'
 
 "leavingZoneLeft": lambda planner:  (planner.our_robot.x - planner.world.pitch.zones[planner.our_robot.zone].boundingBox()[0]) < 5
 "leavingZoneRight": lambda planner: (planner.world.pitch.zones[planner.our_robot.zone].boundingBox()[1] - planner.our_robot.x) < 5
 
 "defenderHasBall": lambda planner:  planner.world.pitch.zones[planner.world.our_defender.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"enemyDefenderHasBall": lambda planner: planner.world.pitch.zones[planner.world.their_defender.zone].isInside(planner.world.ball.x, planner.world.ball.y)
 
 "ballInZone" : lambda planner :     planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
 "notBallInZone" : lambda planner :     not planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
