@@ -48,6 +48,7 @@ class Controller:
         self.simulator = Simulator(our_side, our_role, color)
         self.camera = SimulatedCamera(self.simulator)
         self.robot = SimulatedAction(self.simulator.control_robot)
+        self.robot_defend = SimulatedAction(self.simulator.our_defender)
 
         frame = self.camera.get_frame()
         center_point = self.camera.get_adjusted_center(frame)
@@ -67,6 +68,7 @@ class Controller:
 
         # Set up main planner
         self.planner = Planner(self.world, self.robot, 'attacker', ['planning/fsmSpec.txt'])
+        self.planner2 = Planner(self.world, self.robot_defend, 'defender', ['planning/fsmSpec2.txt'])
 
         # Set up GUI
         self.GUI = GUI(calibration=self.calibration, pitch=self.SIM_PITCH)
@@ -102,13 +104,13 @@ class Controller:
 
             # Huge array of shortcut keys for testing various movements
             if c == ord('t'):
-                self.simulator.ball.body.velocity = Vec2d(0,1)
+                self.simulator.ball.body.velocity = Vec2d(0,3)
             elif c == ord('f'):
-                self.simulator.ball.body.velocity = Vec2d(-1,0)
+                self.simulator.ball.body.velocity = Vec2d(-3,0)
             elif c == ord('g'):
-                self.simulator.ball.body.velocity = Vec2d(0,-1)
+                self.simulator.ball.body.velocity = Vec2d(0,-3)
             elif c == ord('h'):
-                self.simulator.ball.body.velocity = Vec2d(1,0)
+                self.simulator.ball.body.velocity = Vec2d(3,0)
             elif c == ord('i'):
                 catch_handle = self.robot.open_catcher()
             elif c == ord('j'):
@@ -147,6 +149,7 @@ class Controller:
             self.world.update_positions(model_positions)
 
             self.planner.plan()
+            self.planner2.plan()
 
             # Information about the grabbers from the world
             grabbers = {
@@ -156,7 +159,7 @@ class Controller:
 
             # Information about states
             attackerState = (self.planner.current_state, self.planner.current_state)
-            defenderState = (self.planner.current_state, self.planner.current_state)
+            defenderState = (self.planner2.current_state, self.planner2.current_state)
 
             attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
             defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
