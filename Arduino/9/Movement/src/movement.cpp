@@ -88,32 +88,32 @@ void service_movement()
             
             finishedTurn = true;
             command_finished_movement();
-            return;
-        }
-        
-        // Slow down as we approach the target        
-        if(current_distance < 0.5) {
-            turnSpeed = 20;
-        
-        } else if(current_distance < 1.5) {
-            turnSpeed = 35;
             
         } else {
-            turnSpeed = 50;
+            // Slow down as we approach the target        
+            if(current_distance < 0.5) {
+                turnSpeed = 20;
+            
+            } else if(current_distance < 1.5) {
+                turnSpeed = 35;
+                
+            } else {
+                turnSpeed = 50;
+            }
+            
+            Serial.print(current_distance);
+            Serial.print('\t');
+            Serial.println(turnSpeed);
+            
+            static double speeds[NUM_MOTORS];
+            speeds[0] = turnSpeed;
+            speeds[1] = turnSpeed;
+            speeds[2] = turnSpeed;
+            speeds[4] = turnSpeed;
+            
+            wheels_set_target_speeds(speeds);
+            
+            //Serial.print("dist="); Serial.println(current_distance);
         }
-        
-        Serial.print(current_distance);
-        Serial.print('\t');
-        Serial.println(turnSpeed);
-        
-        double speeds[NUM_MOTORS];
-        speeds[0] = turnSpeed;
-        speeds[1] = turnSpeed;
-        speeds[2] = turnSpeed;
-        speeds[4] = turnSpeed;
-        
-        wheels_set_target_speeds(speeds);
-        
-        //Serial.print("dist="); Serial.println(current_distance);
     }
 }
