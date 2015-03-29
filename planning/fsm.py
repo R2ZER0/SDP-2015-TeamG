@@ -122,7 +122,7 @@ def createConfigGrammar():
     finalSDef     = Group(finalSKWD + state)
 
     # A lambda statement is of the form '"alphabetLetter" : lambda planner : code', where code is an alphanumeric 'word', with >< .+-(),\t\n characters
-    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-[]_!=(),\t\n"))
+    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-[]_!'=(),\t\n"))
 
     # A transition is of the form '<stateName, letter1, letter2,..., [TaskName, arg1, arg2,...], newState>'
     transition    = Group(leftAngBrkt + (anyState ^ state) + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
