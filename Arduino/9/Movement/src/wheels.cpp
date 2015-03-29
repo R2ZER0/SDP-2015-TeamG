@@ -33,7 +33,18 @@ void wheels_set_target_speeds(double* speeds)
     for(int i = 0; i < NUM_MOTORS; ++i) {
         wheels[i].target_speed = speeds[i];
     }
-    next_update_time = 0L;
+    next_update_time = 0L; /* Update immidiately */
+}
+
+/* Stop the wheels! */
+void wheels_stop(void)
+{
+    for(int i = 0; i < NUM_MOTORS; ++i) {
+        wheels[i].target_speed = 0;
+        wheels[i].motor_power = 0;
+        runMotor(MOTOR[i], 0);
+    }
+    next_update_time = 0L; /* Update immidiately */
 }
 
 /* Get the last known speed of this wheel */

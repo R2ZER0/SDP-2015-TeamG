@@ -3,6 +3,7 @@
 #define _WHEELS_H_
 
 void wheels_set_target_speeds(double* speed);
+void wheels_stop();
 double wheels_get_speed(int wheel);
 
 void setup_wheels();
