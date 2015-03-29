@@ -51,6 +51,11 @@ static double signof(double a) {
 /* Calculate the next step of the PD controller */
 static void wheel_control_calculate(struct wheel_control* wheel)
 {
+    if(wheel->target_speed == 0) {
+        wheel->motor_power = 0;
+        return;
+    }
+    
     double error = (wheel->target_speed - wheel->speed);
    
     double d_error = error - wheel->prev_error;
