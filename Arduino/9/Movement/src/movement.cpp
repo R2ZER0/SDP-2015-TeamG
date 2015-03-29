@@ -106,10 +106,18 @@ void service_movement()
             Serial.println(turnSpeed);
             
             static double speeds[NUM_MOTORS];
-            speeds[0] = turnSpeed;
-            speeds[1] = turnSpeed;
-            speeds[2] = turnSpeed;
-            speeds[4] = turnSpeed;
+            
+            if(acw_dist > cw_dist) {
+                speeds[0] = -turnSpeed;
+                speeds[1] = -turnSpeed;
+                speeds[2] = -turnSpeed;
+                speeds[4] = -turnSpeed;
+            } else {
+                speeds[0] = turnSpeed;
+                speeds[1] = turnSpeed;
+                speeds[2] = turnSpeed;
+                speeds[4] = turnSpeed;
+            }
             
             wheels_set_target_speeds(speeds);
             
