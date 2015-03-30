@@ -25,6 +25,14 @@ static const int8_t MOTOR[NUM_MOTORS] = {
 /* A controller instance for each wheel */
 static struct wheel_control wheels[NUM_MOTORS] = { {0} };
 
+/* Is wheel control enabled? */
+static bool control_enabled = false;
+
+/* Enable/disable wheel control */
+void wheels_control_enabled(bool enabled) {
+    control_enabled = enabled;
+}
+
 /* Reset the controller and set the desired speed */
 void wheels_set_target_speeds(double* speeds)
 {
@@ -106,11 +114,13 @@ void service_wheels()
             wheel->speed = (float) (wheel->movement) * (1000.0/WHEELS_UPDATE_INTERVAL);
             wheel->movement = 0;
             
-            /* Update the controller */
-            wheel_control_calculate(wheel);
-            
-            /* Send the result to the motor */
-            runMotor(MOTOR[i], wheel->motor_power);
+            if(control_enabled) {
+                /* Update the controller */
+                wheel_control_calculate(wheel);
+                
+                /* Send the result to the motor */
+                runMotor(MOTOR[i], wheel->motor_power);
+            }
             
             wheel->next_update_time = current_time + WHEELS_UPDATE_INTERVAL;
         }
