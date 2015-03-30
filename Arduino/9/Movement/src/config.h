@@ -24,7 +24,7 @@
 #define TURN_ACCEPTABLE_RANGE (0.017453*1.5)
 
 // Wheel PID parameters
-#define WHEELS_UPDATE_INTERVAL (200)
+#define WHEELS_UPDATE_INTERVAL (200.0)
 #define WHEELS_KP 1.0
 #define WHEELS_KI 0.0
 #define WHEELS_KD 0.5
