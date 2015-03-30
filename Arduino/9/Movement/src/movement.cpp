@@ -17,6 +17,7 @@ char current_command = MOVEMENT_COMMAND_STOP;
 double targetAngle = 0.0; // in radians, +PI to -PI
 int turnSpeed = 100;
 bool finishedTurn = true;
+static unsigned long turn_quickstart_endtime = 0L;
 
 double normalise_angle(double a) {
     while(a > PI) { a -= 2.0*PI; }
@@ -69,6 +70,8 @@ void movement_on_new_command(char cmd, float dir_, int spd)
         targetAngle = normalise_angle(getAngle() + dir);
         turnSpeed = spd;
         finishedTurn = false;
+        
+        turn_quickstart_endtime = millis() + TURN_QUICKSTART_TIME;
     }
 }
 
@@ -112,6 +115,10 @@ void service_movement()
         } else {
             turnSpeedA = 50;
             turnSpeedB = 0;
+        }
+        
+        if(millis() <= turn_quickstart_endtime) {
+            turnSpeedA = 100;
         }
         
         //Serial.print(current_distance);

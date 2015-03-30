@@ -51,4 +51,6 @@
 #define ROTARY_SLAVE_ADDRESS 5
 #define ROTARY_COUNT 6
 
+#define TURN_QUICKSTART_TIME (150)
+
 #endif /* _CONFIG_H_ */
