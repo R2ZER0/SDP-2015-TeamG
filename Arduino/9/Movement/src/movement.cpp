@@ -79,49 +79,52 @@ void service_movement()
 {
     if(!finishedTurn && current_command == MOVEMENT_COMMAND_TURN) {
         float acw_dist = acw_distance(getAngle(), targetAngle);
-        float  cw_dist =  cw_distance(getAngle(), targetAngle);
+        float cw_dist = cw_distance(getAngle(), targetAngle);
         float current_distance = (acw_dist < cw_dist) ? acw_dist : cw_dist;
-
+        
+        // Serial.print(getAngle()); Serial.print(" --> "); Serial.print(targetAngle);
+        // Serial.print(" = "); Serial.println(current_distance);
+        //
+        
         if(current_distance <= TURN_ACCEPTABLE_RANGE) {
             // We've probably finished!
-            wheels_stop();
-            
+            motorAllStop();
             finishedTurn = true;
             command_finished_movement();
-            
-        } else {
-            // Slow down as we approach the target        
-            if(current_distance < 0.5) {
-                turnSpeed = 20;
-            
-            } else if(current_distance < 1.5) {
-                turnSpeed = 35;
-                
-            } else {
-                turnSpeed = 50;
-            }
-            
-            Serial.print(current_distance);
-            Serial.print('\t');
-            Serial.println(turnSpeed);
-            
-            static double speeds[NUM_MOTORS];
-            
-            if(acw_dist > cw_dist) {
-                speeds[0] = -turnSpeed;
-                speeds[1] = -turnSpeed;
-                speeds[2] = -turnSpeed;
-                speeds[4] = -turnSpeed;
-            } else {
-                speeds[0] = turnSpeed;
-                speeds[1] = turnSpeed;
-                speeds[2] = turnSpeed;
-                speeds[4] = turnSpeed;
-            }
-            
-            wheels_set_target_speeds(speeds);
-            
-            //Serial.print("dist="); Serial.println(current_distance);
+            Serial.println("Finished turn!");
+            return;
         }
+        
+        // Slow down as we approach the target
+        int turnSpeedA = turnSpeed;
+        int turnSpeedB = turnSpeed;
+        if(current_distance < 0.5) {
+            turnSpeedA = 40;
+            turnSpeedB = 0;
+        } else if(current_distance < 1.5) {
+            turnSpeedA = 40;
+            turnSpeedB = 0;
+        } else {
+            turnSpeedA = 50;
+            turnSpeedB = 0;
+        }
+        
+        //Serial.print(current_distance);
+        //Serial.print('\t');
+        //Serial.println(turnSpeedA);
+        
+        if(acw_dist > cw_dist) {
+            runMotor(MOTOR_MOTOR1, turnSpeedA);
+            runMotor(MOTOR_MOTOR2, turnSpeedB);
+            runMotor(MOTOR_MOTOR3, turnSpeedA);
+            runMotor(MOTOR_MOTOR4, turnSpeedB);
+        } else {
+            runMotor(MOTOR_MOTOR1, -turnSpeedA);
+            runMotor(MOTOR_MOTOR2, -turnSpeedB);
+            runMotor(MOTOR_MOTOR3, -turnSpeedA);
+            runMotor(MOTOR_MOTOR4, -turnSpeedB);
+        }
+        
+        //Serial.print("dist="); Serial.println(current_distance);
     }
 }
