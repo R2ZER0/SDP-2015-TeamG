@@ -63,13 +63,16 @@ class Tracker(object):
                 frame = cv2.add(frame, np.array([float(adjustments['contrast'])]))
 
             # Convert frame to HSV
-            frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            if len(frame.shape) == 3:
+                frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            # Create a mask
-            frame_mask = cv2.inRange(frame_hsv, adjustments['min'], adjustments['max'])
+                # Create a mask
+                frame_mask = cv2.inRange(frame_hsv, adjustments['min'], adjustments['max'])
 
-            # Apply threshold to the masked image, no idea what the values mean
-            return_val, threshold = cv2.threshold(frame_mask, 127, 255, 0)
+                # Apply threshold to the masked image, no idea what the values mean
+                return_val, threshold = cv2.threshold(frame_mask, 127, 255, 0)
+            else:
+                threshold = frame.copy()
 
             # Find contours
             contours, hierarchy = cv2.findContours(
