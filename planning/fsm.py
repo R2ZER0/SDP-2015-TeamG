@@ -98,7 +98,7 @@ def createConfigGrammar():
     state         = Word(alphanums)
 
     # A task invocation is either of the form '[EXISTING]' or '[TaskName, arg1, arg2, ...]']
-    taskInvocation = Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + ZeroOrMore(Word(alphanums+" _()'.\"")^nestedExpr(opener='[', closer=']', content=Word(alphanums+" _()'.\"")))) + rightSqBrkt)
+    taskInvocation = Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + ZeroOrMore(Word(alphanums+" +-_()='.\"")^nestedExpr(opener='[', closer=']', content=Word(alphanums+" _+-=()'.\"")))) + rightSqBrkt)
 
     # An FSM name is an alphanumeric 'word'
     name          = Word(alphanums) 
@@ -122,7 +122,7 @@ def createConfigGrammar():
     finalSDef     = Group(finalSKWD + state)
 
     # A lambda statement is of the form '"alphabetLetter" : lambda planner : code', where code is an alphanumeric 'word', with >< .+-(),\t\n characters
-    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + ">< .+-[]_!'=(),\t\n"))
+    lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + "/>< .+-[]_!'=(),\t\n"))
 
     # A transition is of the form '<stateName, letter1, letter2,..., [TaskName, arg1, arg2,...], newState>'
     transition    = Group(leftAngBrkt + (anyState ^ state) + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
