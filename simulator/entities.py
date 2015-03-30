@@ -102,6 +102,7 @@ class SimulatedPitch:
 
 			segment = pymunk.Segment(static_body, Vec2d(point[0],point[1]), Vec2d(next_point[0], next_point[1]), 1)
 			segment.friction = 0.5
+			segment.elasticity = 1
 
 			static_lines.append(segment)
 
@@ -176,6 +177,7 @@ class SimulatedBall:
 		shape.group = self.BALL_GROUP
 		shape.layers = SimulatedRobot.ROBOT_LAYER | SimulatedRobot.CATCHER_LAYER | SimulatedRobot.KICKER_LAYER
 		shape.collision_type = self.BALL_COLLIDE
+		shape.elasticity = 1
 
 		self.space.add(shape)
 
@@ -213,7 +215,7 @@ class SimulatedRobot:
 	LEG_LENGTH, LEG_WIDTH = 25, 15
 
 	#: Angles of each leg, adding a new angle will result in another leg, radians.
-	LEG_ANGLES = [math.pi/3, math.pi, math.pi*5/3]
+	LEG_ANGLES = [math.pi*1/4, math.pi*3/4, math.pi*5/4, math.pi*7/4]
 
 	#: Template vertices for a leg, at 0 radians.
 	LEG_VERTICES = [(-LEG_WIDTH/2, 0), (LEG_WIDTH/2, 0), (LEG_WIDTH/2, LEG_LENGTH), (-LEG_WIDTH/2, LEG_LENGTH)]
