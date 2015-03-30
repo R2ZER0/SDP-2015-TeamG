@@ -5,6 +5,7 @@ from tasks import *
 from utilities import *
 from pyparsing import *
 from planning.fsm import *
+import math
 
 class Planner:    
 
@@ -63,9 +64,11 @@ class Planner:
         list"""
         trueCnds = []
         lambdas = fsm.getLambdaDic()
+
         for letter in fsm.getAlpha():
             if letter in lambdas.keys() and lambdas[letter](self) == True:
                 trueCnds.append(letter)
+
         return trueCnds
 
     def plan(self):

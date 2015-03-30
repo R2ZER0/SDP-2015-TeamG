@@ -102,32 +102,6 @@ class Controller:
 
         while c != 27:  # the ESC key
 
-            # Huge array of shortcut keys for testing various movements
-            if c == ord('t'):
-                self.simulator.ball.body.velocity = Vec2d(0,3)
-            elif c == ord('f'):
-                self.simulator.ball.body.velocity = Vec2d(-3,0)
-            elif c == ord('g'):
-                self.simulator.ball.body.velocity = Vec2d(0,-3)
-            elif c == ord('h'):
-                self.simulator.ball.body.velocity = Vec2d(3,0)
-            elif c == ord('i'):
-                catch_handle = self.robot.open_catcher()
-            elif c == ord('j'):
-                catch_handle = self.robot.catch()
-            elif c == ord('k'):
-                kick_handle = self.robot.kick()
-            elif c == ord('l'):
-                move_hadnle = self.robot.turnBy(3.14)
-            elif c == ord('z'):
-                move_handle = self.robot.move(-math.pi/2,100)
-            elif c == ord('x'):
-                move_handle = self.robot.move(math.pi/2, 100)
-            elif c == ord('c'):
-                move_handle = self.robot.move(math.pi, 100)
-            elif c == ord('v'):
-                move_handle = self.robot.move(0, 100)
-
             self.simulator.update(1)
 
             frame = self.camera.get_frame()
@@ -149,7 +123,7 @@ class Controller:
             self.world.update_positions(model_positions)
 
             self.planner.plan()
-            self.planner2.plan()
+            #self.planner2.plan()
 
             # Information about the grabbers from the world
             grabbers = {

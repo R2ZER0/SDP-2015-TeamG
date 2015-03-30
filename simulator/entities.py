@@ -387,18 +387,17 @@ class SimulatedRobot:
 			cw_dist = (target-our + math.pi*2) if (target-our) < 0 else target-our
 
 			dist = min(acw_dist, cw_dist)
-			multiplier = 1 if acw_dist > cw_dist else -1
 
 			if dist < 0.03:
 				self.body.angular_velocity = 0.0
 				self.move_handle._onComplete()
 				self.move_handle = None
 			elif dist < 0.5:
-				self.body.angular_velocity = multiplier*90*self.TURN_POWER
+				self.body.angular_velocity = 90*self.TURN_POWER
 			elif dist < 1.5:
-				self.body.angular_velocity = multiplier*95*self.TURN_POWER
+				self.body.angular_velocity = 95*self.TURN_POWER
 			else:
-				self.body.angular_velocity = multiplier*100*self.TURN_POWER
+				self.body.angular_velocity = 100*self.TURN_POWER
 
 			if acw_dist < cw_dist:
 				self.body.angular_velocity = -self.body.angular_velocity
