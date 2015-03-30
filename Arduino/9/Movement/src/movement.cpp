@@ -96,7 +96,7 @@ void service_movement()
             motorAllStop();
             finishedTurn = true;
             command_finished_movement();
-            Serial.println("Finished turn!");
+            //Serial.println("Finished turn!");
             return;
         }
         

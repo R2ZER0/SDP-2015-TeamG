@@ -110,19 +110,13 @@ void service_wheels()
         
         if(current_time > wheel->next_update_time) {
             
-            /* DEBUG */
-            if(control_enabled) {
-                Serial.print(i); Serial.print('\t'); Serial.println(wheel->movement);
-            }
-            
             /* Calculate average wheel speed since last update */
-            //wheel->speed = (float) (wheel->movement) * (1000.0/WHEELS_UPDATE_INTERVAL);
             wheel->speed = (double) (wheel->movement);
             wheel->speed = wheel->speed * (double)1000.0;
             wheel->speed = wheel->speed / (double)WHEELS_UPDATE_INTERVAL;
             wheel->movement = 0;
             
-            if(control_enabled) {                
+            if(control_enabled) {
                 /* Update the controller */
                 wheel_control_calculate(wheel);
                 
