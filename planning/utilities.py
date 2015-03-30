@@ -543,3 +543,10 @@ def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False
 
 def do_nothing():
     return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0}
+
+def dist_point_to_line(startX,startY,endX,endY,pntX,pntY):
+    ''' 
+    Returns the shortest distance between a point (pntX,pntY)
+    and a line (NOT line segment) defined by start point (startX,startY) and end point (endX,endY)
+    '''
+    return abs((endY-startY)*pntX-(endX-startX)*pntY+endX*startY-endY*startX)/sqrt((endY-startY)**2+(endX-startX)**2)

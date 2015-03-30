@@ -36,9 +36,7 @@ void movement_on_new_command(char cmd, float dir, int spd)
 {
     if(cmd == MOVEMENT_COMMAND_STOP) {
 
-        // Reset desired speeds down to 0
-        double speeds[NUM_MOTORS] = { 0.0, 0.0, 0.0, 0.0 };
-        wheels_set_target_speeds(speeds);
+        wheels_stop();
 
         current_command = cmd;
         motorStop(MOTOR_MOTOR1);
@@ -86,45 +84,36 @@ void service_movement()
 
         if(current_distance <= TURN_ACCEPTABLE_RANGE) {
             // We've probably finished!
-            motorAllStop();
+            wheels_stop();
+            
             finishedTurn = true;
             command_finished_movement();
-            return;
-        }
-        
-        // Slow down as we approach the target
-        int turnSpeedA = turnSpeed;
-        int turnSpeedB = turnSpeed;
-        
-        if(current_distance < 0.5) {
-            turnSpeedA = 40;
-            turnSpeedB = 0;
-        
-        } else if(current_distance < 1.5) {
-            turnSpeedA = 40;
-            turnSpeedB = 0;
             
         } else {
-            turnSpeedA = 50;
-            turnSpeedB = 0;
+            // Slow down as we approach the target        
+            if(current_distance < 0.5) {
+                turnSpeed = 20;
+            
+            } else if(current_distance < 1.5) {
+                turnSpeed = 35;
+                
+            } else {
+                turnSpeed = 50;
+            }
+            
+            Serial.print(current_distance);
+            Serial.print('\t');
+            Serial.println(turnSpeed);
+            
+            static double speeds[NUM_MOTORS];
+            speeds[0] = turnSpeed;
+            speeds[1] = turnSpeed;
+            speeds[2] = turnSpeed;
+            speeds[4] = turnSpeed;
+            
+            wheels_set_target_speeds(speeds);
+            
+            //Serial.print("dist="); Serial.println(current_distance);
         }
-        
-        Serial.print(current_distance);
-        Serial.print('\t');
-        Serial.println(turnSpeedA);
-        
-        if(acw_dist > cw_dist) {
-            runMotor(MOTOR_MOTOR1, turnSpeedA);
-            runMotor(MOTOR_MOTOR2, turnSpeedB);
-            runMotor(MOTOR_MOTOR3, turnSpeedA);
-            runMotor(MOTOR_MOTOR4, turnSpeedB);
-        } else {
-            runMotor(MOTOR_MOTOR1, -turnSpeedA);
-            runMotor(MOTOR_MOTOR2, -turnSpeedB);
-            runMotor(MOTOR_MOTOR3, -turnSpeedA);
-            runMotor(MOTOR_MOTOR4, -turnSpeedB);
-        }
-        
-        //Serial.print("dist="); Serial.println(current_distance);
     }
 }

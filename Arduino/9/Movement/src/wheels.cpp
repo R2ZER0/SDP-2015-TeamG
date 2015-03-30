@@ -11,6 +11,7 @@ struct wheel_control {
     double motor_power;
     int movement;
     double prev_error;
+    unsigned long next_update_time;
 };
 
 /* Motor lookup table */
@@ -24,16 +25,26 @@ static const int8_t MOTOR[NUM_MOTORS] = {
 /* A controller instance for each wheel */
 static struct wheel_control wheels[NUM_MOTORS] = { {0} };
 
-/* Timeout variable used to know if we need to recalculate the motor powers */
-static unsigned long next_update_time = 0L;
-
 /* Reset the controller and set the desired speed */
 void wheels_set_target_speeds(double* speeds)
 {
     for(int i = 0; i < NUM_MOTORS; ++i) {
-        wheels[i].target_speed = speeds[i];
+        if(wheels[i].target_speed != speeds[i]) {
+            wheels[i].target_speed = speeds[i];
+            wheels[i].next_update_time = 0L; /* Update immidiately */
+        }
     }
-    next_update_time = 0L;
+}
+
+/* Stop the wheels! */
+void wheels_stop(void)
+{
+    for(int i = 0; i < NUM_MOTORS; ++i) {
+        wheels[i].target_speed = 0;
+        wheels[i].motor_power = 0;
+        wheels[i].next_update_time = 0L; /* Update immidiately */
+        runMotor(MOTOR[i], 0);
+    }
 }
 
 /* Get the last known speed of this wheel */
@@ -51,6 +62,12 @@ static double signof(double a) {
 /* Calculate the next step of the PD controller */
 static void wheel_control_calculate(struct wheel_control* wheel)
 {
+    /* Check if the target speed is in the dead zone, i.e. stopped */
+    if(abs(wheel->target_speed) <= WHEELS_DEADZONE_SIZE) {
+        wheel->motor_power = 0;
+        return;
+    }
+    
     double error = (wheel->target_speed - wheel->speed);
    
     double d_error = error - wheel->prev_error;
@@ -78,10 +95,12 @@ void service_wheels()
     }
   
     /* If needed, recalculate wheel speeds and update motors */
-    if(millis() > next_update_time) {
-
-        for (int i = 0; i < NUM_MOTORS; i++) {
-            struct wheel_control* wheel = &wheels[i];
+    unsigned long current_time = millis();
+    
+    for (int i = 0; i < NUM_MOTORS; i++) {
+        struct wheel_control* wheel = &wheels[i];
+        
+        if(current_time > wheel->next_update_time) {
             
             /* Calculate average wheel speed since last update */
             wheel->speed = (float) (wheel->movement) * (1000.0/WHEELS_UPDATE_INTERVAL);
@@ -92,8 +111,8 @@ void service_wheels()
             
             /* Send the result to the motor */
             runMotor(MOTOR[i], wheel->motor_power);
+            
+            wheel->next_update_time = current_time + WHEELS_UPDATE_INTERVAL;
         }
-        
-        next_update_time = millis() + WHEELS_UPDATE_INTERVAL;
     }
 }

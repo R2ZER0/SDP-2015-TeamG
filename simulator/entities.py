@@ -102,6 +102,7 @@ class SimulatedPitch:
 
 			segment = pymunk.Segment(static_body, Vec2d(point[0],point[1]), Vec2d(next_point[0], next_point[1]), 1)
 			segment.friction = 0.5
+			segment.elasticity = 1
 
 			static_lines.append(segment)
 
@@ -125,6 +126,8 @@ class SimulatedBall:
 	BALL_GROUP = 5
 	BALL_COLLIDE = 25
 
+	BALL_MOVE_SPEED = 0.02
+
 	#: The body representing this Ball
 	body = None
 
@@ -142,6 +145,13 @@ class SimulatedBall:
 		'''
 		self.space = space
 		self._construct_ball(center, scale)
+
+	def stop(self):
+		'''Resets all forces on the ball and sets it's velocity to zero.
+		'''
+		self.body.reset_forces()
+		self.body.angular_velocity = 0
+		self.body.velocity = Vec2d(0,0)
 
 	def update(self, dt):
 		'''This function is executed every time the world is updated, before stepping the world by
@@ -176,6 +186,7 @@ class SimulatedBall:
 		shape.group = self.BALL_GROUP
 		shape.layers = SimulatedRobot.ROBOT_LAYER | SimulatedRobot.CATCHER_LAYER | SimulatedRobot.KICKER_LAYER
 		shape.collision_type = self.BALL_COLLIDE
+		shape.elasticity = 1
 
 		self.space.add(shape)
 
@@ -213,7 +224,7 @@ class SimulatedRobot:
 	LEG_LENGTH, LEG_WIDTH = 25, 15
 
 	#: Angles of each leg, adding a new angle will result in another leg, radians.
-	LEG_ANGLES = [math.pi/3, math.pi, math.pi*5/3]
+	LEG_ANGLES = [math.pi*1/4, math.pi*3/4, math.pi*5/4, math.pi*7/4]
 
 	#: Template vertices for a leg, at 0 radians.
 	LEG_VERTICES = [(-LEG_WIDTH/2, 0), (LEG_WIDTH/2, 0), (LEG_WIDTH/2, LEG_LENGTH), (-LEG_WIDTH/2, LEG_LENGTH)]
@@ -253,19 +264,6 @@ class SimulatedRobot:
 	#: Stores the impulse points to apply motor speeds to as 4-tuples (x,y,fx,fy)
 	impulse_points = []
 
-	# State Values
-
-	#: Our robot's colour, used as index into COLORS 
-	our_color = None
-
-	#: Catcher and Kicker states are one of: open, closed, opening, closing
-	catcher_state, kicker_state = 'closed', 'closed'
-
-	#: Stores movement, and rotation action handles
-	move_handle = None
-	kick_handle = None
-	catch_handle = None
-
 	def __init__(self, space, center, color='yellow', scale=1):
 		'''Constructs a new SimulatedRobot, centered on the given position. Allows a scale
 		value to modify the resultant size of the Robot.
@@ -276,9 +274,19 @@ class SimulatedRobot:
 		:param scale: Multiplier for all dimensions, < 1 results in smaller robot, > 1 larger.
 		'''
 		self.space = space
+
+		#: Our robot's colour, used as index into COLORS 
 		self.our_color = color
 
 		self._construct_robot(center, scale)
+	
+		#: Catcher and Kicker states are one of: open, closed, opening, closing
+		self.catcher_state, self.kicker_state = 'closed', 'closed'
+		
+		#: Stores movement, and rotation action handles
+		self.move_handle = None
+		self.kick_handle = None
+		self.catch_handle = None
 
 		# Add collision handler between our Robot and the ball
 		space.add_collision_handler(SimulatedRobot.KICKER_COLLIDE, SimulatedBall.BALL_COLLIDE, separate=self._ball_kicked)
@@ -377,17 +385,18 @@ class SimulatedRobot:
 			cw_dist = (target-our + math.pi*2) if (target-our) < 0 else target-our
 
 			dist = min(acw_dist, cw_dist)
+			multiplier = 1 if acw_dist > cw_dist else -1
 
-			if dist < 0.01:
+			if dist < 0.03:
 				self.body.angular_velocity = 0.0
 				self.move_handle._onComplete()
 				self.move_handle = None
 			elif dist < 0.5:
-				self.body.angular_velocity = 90*self.TURN_POWER
+				self.body.angular_velocity = multiplier*90*self.TURN_POWER
 			elif dist < 1.5:
-				self.body.angular_velocity = 95*self.TURN_POWER
+				self.body.angular_velocity = multiplier*95*self.TURN_POWER
 			else:
-				self.body.angular_velocity = 100*self.TURN_POWER
+				self.body.angular_velocity = multiplier*100*self.TURN_POWER
 
 		elif self.move_handle.cmd == 'M':
 			#: Set our move handle as completed if it's just a move
