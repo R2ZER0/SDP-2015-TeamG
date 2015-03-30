@@ -7,10 +7,11 @@ classes.'''
 class Task(object):
 
 	'''Initialise this task.'''
-	def __init__(self, world, robot, role):
+	def __init__(self, world, robot, role='attacker'):
 		self.complete = False
 		self.world = world
 		self.robot = robot
+                self.role = role
 		if role == 'attacker':
 			self.robot_info = self.world.our_attacker
 		elif role == 'defender':
@@ -53,7 +54,7 @@ class TurnToPoint(Task):
 					self.complete = True
 				else:
 					self.turnHandle = None
-			elif self.motionHandle.finished:
+			elif self.turnHandle.finished:
 				if abs(self.robot_info.angular_velocity) < 0.1 and self.check():
 					self.complete = True
 				else:
