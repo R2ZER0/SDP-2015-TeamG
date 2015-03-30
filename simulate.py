@@ -167,14 +167,18 @@ class Controller:
             # Use 'y', 'b', 'r' to change color.
             c = waitKey(2) & 0xFF
 
+            # Handle the key press in the simualtor; return result indicates if
+            # this key press has been used
+            key_handled = self.simulator.key_pressed(c)
+
             actions = []
             fps = float(counter) / (time.clock() - timer)
+
             # Draw vision content and actions
-            
             self.GUI.draw(
                 frame, model_positions, actions, regular_positions, fps, attackerState,
                 defenderState, attacker_actions, defender_actions, grabbers,
-                our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
+                our_color=self.color, our_side=self.side, key=(-1 if key_handled else c), preprocess=pre_options)
             counter += 1
         
         if self.robot is not None:
