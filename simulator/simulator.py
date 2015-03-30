@@ -141,19 +141,16 @@ class SimulatedAction:
 
 class SimulatedCamera():
 
-	#: Holds the instance of our simulation
-	simulator = None
-
-	#: The frame we draw the simulation to, overwritten each draw rather than instantiating a new one
-	frame = None
-
 	def __init__(self, simulator):
 		'''Given a simulator instance, provides convenient access to retrieving a current image of the simulation;
 		mimicking a camera interface to the Pitch.
 
 		:param simulator: A Simulator instance.
 		'''
+		#: Holds the instance of our simulation
 		self.simulator = simulator
+
+		#: The frame we draw the simulation to, overwritten each draw rather than instantiating a new one
 		self.frame = np.zeros((self.simulator.width, self.simulator.length, 3), np.uint8)
 
 	def get_frame(self):
@@ -173,25 +170,6 @@ class Simulator():
 	'''Runs the Simulation. Provides convenient interfaces to objects in the simulation and manages setup.
 	'''
 
-	#: Pymunk Variables
-
-	#: The pymunk space being simulated
-	space = None
-
-	#: The four robots being simulated; SimulatedRobot objects
-	robots = []
-
-	#: The SimulatedBall object
-	ball = None
-
-	#: Represents the complete pitch in the world (zones, drawing, border)
-	pitch = None
-
-	#: General Game Rules
-	
-	#: Our side, 'left' or 'right', role, 'attacker' or 'defender', and colour 'yellow' or 'blue'
-	our_side, our_role, our_color = None, None, None
-
 	def __init__(self, side, role, color):
 		'''Constructs a new simulation, with our controlled robot being based on the given side,
 		role, and colour.
@@ -204,19 +182,26 @@ class Simulator():
 		assert role in ['attacker', 'defender']
 		assert color in ['yellow', 'blue']
 
+		#: Our side, 'left' or 'right', role, 'attacker' or 'defender', and colour 'yellow' or 'blue'
 		self.our_side = side
 		self.our_role = role
 		self.our_color = color
 
+		#: The pymunk space being simulated
 		self.space = pymunk.Space()
 		self.space.gravity = Vec2d(0,0)
 		self.space.damping = 0.99
 
-		self.pitch = SimulatedPitch(self.space)
+		#: Represents the complete pitch in the world (zones, drawing, border)
+		self.pitch = SimulatedPitch(self.space)		
 		self.ball = SimulatedBall(self.space, (self.pitch.PITCH_LENGTH*3/4,self.pitch.PITCH_WIDTH/2))
 
 		their_color = 'yellow' if color == 'blue' else 'blue'
 		our_color = color
+
+		#: The four robots being simulated; SimulatedRobot objects
+		self.robots = []
+		self.robot_actions = []
 
 		# Generate our robots using a list, iterating over all possible zones
 		for num in range(0,4):
@@ -233,6 +218,61 @@ class Simulator():
 			# Construct our robot with appropriate colour and position, and add to our robot list
 			robot = SimulatedRobot(self.space, zone_poly.center(), our_color if side == side_compare else their_color)
 			self.robots.append(robot)
+
+			# Add robot controller for each robot
+			self.robot_actions.append(SimulatedAction(robot))
+
+		#: Key Control / Keyboard Shortcuts
+		self.focus_robot = self.our_attacker_controller
+
+		self.key_map = {
+
+			# Change focus robot
+			ord('1'): lambda sim: sim.change_focus(sim.our_defender_controller),
+			ord('2'): lambda sim: sim.change_focus(sim.their_attacker_controller),
+			ord('3'): lambda sim: sim.change_focus(sim.our_attacker_controller),
+			ord('4'): lambda sim: sim.change_focus(sim.their_defender_controller),
+
+			# Move robot in plane
+			ord('t'): lambda sim: sim.focus_robot.move(0, 60),
+			ord('g'): lambda sim: sim.focus_robot.move(math.pi, 60),
+			ord('h'): lambda sim: sim.focus_robot.move(math.pi/2, 60),
+			ord('f'): lambda sim: sim.focus_robot.move(-math.pi/2, 60),
+
+			# Rotate robot
+			ord('y'): lambda sim: sim.focus_robot.turnBy(math.pi/4),
+			ord('r'): lambda sim: sim.focus_robot.turnBy(-math.pi/4),
+			
+			# Stop robot
+			ord(' '): lambda sim: sim.focus_robot.stop(),
+			
+			# Kick
+			ord(';'): lambda sim: sim.focus_robot.kick(),
+			
+			# Open catcher / Close catcher
+			ord('['): lambda sim: sim.focus_robot.open_catcher(),
+			ord(']'): lambda sim: sim.focus_robot.catch(),
+
+			# Move ball in plane
+			ord('i'): lambda sim: sim.ball.body.apply_impulse(Vec2d(0, -SimulatedBall.BALL_MOVE_SPEED)),
+			ord('j'): lambda sim: sim.ball.body.apply_impulse(Vec2d(-SimulatedBall.BALL_MOVE_SPEED, 0)),
+			ord('l'): lambda sim: sim.ball.body.apply_impulse(Vec2d(SimulatedBall.BALL_MOVE_SPEED, 0)),
+			ord('m'): lambda sim: sim.ball.body.apply_impulse(Vec2d(0, SimulatedBall.BALL_MOVE_SPEED)),
+			ord('k'): lambda sim: sim.ball.stop()
+		}
+
+	def key_pressed(self, key_char):
+		'''Handles the given keypress by indexing into key map.'''
+		if key_char in self.key_map:
+			self.key_map[key_char](self)
+			return True
+
+		return False
+
+	def change_focus(self, robot):
+		'''Changes the focus robot to be the given robot, which is an instance of
+		SimulatedAction.'''
+		self.focus_robot = robot
 
 	@property
 	def control_robot(self):
@@ -263,6 +303,30 @@ class Simulator():
 		''':returns: Returns the opposing defender, as a SimulatedRobot instance
 		'''
 		return self.robots[3] if self.our_side == 'left' else self.robots[0]
+
+	@property
+	def our_attacker_controller(self):
+		''':returns: Returns the attacker belonging to our side, as a SimulatedRobot instance
+		'''
+		return self.robot_actions[2] if self.our_side == 'left' else self.robot_actions[1]
+
+	@property
+	def their_attacker_controller(self):
+		''':returns: Returns the opposing attacker, as a SimulatedRobot instance
+		'''
+		return self.robot_actions[1] if self.our_side == 'left' else self.robot_actions[2]
+
+	@property
+	def our_defender_controller(self):
+		''':returns: Returns the defender belonging to our side, as a SimulatedRobot instance
+		'''
+		return self.robot_actions[0] if self.our_side == 'left' else self.robot_actions[3]
+
+	@property
+	def their_defender_controller(self):
+		''':returns: Returns the opposing defender, as a SimulatedRobot instance
+		'''
+		return self.robot_actions[3] if self.our_side == 'left' else self.robot_actions[0]
 
 	@property
 	def width(self):
