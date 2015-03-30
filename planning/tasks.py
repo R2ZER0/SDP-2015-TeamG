@@ -169,6 +169,10 @@ class AcquireBall(Task):
 				self.turn_task.execute()
 				return
 
+			if self.robot_info.catcher == 'closed':
+				self.robot.open_catcher()
+				self.robot_info.catcher = 'open'
+
 			self.updateMove()
 
 			if self.move_task == None:
@@ -197,12 +201,11 @@ class MirrorObject(Task):
 	def __init__(self,world,robot,role,obj):
 		super(MirrorObject,self).__init__(world,robot,role)
 		self.DISP_TOLERANCE = 30
-		self.TRAJECTORY_CONTROL = 0.2
 		self.obj = obj
 		self.angle = self.robot_info.get_rotation_to_point(self.robot_info.x, obj.y)
-		self.motionHandle = None
+		self.motion_task = None
 		last_speed = 0
-		self.turnHandle = None
+		self.turn_task = None
 	
 	def check(self):
 		return self.robot_info.get_displacement_to_point(self.robot_info.x, self.obj.y) < self.DISP_TOLERANCE
@@ -211,24 +214,23 @@ class MirrorObject(Task):
 		'''Executes another round of this Task.
 		'''
 
-		if self.turnHandle == None:
-			angle = -self.robot_info.get_rotation_to_point(self.obj.x,self.robot_info.y)
-			self.turnHandle = self.robot.turnBy(angle)
-
-		if self.turnHandle.completed:
-			if self.motionHandle == None:
-				self.angle = -self.robot_info.get_rotation_to_point(self.robot_info.x, self.obj.y)
-				self.motionHandle = self.robot.move(self.angle, scale = self.calc_speed())
-				self.last_speed = self.calc_speed()
-			else:
-				if self.motionHandle.completed or self.motionHandle.finished:
-					if not self.check():
-						if abs(-self.robot_info.get_rotation_to_point(self.robot_info.x, self.obj.y) - self.angle) > self.TRAJECTORY_CONTROL:
-							self.turnHandle = None
-						if abs(self.calc_speed() - self.last_speed) > 10:
-							self.motionHandle = None
-					else:
-						self.robot.stop()
+		if self.turn_task == None:
+			self.turn_task = self.TurnToPoint(self.world, self.robot, self.role, self.obj.x, self.obj.y)
+		if not self.turn_task.complete:
+			self.turn_task.execute()
+		else
+			if self.motion_task == None:
+				self.motion_task = MoveToPoint(self.world, self.robot, self.role, self.robot_info.x, self.obj.y, speed = self.calc_speed())
+			if self.check():
+				self.robot.stop()
+				return
+			if math.hypot(0, self.obj.y - self.motion_task.y) > 10:
+				self.motion_task = None
+				return
+			if abs(self.calc_speed() - self.motion_task.speed) > 10:
+				self.motion_task = None
+				return
+			self.motion_task.execute()
 
 	def calc_speed(self):
 		speed = math.sin(self.obj.angle) * self.obj.velocity
