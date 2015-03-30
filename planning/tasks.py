@@ -92,7 +92,7 @@ class MoveToPoint(Task):
 		if self.complete:
 			return
 		if self.motionHandle == None:
-			self.angle = self.new_angle(-self.robot_info.get_rotation_to_point(self.x,self.y))
+			self.angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
 			self.motionHandle = self.robot.move(self.angle, scale = self.speed)
 		else:
 			if self.motionHandle.completed:
