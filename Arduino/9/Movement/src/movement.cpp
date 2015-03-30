@@ -61,7 +61,7 @@ void movement_on_new_command(char cmd, float dir, int spd)
     } else if(cmd == MOVEMENT_COMMAND_TURN) {
         current_command = cmd;
         
-        targetAngle = normalise_angle(dir);
+        targetAngle = normalise_angle(getAngle() + dir);
         turnSpeed = spd;
         finishedTurn = false;
     }

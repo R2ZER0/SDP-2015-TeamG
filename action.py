@@ -140,9 +140,8 @@ class Action():
         return self._cmd_movement('M', angle+math.pi/2, scale)
         
     def turnBy(self, angle, scale=64):
-        target = mkangle(self.curr_dir + angle)
-        #print "Turning from " + str(self.curr_dir) + " to " + str(target)
-        return self._cmd_movement('T', target, scale)
+        #print "Turning from " + str(self.curr_dir) + " by " + str(angle)
+        return self._cmd_movement('T', mkangle(angle), scale)
         
     def stop(self):
         return self._cmd_movement('S', 0, 0)
