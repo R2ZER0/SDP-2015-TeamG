@@ -26,6 +26,7 @@ source venv/bin/activate
 #install dependencies
 pip install Polygon2
 pip install numpy
+pip install PyParsing
 pip install pySerial
 pip install ArgParse
 pip install unittest2
@@ -54,7 +55,7 @@ rm -rf opencv-2.4.10
 rm opencv-2.4.10.zip
 
 #move cv2 to the right directory
-mv venv/lib/python2.7/site-packages/* venv/lib/python2.6/site-packages/
+mv $VIRTUAL_ENV/lib/python2.7/site-packages/* venv/lib/python2.6/site-packages/
 
 #try running the controller
 cd SDP-2015-Group9
