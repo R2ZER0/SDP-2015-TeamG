@@ -164,7 +164,7 @@ class AcquireBall(Task):
 			if self.turn_task == None:
 				self.turn_task = TurnToPoint(self.world, self.robot, self.role, self.world.ball.x, self.world.ball.y)
 				return
-			elif not self.turn_task.complete
+			elif not self.turn_task.complete:
 				self.turn_task.execute()
 				return
 
@@ -183,7 +183,7 @@ class AcquireBall(Task):
 					speed = 60
 				self.move_task = MoveToPoint(self.world, self.robot, self.role, target_x, target_y, speed = speed)
 
-			elif not self.move_task.complete
+			elif not self.move_task.complete:
 				self.move_task.execute()
 
 
