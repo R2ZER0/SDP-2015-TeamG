@@ -37,6 +37,7 @@ void movement_on_new_command(char cmd, float dir, int spd)
     if(cmd == MOVEMENT_COMMAND_STOP) {
 
         wheels_stop();
+        wheels_control_enabled(false);
 
         current_command = cmd;
         motorStop(MOTOR_MOTOR1);
@@ -53,6 +54,7 @@ void movement_on_new_command(char cmd, float dir, int spd)
         calc_motor_speeds(dir, spd, speeds);
 
         // Set desired motor speeds
+        wheels_control_enabled(true);
         wheels_set_target_speeds(speeds);
 
         // We are done! (?)
@@ -61,6 +63,7 @@ void movement_on_new_command(char cmd, float dir, int spd)
     } else if(cmd == MOVEMENT_COMMAND_TURN) {
         current_command = cmd;
         
+        wheels_control_enabled(false);
         targetAngle = normalise_angle(getAngle() + dir);
         turnSpeed = spd;
         finishedTurn = false;
