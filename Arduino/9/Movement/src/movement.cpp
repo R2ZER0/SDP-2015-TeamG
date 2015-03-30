@@ -116,7 +116,7 @@ void service_movement()
         //Serial.print('\t');
         //Serial.println(turnSpeedA);
         
-        if(acw_dist > cw_dist) {
+        if(acw_dist < cw_dist) {
             runMotor(MOTOR_MOTOR1, turnSpeedA);
             runMotor(MOTOR_MOTOR2, turnSpeedB);
             runMotor(MOTOR_MOTOR3, turnSpeedA);
