@@ -14,26 +14,28 @@
 
 char current_command = MOVEMENT_COMMAND_STOP;
 
-float targetAngle = 0.0; // in radians, +PI to -PI
+double targetAngle = 0.0; // in radians, +PI to -PI
 int turnSpeed = 100;
 bool finishedTurn = true;
 
-float normalise_angle(float a) {
+double normalise_angle(double a) {
     while(a > PI) { a -= 2.0*PI; }
     while(a <= (-PI)) { a += 2.0*PI; }
     return a;
 }
 
-void calc_motor_speeds(float angle, int scale, double* speed) {
-    static const float motor_angle[NUM_MOTORS] = {PI/4.0, PI*3.0/4.0, PI*5.0/4.0, PI*7.0/4.0};
+void calc_motor_speeds(double angle, int scale, double* speed) {
+    static const double motor_angle[NUM_MOTORS] = {PI/4.0, PI*3.0/4.0, PI*5.0/4.0, PI*7.0/4.0};
     
     for(int i = 0; i < NUM_MOTORS; ++i) {
-        speed[i] = (double)( (float)scale * (cos(angle) * cos(motor_angle[i]) - sin(angle) * sin(motor_angle[i])) );
+        speed[i] = (double)( (double)scale * (cos(angle) * cos(motor_angle[i]) - sin(angle) * sin(motor_angle[i])) );
     }
 }
 
-void movement_on_new_command(char cmd, float dir, int spd)
+void movement_on_new_command(char cmd, float dir_, int spd)
 {
+    double dir = (double) dir_;
+    
     if(cmd == MOVEMENT_COMMAND_STOP) {
 
         wheels_stop();
@@ -75,15 +77,15 @@ void setup_movement()
     motorAllStop();
 }
 
-float acw_distance(float a, float b) { return (b-a)<0 ? (b - a + PI*2.0) : (b - a); }
-float  cw_distance(float a, float b) { return (a-b)<0 ? (a - b + PI*2.0) : (a - b); }
+double acw_distance(double a, double b) { return (b-a)<0 ? (b - a + PI*2.0) : (b - a); }
+double  cw_distance(double a, double b) { return (a-b)<0 ? (a - b + PI*2.0) : (a - b); }
 
 void service_movement()
 {
     if(!finishedTurn && current_command == MOVEMENT_COMMAND_TURN) {
-        float acw_dist = acw_distance(getAngle(), targetAngle);
-        float cw_dist = cw_distance(getAngle(), targetAngle);
-        float current_distance = (acw_dist < cw_dist) ? acw_dist : cw_dist;
+        double acw_dist = acw_distance(getAngle(), targetAngle);
+        double cw_dist = cw_distance(getAngle(), targetAngle);
+        double current_distance = (acw_dist < cw_dist) ? acw_dist : cw_dist;
         
         // Serial.print(getAngle()); Serial.print(" --> "); Serial.print(targetAngle);
         // Serial.print(" = "); Serial.println(current_distance);
