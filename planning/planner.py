@@ -27,12 +27,18 @@ class Planner:
         grammar = createConfigGrammar()  # Build the grammar used to parse input config files
         self._fsmList = []
         self._dynFsmList = []
+        self._readTexts=[]
 
 
         logger.info("-------- READING AND PARSING FSM SPEC FILES --------")
         for pathStr in fsmSpecFilePaths:
             with open(pathStr, 'r') as fileObj:
                 inputText = fileObj.read()
+                
+                if inputText in self._readTexts:
+                    logger.warning("WARNING: Identified that two input spec files are identical. This could result in VERY undesirable behaviour.")
+                self._readTexts.append(inputText)
+
                 if len(inputText) == 0:
                     logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
                     self._fsmList.append(False)
@@ -43,6 +49,11 @@ class Planner:
         for pathStr in dynPlansPaths:
             with open(pathStr, 'r') as fileObj:
                 inputText = fileObj.read()
+
+                if inputText in self._readTexts:
+                    logger.warning("WARNING: Identified that two input spec files are identical. This could result in VERY undesirable behaviour.")
+                self._readTexts.append(inputText)
+                
                 if len(inputText) == 0:
                     logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
                     self._dynFsmList.append(False)
