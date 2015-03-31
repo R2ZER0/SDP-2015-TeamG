@@ -128,7 +128,7 @@ class Action():
 
     def last_command(self, offset):
         if self.move_handle.cmd == 'M':
-            print "Command Dir: %f Robot_dir %f" %(self.move_handle.dir, offset)
+            
             dx = math.cos(-(self.move_handle.dir - math.pi/2) + offset) * self.move_handle.spd
             dy = math.sin(-(self.move_handle.dir - math.pi/2) + offset) * self.move_handle.spd
             return [dx,dy,0]
