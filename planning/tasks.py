@@ -266,6 +266,7 @@ class KickToPoint(Task):
 			return
 		
 		if self.kickHandle == None:
+			self.robot.open_catcher()
 			self.kickHandle = self.robot.kick()
 
 		if self.kickHandle != None and not self.kickHandle.completed:
