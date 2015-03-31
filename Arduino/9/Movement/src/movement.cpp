@@ -96,7 +96,11 @@ void service_movement()
         
         if(current_distance <= TURN_ACCEPTABLE_RANGE) {
             // We've probably finished!
-            motorAllStop();
+            runMotor(MOTOR_MOTOR1, 0);
+            runMotor(MOTOR_MOTOR2, 0);
+            runMotor(MOTOR_MOTOR3, 0);
+            runMotor(MOTOR_MOTOR4, 0);
+            
             finishedTurn = true;
             command_finished_movement();
             //Serial.println("Finished turn!");
