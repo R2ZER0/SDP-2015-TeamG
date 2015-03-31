@@ -119,7 +119,7 @@ class Planner:
             machineResponse = fsm.consumeInput(truths, self._world, self._robot, self._role)
             if machineResponse != None:
                 for fsm in self._dynFsmList:
-                    if fsm.definingFile == machineResponse and :
+                    if fsm.definingFile == machineResponse:
                         self._fsmList.append(fsm)
         logger.info("---------- end plan step ----------")
         logger.newline()
