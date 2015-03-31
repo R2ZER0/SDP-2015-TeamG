@@ -87,7 +87,7 @@ class Coordinate(object):
 
 class Vector(Coordinate):
 
-    def __init__(self, x, y, angle, velocity, angular_velocity=0):
+    def __init__(self, x, y, angle, velocity, velocity_dir=None, angular_velocity=0):
         '''Assigns the given values and constructs a Vector.
 
         :param x: The x coordinate position, not None
@@ -95,6 +95,7 @@ class Vector(Coordinate):
         :param angle: The angle of this Vector, in radians. The angle must be \
                         not None and in the range [0,2pi]
         :param velocity: The force value for this vector.
+        :param velocity_angle: The direction of the velocity
         :raises ValueError: If the angle is outwith the range [0,2pi], or if \
                         velocity is negative.
         '''
@@ -111,6 +112,7 @@ class Vector(Coordinate):
             self._angle = angle
             self._velocity = velocity
             self._angular_velocity = angular_velocity
+            self._velocity_dir = angle if velocity_dir is None else velocity_dir
 
     @property
     def angle(self):
@@ -121,6 +123,10 @@ class Vector(Coordinate):
     def velocity(self):
         ''':returns: The velocity of this vector'''
         return self._velocity
+
+    @property 
+    def velocity_dir(self):
+        return self._velocity_dir
 
     @property
     def angular_velocity(self):
@@ -220,6 +226,10 @@ class PitchObject(object):
     @property
     def velocity(self):
         return self._vector.velocity
+
+    @property
+    def velocity_dir(self):
+        return self._vector.velocity_dir
 
     @property
     def angular_velocity(self):

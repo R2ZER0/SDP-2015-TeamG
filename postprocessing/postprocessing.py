@@ -98,11 +98,12 @@ class Postprocessing(object):
             # Offset the angle if negative, we only want positive values
             delta_angle = delta_angle % (2*math.pi)
 
-            velocity = hypot(delta_y, delta_x)/(self._time - self._vectors[key]['time'])
+            velocity = hypot(delta_y, delta_x)
+            velocity_dir = atan2(delta_y, delta_x) % (2*pi)
 
-            self._vectors[key]['vec'] = Vector(info['x'], info['y'], info['angle'], velocity)
+            self._vectors[key]['vec'] = Vector(info['x'], info['y'], info['angle'], velocity, velocity_dir)
             self._vectors[key]['time'] = self._time
             
-            return Vector(info['x'], info['y'], info['angle'], velocity)
+            return Vector(info['x'], info['y'], info['angle'], velocity, velocity_dir)
         else:
             return deepcopy(self._vectors[key]['vec'])
