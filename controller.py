@@ -37,7 +37,7 @@ class Controller:
     #: Beginning initialisation time, in seconds.
     INITIALISE_TIME = 3
 
-    def __init__(self, pitch, color, our_side, attack_port, defend_port, video_port=0):
+    def __init__(self, pitch, color, our_side, attack_port, defend_port, video_port=0, fsmSpecFiles):
         '''Initialises the main controller. Constructs all necessary elements; doesn't start until
         run is called.
 
@@ -73,6 +73,8 @@ class Controller:
 
         self.robot9 = Action(comm)
 
+        self.plannerSpecFiles = fsmSpecFiles
+
         # Grab an initial frame to adjust for center position
         frame = self.camera.get_frame()
         center_point = self.camera.get_adjusted_center(frame)
@@ -92,7 +94,7 @@ class Controller:
         self.world = World(our_side, pitch)
 
         # Set up main planner
-        self.planner = Planner(self.world, self.robot9, 'attacker', ['planning/fsmSpec.txt'])
+        self.planner = Planner(self.world, self.robot9, 'attacker', self.plannerSpecFiles)
 
         # Set up GUI
         self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
@@ -351,6 +353,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
 
+    # Planner spec files
+    parser.add_argument('plannerSpecFiles', nargs='*', type=str, help="The location of the planner finite state machine specification files")
+
     # Communication Conditions
     parser.add_argument(
         "-a", "--attacker", default=None, help="Serial port for Attacker communication [Omit for no communications]")
@@ -360,4 +365,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Setup controller with appropriate parameters
-    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, defend_port=args.defender).run()
+    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, defend_port=args.defender, args.plannerSpecFiles).run()
