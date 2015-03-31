@@ -1,5 +1,5 @@
 from action import Action
-from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint, MirrorObject
+from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint, MirrorObject, Shoot
 from planning.planner import Planner
 from planning.models import World
 from vision.vision import Vision, Camera, GUI
@@ -145,11 +145,11 @@ class Controller:
                 counter += 1
 
         center_zone = self.world.pitch.zones[self.world.our_attacker.zone].center()
-        self.task = MoveToPoint(self.world, self.robot9, 'attacker', center_zone[0], center_zone[1])
+        self.task = MirrorObject(self.world, self.robot9, 'attacker',self.world.ball)
 
         # Set up our cache of commands for the predictors
-        self.command_cache = [[0,0,0]]*8
-        self.command = [0,0,0]
+        self.command_cache = [[0,0]]*8
+        self.command = [0,0]
 
         # Set up predictors
         #

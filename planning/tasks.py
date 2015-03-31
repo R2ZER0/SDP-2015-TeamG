@@ -1,6 +1,7 @@
 from utilities import *
 from action import Action
 import time
+import math
 
 '''Task base class. Execute function must be implemented by inheriting
 classes.'''
@@ -255,7 +256,7 @@ class MirrorObject(Task):
         '''
 
         if self.turn_task == None:
-            self.turn_task = self.TurnToPoint(self.world, self.robot, self.role, self.obj.x, self.obj.y)
+            self.turn_task = TurnToPoint(self.world, self.robot, self.role, self.obj.x, self.robot_info.y)
         if not self.turn_task.complete:
             self.turn_task.execute()
         else:
@@ -263,6 +264,9 @@ class MirrorObject(Task):
                 self.motion_task = MoveToPoint(self.world, self.robot, self.role, self.robot_info.x, self.obj.y, speed = self.calc_speed())
             if self.check():
                 self.robot.stop()
+                if abs(self.robot_info.get_rotation_to_point(self.obj.x, self.robot_info.y)) > math.pi/8:
+                    print 'Turn task is none!'
+                    self.turn_task = None
                 return
             if math.hypot(0, self.obj.y - self.motion_task.y) > 10:
                 self.motion_task = None
@@ -274,7 +278,10 @@ class MirrorObject(Task):
 
     def calc_speed(self):
         speed = math.sin(self.obj.angle) * self.obj.velocity
-        return min(100, max(50, speed))
+        speed = min(70, max(60, speed))
+        if abs(self.robot_info.y - self.obj.y) > 40:
+            speed += 10
+        return speed
 
 
 class KickToPoint(Task):
@@ -286,6 +293,8 @@ class KickToPoint(Task):
         self.y = y
         self.turn_task = None
         self.kickHandle = None
+        self.complete = False
+        self.robot.catch()
 
     def execute(self):
         '''Executes another round of this Task. Performs as follows:
@@ -294,7 +303,6 @@ class KickToPoint(Task):
         * Work through check states; checking angle is still on point, \
           opening catcher, waiting, then kicking.
         '''
-
         if self.complete:
             return
 
