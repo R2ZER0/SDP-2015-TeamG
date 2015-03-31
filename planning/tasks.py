@@ -47,7 +47,7 @@ class TurnToPoint(Task):
 
 		if self.turnHandle == None:
 			print '[TurnToPoint]: No TurnHandle assigned, generating new movement.'
-			angle_to_turn = -self.robot_info.get_rotation_to_point(self.x,self.y)
+			angle_to_turn = self.robot_info.get_rotation_to_point(self.x,self.y)
 
 
 			print '[TurnToPoint]: New Angle To Turn: %f' % (angle_to_turn)
