@@ -193,14 +193,15 @@ class Controller:
 
                 self.task.execute()
                 #self.planner.plan()
-                self.command_cache.append(self.robot9.last_command())
+                self.command_cache.append(self.robot9.last_command(self.world.our_attacker.angle))
 
                 # Predict ball position and replace regular ball position with this
                 ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
                 if regular_positions['ball']:
                     regular_positions['ball']['x'] = self.world.ball.vector.x
                     regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
-                self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 4)
+                
+                self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
                 # Information about the grabbers from the world
                 grabbers = {
                     'our_defender': self.world.our_defender.catcher_area,
