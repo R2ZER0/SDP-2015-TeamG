@@ -158,13 +158,13 @@ class KalmanRobotPredictor:
 			       [0, 0, 0, 0, 0, 1]])
 		Ex = np.matrix([[0, 0, 0, 0, 0, 0],
 			       [0, 0, 0, 0, 0, 0],
-			       [0, 0, 0.0001, 0, 0, 0],
+			       [0, 0, 0.001, 0, 0, 0],
 			       [0, 0, 0, 0.1, 0, 0],
 			       [0, 0, 0, 0, 0.1, 0],
-			       [0, 0, 0, 0, 0, 0.0001]])
+			       [0, 0, 0, 0, 0, 0.01]])
 		Ez = np.matrix([[10, 0, 0, 0, 0, 0],
 			       [0, 10, 0, 0, 0, 0],
-			       [0, 0, 0.0005, 0, 0, 0],
+			       [0, 0, 0.005, 0, 0, 0],
 			       [0, 0, 0, 25, 0, 0],
 			       [0, 0, 0, 0, 25, 0],
 			       [0, 0, 0, 0, 0, 0.1]])
@@ -181,7 +181,7 @@ class KalmanRobotPredictor:
 		self.a = acceleration
 
 	def predict(self, control, world, time = 8):
-		print control
+
 		vector = np.array([[world.our_attacker.x],
 						  [world.our_attacker.y],
 						  [world.our_attacker.angle],
@@ -203,29 +203,20 @@ class KalmanRobotPredictor:
 			for z in world._pitch._zones:
 				if z.isInside(new[0], new[1]):
 					zoneNew = z
-			if zoneNew == None:
-				old_vector = world.our_attacker.vector
 
+			if zoneNew is None:
+				old_vector = world.our_attacker.vector
 				old_vector.x = predX.item((0, 0))
 				old_vector.y = predX.item((1, 0))
 				old_vector.angle = predX.item((2, 0)) % (2*math.pi)
-
 				return old_vector
 			predX = new
 			predX[2,0] = predX.item((2, 0)) % (2*math.pi)
-			if predX.item((3, 0)) < 0:
-				predX[3,0] = 0
-			if predX.item((4, 0)) < 0:
-				predX[4,0] = 0
-			if predX.item((5, 0)) < 0:
-				predX[5,0] = 0
 
 		old_vector = world.our_attacker.vector
-
 		old_vector.x = predX.item((0, 0))
 		old_vector.y = predX.item((1, 0))
 		old_vector.angle = predX.item((2, 0)) % (2*math.pi)
-
 		return old_vector
 
 	def convert(self, state, control):
@@ -241,13 +232,13 @@ class KalmanRobotPredictor:
 				else:
 					ax = int(-state.item((3, 0)))
 		if state.item((4, 0)) != control[1]:
-			if control[0] != 0:
+			if control[1] != 0:
 				ay = (control[1] - state.item((4, 0))) / self.a
 			else:
 				if abs(self.friction) < state.item((4, 0)):
 					ay = self.friction
 				else:
-					ay = int(-state.item((3, 0)))
+					ay = int(-state.item((4, 0)))
 		if state.item((5, 0)) != control[2]:
 			if control[2] != 0:
 				ar = control[2] - state.item((5, 0)) / self.a

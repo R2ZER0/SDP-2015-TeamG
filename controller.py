@@ -200,7 +200,7 @@ class Controller:
                 if regular_positions['ball']:
                     regular_positions['ball']['x'] = self.world.ball.vector.x
                     regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
-                self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 1)
+                self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 4)
                 # Information about the grabbers from the world
                 grabbers = {
                     'our_defender': self.world.our_defender.catcher_area,
