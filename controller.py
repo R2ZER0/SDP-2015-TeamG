@@ -191,7 +191,7 @@ class Controller:
                 # TODO: Add Robot 10 prediction here
                 self.command = self.command_cache.pop(0)
 
-                #self.task.execute()
+                self.task.execute()
                 #self.planner.plan()
                 self.command_cache.append(self.robot9.last_command())
 
@@ -201,7 +201,6 @@ class Controller:
                     regular_positions['ball']['x'] = self.world.ball.vector.x
                     regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
                 self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 1)
-                print "(%f,%f, %f)" %(self.world.our_attacker.x, self.world.our_attacker.y, self.world.our_attacker.velocity)
                 # Information about the grabbers from the world
                 grabbers = {
                     'our_defender': self.world.our_defender.catcher_area,

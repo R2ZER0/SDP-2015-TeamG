@@ -212,7 +212,7 @@ class KalmanRobotPredictor:
 
 				return old_vector
 			predX = new
-			predX[2,0] = predX.item((2, 0)) % 2*math.pi
+			predX[2,0] = predX.item((2, 0)) % (2*math.pi)
 			if predX.item((3, 0)) < 0:
 				predX[3,0] = 0
 			if predX.item((4, 0)) < 0:
@@ -224,7 +224,7 @@ class KalmanRobotPredictor:
 
 		old_vector.x = predX.item((0, 0))
 		old_vector.y = predX.item((1, 0))
-		old_vector.angle = predX.item((2, 0))
+		old_vector.angle = predX.item((2, 0)) % (2*math.pi)
 
 		return old_vector
 
