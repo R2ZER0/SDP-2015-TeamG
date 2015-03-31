@@ -98,24 +98,24 @@ class Action():
         # Number of messages received
         self.num_messages_recvd = 0
         
-	if self.comm:
-		# Comms threads
-		self._exit = False
-		def set_exit():
-		    self._exit = True
-		atexit.register(set_exit)
-		
-		self.prev_handler = None
-		def handler(signum, frame):
-		    self._exit = True
-		    self.prev_handler(signum, frame)
-		self.prev_handler = signal.signal(2, handler)
-		
-		self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
-		self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
-		
-		self.recv_thread.start()
-		self.send_thread.start()
+        if self.comm:
+            # Comms threads
+            self._exit = False
+            def set_exit():
+                self._exit = True
+            atexit.register(set_exit)
+            
+            self.prev_handler = None
+            def handler(signum, frame):
+                self._exit = True
+                self.prev_handler(signum, frame)
+            self.prev_handler = signal.signal(2, handler)
+            
+            self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
+            self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
+            
+            self.recv_thread.start()
+            self.send_thread.start()
     
     def exit(self):
         self._exit = True
@@ -132,10 +132,10 @@ class Action():
             dx = math.cos(-(self.move_handle.dir - math.pi/2) + offset) * self.move_handle.spd
             dy = math.sin(-(self.move_handle.dir - math.pi/2) + offset) * self.move_handle.spd
             return [dx,dy,0]
-    	elif self.move_handle.cmd == 'T':
-    		return [0,0,self.move_handle.spd]
-    	else:
-    		return [0,0,0]
+        elif self.move_handle.cmd == 'T':
+            return [0,0,self.move_handle.spd]
+        else:
+            return [0,0,0]
 
     def move(self, angle, scale=64):
         return self._cmd_movement('M', angle+math.pi/2, scale)
@@ -222,12 +222,12 @@ class Action():
     def run_state_processor(self):
         """Processes incoming state messages"""
         while not self._exit:
-	
+    
             self.comm.timeout = 0.1
             line = self.comm.readline()
             line = line.rstrip()
-	    #if not line.startswith('dist'):
-	    #	print line
+        #if not line.startswith('dist'):
+        #    print line
             if line != "":
                 self.process_message(line)
             
