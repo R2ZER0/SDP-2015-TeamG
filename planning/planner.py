@@ -54,8 +54,15 @@ class Planner:
         self._robot=robot
         self._role = role
         # self._fsm.show()
+        logger.info("-------- Planning FSMs --------")
+        logger.newline()
+        logger.newline()
         for fsm in self._fsmList:
             fsm.show()
+
+        logger.info("-------- COMMENCING PLANNING OPERATIONS --------")
+        logger.newline()
+        logger.newline()
 
     def checkTrueConditions(self, fsm):
         """An FSM accepts a list of letters from it's alphabet which reflect conditions in the world
@@ -100,3 +107,8 @@ class Planner:
     def our_robot(self):
         '''Returns the Robot model pertaining to our role.'''
         return self.world.our_attacker if self._role == 'attacker' else self.world.our_defender
+
+    def showFsms(self):
+        for fsm in self._fsms:
+        fsm.show()
+        logger.newline()

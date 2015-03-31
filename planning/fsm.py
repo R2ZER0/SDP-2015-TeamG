@@ -19,7 +19,10 @@ def createFSM(parsedInput, sourceFilePath, logger):
     startState = parsedInput[0][4][1]
 
     # parsedInput[0][5][1] contains the string read which represents the machine final state
-    finalState = parsedInput[0][5][1]
+    finalState = parsedInput[0][5][1:]
+
+    # parsedInput[0][6][1:] contains the string read which represents the next plan spec file to execute (if there is one)
+    nextPlanToInvoke = parsedInput[0][6][1:]
 
     # Create the list which we'll populate with transition tuples of the form
     # (currState, letter1, letter2,..., [TaskName, arg1,arg2,..], newState)
@@ -59,7 +62,9 @@ def createFSM(parsedInput, sourceFilePath, logger):
     if transitionParseError or lambdaParseError:
         return False
     else:
-        return FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
+        logger.newline()
+        logger.info("Parse of file '" + str(sourceFilePath) + "' successful.")
+        return FSM(name, alphabet, states, startState, finalState, nextPlanToInvoke, transitions, dic, lambdas, logger)
 
     # If we're here, everything is valid and we can go ahead and create the FSM
     # fsm = FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
@@ -82,6 +87,9 @@ def createConfigGrammar():
     worldKWD      = Literal("world")
     exisitingKWD  = Literal("EXISTING")
     plannerKWD    = Literal("planner")
+    nextPlanKWD   = Literal("nextPlanOnCompletion")
+    unusedKWD     = Literal("UNUSED")
+    naKWD         = Literal("NA")
 
     # Define the various single-character tokens we wish to recognise
     separator     = Literal(",")
@@ -109,11 +117,20 @@ def createConfigGrammar():
     # A name definition is of the form 'name identifier'
     nameDef       = Group(nameKWD + name)
 
+    # A filename is an alphanumeric word, including a period character
+    fileName      = Word(alphanums+".")
+
     # An alphabet definition is of the form  'inAlph letter1,...'
     inAlphabetDef = Group(inAlphKWD + Group(letter + ZeroOrMore(separator + letter)))
 
     # A states definition list is of the form  'states state1,...'
     statesDef     = Group(statesKWD + Group(state + ZeroOrMore(separator + state)))
+
+    # If there is no next plan to invoke, it is of the form [NA]
+    noNextPlan    = leftSqBrkt + naKWD + rightSqBrkt
+
+    # A new plan is either nextPlanOnCompletion [NA] or nextPlanOnCompletion filename.txt
+    nextPlanDef   = Group(nextPlanKWD + noNextPlan) ^ Group(nextPlanKWD + fileName)
 
     # An initial state definition is of the form  'initialState state1,...'
     initialSDef   = Group(initSKWD + state)
@@ -127,7 +144,7 @@ def createConfigGrammar():
     # A transition is of the form '<stateName, letter1, letter2,..., [TaskName, arg1, arg2,...], newState>'
     transition    = Group(leftAngBrkt + (anyState ^ state) + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
 
-    machineParamSec= machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef
+    machineParamSec= machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef + nextPlanDef
     transitionSec  = transitionsKWD + OneOrMore(transition)
     lambdaSec      = lambdaSecKWD + OneOrMore(lambdaStmt)
 
@@ -204,10 +221,11 @@ def checkAlphabet(alphabet, lambdas, sourceFilePath, logger):
 
 class FSM:
     """Class representing planner finite state machines"""
-    def __init__(self, name, inAlph, states, initState, finalState, transTable, lambdaDict, lambdaDescs, logger):
+    def __init__(self, name, inAlph, states, initState, finalState, nextPlanToInvoke, transTable, lambdaDict, lambdaDescs, logger):
         self._alph = inAlph
         self._states = states
         self._initState = initState
+        self._nextPlan = nextPlanToInvoke
         self._finalState = finalState
         self._lambdas = lambdaDict      # The {letter : lambda} dictionary used in actual computation
         self._lambdaDescs = lambdaDescs # This is a print-friendly form of self._lambdas
@@ -375,7 +393,8 @@ class FSM:
         self._logger.info("Recognised alphabet: " + str(self._alph))
         self._logger.info("States : " + str(self._states))
         self._logger.info("Initial State: " + str(self._initState))
-        self._logger.info("Final State: " + str(self._finalState))
+        self._logger.info("Final State: " + "".join(c for c in self._finalState if c != "[" and c != "]"))
+        self._logger.info("Next plan to invoke: " + "".join(c for c in self._nextPlan if c != "[" and c != "]"))
         self._logger.info("Current State: " + str(self._currentState))
         self._logger.info("Current Task: " + str(self._currentTask))
         self._logger.newline()
