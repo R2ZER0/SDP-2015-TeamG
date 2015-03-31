@@ -1,0 +1,28 @@
+machineParams
+name 			penFsm
+inAlph			ballInZone, notGotBall, gotBall, notAtDest, atDest, shotIncomplete, shotComplete
+states 			starting, gettingBall, movingToTakeShot, takingShot
+initialState	starting
+finalState		unnec
+
+transitions
+<starting, ballInZone, [AcquireBall, world, robot, role], gettingBall>
+<gettingBall, notGotBall, [EXISTING], gettingBall>
+<gettingBall, gotBall, [MoveToPoint, world, robot, role, choose_attacker_destination(world)[0],choose_attacker_destination(world)[1]], movingToTakeShot>
+<movingToTakeShot, notAtDest, [EXISTING], movingToTakeShot>
+<movingToTakeShot, atDest, [Shoot, world, robot, role], takingShot>
+<takingShot, shotIncomplete, [EXISTING], takingShot>
+<takingShot, shotComplete, [MoveToPoint, world, robot, role], starting>
+
+
+lamndaConditions
+"ballInZone" : lambda planner :		planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+
+"notGotBall" : lambda planner :		planner.current_task != None and isinstance(planner.current_task, AcquireBall) and not planner.current_task.complete
+"gotBall" : lambda planner :		planner.current_task != None and isinstance(planner.current_task, AcquireBall) and planner.current_task.complete
+
+"notAtDest" : lambda planner :		planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and not planner.current_task.complete
+"atDest" : lambda planner : 		planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and planner.current_task.complete
+
+"shotIncomplete" : lambda planner : planner.current_task != None and isinstance(planner.current_task, Shoot) and not planner.current_task.complete
+"shotComplete" : lambda planner :	planner.current_task != None and isinstance(planner.current_task, Shoot) and planner.current_task.complete
