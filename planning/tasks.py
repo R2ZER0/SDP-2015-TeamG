@@ -85,18 +85,24 @@ class TurnToPoint(Task):
 class MoveToPoint(Task):
 	'''Movement Task. Travels to point(x,y) within some threshold.
 	'''
-	def __init__(self, world, robot, role, x, y, speed = 60, tolerance = 20):
+	def __init__(self, world, robot, role, x, y, speed = 40, tolerance = 20, vtolerance = 2):
 		super(MoveToPoint,self).__init__(world,robot,role)
 		self.x = x
 		self.y = y
 		self.speed = speed
 		self.motionHandle = None
 		self.DISP_TOLERANCE = tolerance
+                self.VELOCITY_TOLERANCE = vtolerance
 		self.TRAJECTORY_CONTROL = 0.1
+                self.last_displacement = 0
+                self.last_displacement_time = int(round(time.time() * 1000))
+                self.displacement_update_time = 50
+                self.displacement = self.robot_info.get_displacement_to_point(self.x,self.y)
+                self.stopping = False
 
 	
 	def check(self):
-		return self.robot_info.get_displacement_to_point(self.x,self.y) < self.DISP_TOLERANCE
+                return (self.robot_info.get_displacement_to_point(self.x,self.y) < self.DISP_TOLERANCE)
 
 	def angle_tolerance(self):
 		if self.robot_info.get_displacement_to_point(self.x,self.y) > 100:
@@ -110,28 +116,31 @@ class MoveToPoint(Task):
 		* Check if our angle is on target; if not, adjust by rotating.
 		* Otherwise, we're done.
 		'''
-		if self.complete:
-			return
-		if self.motionHandle == None:
-			self.angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
-			self.motionHandle = self.robot.move(self.angle, scale = self.speed)
-		else:
-			if self.motionHandle.completed:
-				if not self.check():
-					if abs(-self.robot_info.get_rotation_to_point(self.x,self.y) - self.angle) < self.angle_tolerance():
-						pass
-					else:
-						motionHandle = None
-				else:
-					self.motionHandle = self.robot.stop()
-					self.complete = True
-			elif self.motionHandle.finished:
-				if self.check():
-					self.complete = True
-					self.robot.stop()
-				else:
-					self.motionHandle = None
 
+                if self.complete:
+                        return
+                
+                if int(round(time.time() * 1000)) - self.last_displacement_time > self.displacement_update_time:
+                        self.displacement = self.robot_info.get_displacement_to_point(self.x,self.y)
+                        self.last_displacement = self.displacement
+                        self.last_displacement_time = int(round(time.time() * 1000))
+
+                if not self.stopping:
+                        if not self.check():
+                                if self.displacement - self.last_displacement > 0:
+                                        self.motionHandle = self.robot.stop()
+                                        self.stopping = True
+                        else:
+                                self.motionHandle = self.robot.stop()
+                                self.stopping = True
+                else:
+                        if self.robot_info.velocity < self.VELOCITY_TOLERANCE:
+                                if not self.check():
+                                        self.angle = -self.robot_info.get_rotation_to_point(self.x,self.y)
+                                        self.motionHandle = self.robot.move(self.angle, scale = self.speed)
+                                        self.stopping = False
+                                else:
+                                        self.complete = True
 
 class AcquireBall(Task):
 	'''Acquire Ball task. Rotate to face the ball, move to an appropriate

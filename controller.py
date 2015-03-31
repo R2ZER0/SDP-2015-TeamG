@@ -117,7 +117,7 @@ class Controller:
 
                 # Update world state
                 self.world.update_positions(model_positions)
-
+                
                 # Information about the grabbers from the world
                 grabbers = {
                     'our_defender': self.world.our_defender.catcher_area,
@@ -145,7 +145,7 @@ class Controller:
                 counter += 1
 
         center_zone = self.world.pitch.zones[self.world.our_attacker.zone].center()
-        self.task = MoveToPoint(self.world, self.robot9, 'attacker', self.world.our_attacker.x, self.world.our_attacker.y+50)
+        self.task = MoveToPoint(self.world, self.robot9, 'attacker', center_zone[0], center_zone[1])
 
         # Set up our cache of commands for the predictors
         self.command_cache = [[0,0,0]]*8

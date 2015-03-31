@@ -181,7 +181,6 @@ class KalmanRobotPredictor:
 		self.a = acceleration
 
 	def predict(self, control, world, time = 8):
-
 		vector = np.array([[world.our_attacker.x],
 						  [world.our_attacker.y],
 						  [world.our_attacker.angle],
