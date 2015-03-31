@@ -95,8 +95,8 @@ class KalmanBallPredictor:
 
 		old_vector = world.ball.vector
 		
-		#old_vector.x = predX[0]
-		#old_vector.y = predX[1]
+		old_vector.x = predX[0]
+		old_vector.y = predX[1]
 		#for x in predX:
 		#	print x,
 		#print
@@ -181,6 +181,7 @@ class KalmanRobotPredictor:
 		self.a = acceleration
 
 	def predict(self, control, world, time = 8):
+		print control
 		vector = np.array([[world.our_attacker.x],
 						  [world.our_attacker.y],
 						  [world.our_attacker.angle],
@@ -202,12 +203,12 @@ class KalmanRobotPredictor:
 			for z in world._pitch._zones:
 				if z.isInside(new[0], new[1]):
 					zoneNew = z
-			if zoneNew == z:
+			if zoneNew == None:
 				old_vector = world.our_attacker.vector
 
-				#old_vector.x = predX.item((0, 0))
-				#old_vector.y = predX.item((1, 0))
-				#old_vector.angle = predX.item((2, 0)) % (2*math.pi)
+				old_vector.x = predX.item((0, 0))
+				old_vector.y = predX.item((1, 0))
+				old_vector.angle = predX.item((2, 0)) % (2*math.pi)
 
 				return old_vector
 			predX = new
@@ -221,9 +222,9 @@ class KalmanRobotPredictor:
 
 		old_vector = world.our_attacker.vector
 
-		#old_vector.x = predX.item((0, 0))
-		#old_vector.y = predX.item((1, 0))
-		#old_vector.angle = predX.item((2, 0))
+		old_vector.x = predX.item((0, 0))
+		old_vector.y = predX.item((1, 0))
+		old_vector.angle = predX.item((2, 0))
 
 		return old_vector
 
