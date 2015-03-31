@@ -184,8 +184,8 @@ class KalmanRobotPredictor:
 		vector = np.array([[world.our_attacker.x],
 						  [world.our_attacker.y],
 						  [world.our_attacker.angle],
-						  [math.cos(world.our_attacker.angle)*world.our_attacker.velocity],
-						  [math.sin(world.our_attacker.angle)*world.our_attacker.velocity],
+						  [math.cos(world.our_attacker.velocity_dir)*world.our_attacker.velocity],
+						  [math.sin(world.our_attacker.velocity_dir)*world.our_attacker.velocity],
 						  [0]])
 		control = np.array(control).transpose()
 		zone = None
