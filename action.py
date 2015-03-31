@@ -12,7 +12,7 @@ class ActionHandle(object):
         self._finished = False
         self._completed = False
         self._running = False
-        self.idx = idx
+        self.idx = (idx % 512)
         self.cmd = cmd
 
     @property
@@ -243,7 +243,8 @@ class Action():
             self._send_event.clear()
             
             if self.num_messages_recvd > 10:
-                message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
+                # Fixed size message of 43 chars
+                message = "({0:> 5d} {1} {2:> 5d} {3:> 4d} {4:> 5d} {5} {6} {7:> 5d} {8} {9:> 4d})".format(
                     self.move_handle.idx, self.move_handle.cmd, f2i(self.move_handle.dir), self.move_handle.spd,
                     self.kick_handle.idx, self.kick_handle.cmd, self.kick_handle.spd,
                     self.catch_handle.idx, self.catch_handle.cmd, self.catch_handle.spd
