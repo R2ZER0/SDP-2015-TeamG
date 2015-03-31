@@ -239,7 +239,7 @@ class Action():
     def run_state_sender(self):
         """Sends out state messages"""
         while not self._exit:
-            self._send_event.wait(0.120)
+            self._send_event.wait(0.064)
             self._send_event.clear()
             
             if self.num_messages_recvd > 10:
