@@ -19,10 +19,10 @@ def createFSM(parsedInput, sourceFilePath, logger):
     startState = parsedInput[0][4][1]
 
     # parsedInput[0][5][1] contains the string read which represents the machine final state
-    finalState = parsedInput[0][5][1:]
+    finalState = "".join(c for c in parsedInput[0][5][1:] if c != "[" and c != "]")
 
     # parsedInput[0][6][1:] contains the string read which represents the next plan spec file to execute (if there is one)
-    nextPlanToInvoke = parsedInput[0][6][1:]
+    nextPlanToInvoke = "".join(c for c in parsedInput[0][6][1:] if c != "[" and c != "]")
 
     # Create the list which we'll populate with transition tuples of the form
     # (currState, letter1, letter2,..., [TaskName, arg1,arg2,..], newState)
@@ -58,8 +58,9 @@ def createFSM(parsedInput, sourceFilePath, logger):
     checkAlphabet(alphabet, dic, sourceFilePath, logger)
     transitionParseError = checkTransitions(alphabet, transitions, sourceFilePath, states, logger)
     lambdaParseError = checkLambdas(alphabet, dic, sourceFilePath, logger)
+    finalStateConsistencyError = checkFinalStateConsistencies(finalState, nextPlanToInvoke, sourceFilePath, logger)
 
-    if transitionParseError or lambdaParseError:
+    if transitionParseError or lambdaParseError or finalStateConsistencyError:
         return False
     else:
         logger.newline()
@@ -218,6 +219,13 @@ def checkAlphabet(alphabet, lambdas, sourceFilePath, logger):
             logger.newline()
             logger.warning("PARSE WARNING: The FSM alphabet letter '" + str(letter) + "' has no corresponding lambda condition trigger in spec file '" + str(sourceFilePath) + "'.")
 
+def checkFinalStateConsistencies(finalState, nextPlanSpec, sourceFilePath, logger):
+    if finalState == 'UNUSED' and nextPlanSpec != "NA":
+        logger.error("PARSE ERROR: Machine specified in file '" + str(sourceFilePath) + "' wants to execute a new plan ('" + str(nextPlanSpec) + "') upon it's own completion - however, this can never happen since there is no final state defined.")
+        return True
+    elif finalState == 'UNUSED' and nextPlanSpec != "NA":
+        logger.error("PARSE ERROR: Machine specified in file '" + str(sourceFilePath) + "' defines a final state, but no new plan to invoke after settling in this state.")
+        return True
 
 class FSM:
     """Class representing planner finite state machines"""
@@ -393,8 +401,8 @@ class FSM:
         self._logger.info("Recognised alphabet: " + str(self._alph))
         self._logger.info("States : " + str(self._states))
         self._logger.info("Initial State: " + str(self._initState))
-        self._logger.info("Final State: " + "".join(c for c in self._finalState if c != "[" and c != "]"))
-        self._logger.info("Next plan to invoke: " + "".join(c for c in self._nextPlan if c != "[" and c != "]"))
+        self._logger.info("Final State: " + self._finalState)
+        self._logger.info("Next plan to invoke: " + self._nextPlan)
         self._logger.info("Current State: " + str(self._currentState))
         self._logger.info("Current Task: " + str(self._currentTask))
         self._logger.newline()
