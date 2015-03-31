@@ -46,18 +46,38 @@ class TurnToPoint(Task):
 			return
 
 		if self.turnHandle == None:
+			print '[TurnToPoint]: No TurnHandle assigned, generating new movement.'
 			angle_to_turn = -self.robot_info.get_rotation_to_point(self.x,self.y)
+
+
+			print '[TurnToPoint]: New Angle To Turn: %f' % (angle_to_turn)
 			self.turnHandle = self.robot.turnBy(angle_to_turn)
+
 		else:
 			if self.turnHandle.completed:
+				print '[TurnToPoint]: TurnHandle completed.'
+
 				if self.check():
+
+					print '[TurnToPoint]: Within tolerance of angle, complete is True.'
 					self.complete = True
 				else:
+
+					print '[TurnToPoint]: Outwith tolerance, resetting TurnHandle.'
 					self.turnHandle = None
+
 			elif self.turnHandle.finished:
+
+
+				print '[TurnToPoint]: TurnHandle finished, but not complete.'
 				if abs(self.robot_info.angular_velocity) < 0.1 and self.check():
+
+
+					print '[TurnToPoint]: Robot stopped, and within tolerance.'
 					self.complete = True
 				else:
+
+					print '[TurnToPoint]: Robot outwith tolerance, resetting TurnHandle.'
 					self.turnHandle = None
 			else:
 				pass
@@ -65,7 +85,7 @@ class TurnToPoint(Task):
 class MoveToPoint(Task):
 	'''Movement Task. Travels to point(x,y) within some threshold.
 	'''
-	def __init__(self, world, robot, role, x, y, speed = 100, tolerance = 20):
+	def __init__(self, world, robot, role, x, y, speed = 60, tolerance = 20):
 		super(MoveToPoint,self).__init__(world,robot,role)
 		self.x = x
 		self.y = y
@@ -218,7 +238,7 @@ class MirrorObject(Task):
 			self.turn_task = self.TurnToPoint(self.world, self.robot, self.role, self.obj.x, self.obj.y)
 		if not self.turn_task.complete:
 			self.turn_task.execute()
-		else
+		else:
 			if self.motion_task == None:
 				self.motion_task = MoveToPoint(self.world, self.robot, self.role, self.robot_info.x, self.obj.y, speed = self.calc_speed())
 			if self.check():
