@@ -143,7 +143,10 @@ class Controller:
                     defenderState, attacker_actions, defender_actions, grabbers,
                     our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
                 counter += 1
-        
+
+        center_zone = self.world.pitch.zones[self.world.our_attacker.zone].center()
+        self.task = MoveToPoint(self.world, self.robot9, 'attacker', self.world.our_attacker.x, self.world.our_attacker.y+50)
+
         # Set up our cache of commands for the predictors
         self.command_cache = [[0,0,0]]*8
         self.command = [0,0,0]
@@ -187,6 +190,8 @@ class Controller:
                 #
                 # TODO: Add Robot 10 prediction here
                 self.command = self.command_cache.pop(0)
+
+                self.task.execute()
                 #self.planner.plan()
                 self.command_cache.append(self.robot9.last_command())
 
@@ -195,7 +200,7 @@ class Controller:
                 if regular_positions['ball']:
                     regular_positions['ball']['x'] = self.world.ball.vector.x
                     regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
-                self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
+                self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 5)
 
                 # Information about the grabbers from the world
                 grabbers = {
