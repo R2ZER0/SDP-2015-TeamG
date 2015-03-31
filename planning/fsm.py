@@ -380,9 +380,18 @@ class FSM:
 
                     # return
                     
-        # If we get here, we looped through the entire set of transitions and didn't find any that applied
-        # in the current situation.
-        self._logger.info("FSM '" + self._name + " reports there is no transition entry for current state " + self._currentState + " and input '" + str(inp) + "'")
+       
+        if self._finalState != "UNUSED" and self._finalState == self.currentState:
+            # Here, the current FSM has entered it's final state and is done executing. We inform the users and 
+            # return the next plan to execute, if there is one
+            self._logger.info("FSM '" + self._name + " has entered it's final state and ceased running. ")
+            return self._nextPlan
+        else:
+             # If we get here, we looped through the entire set of transitions and didn't find any that applied
+             # in the current situation.
+            self._logger.info("FSM '" + self._name + " reports there is no transition entry for current state " + self._currentState + " and input '" + str(inp) + "'")
+
+      
 
     def getStates(self):
         return self._states
