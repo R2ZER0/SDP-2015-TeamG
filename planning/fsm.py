@@ -65,7 +65,7 @@ def createFSM(parsedInput, sourceFilePath, logger):
     else:
         logger.newline()
         logger.info("Parse of file '" + str(sourceFilePath) + "' successful.")
-        return FSM(name, alphabet, states, startState, finalState, nextPlanToInvoke, transitions, dic, lambdas, logger)
+        return FSM(name, alphabet, states, startState, finalState, sourceFilePath, nextPlanToInvoke, transitions, dic, lambdas, logger)
 
     # If we're here, everything is valid and we can go ahead and create the FSM
     # fsm = FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
@@ -229,10 +229,11 @@ def checkFinalStateConsistencies(finalState, nextPlanSpec, sourceFilePath, logge
 
 class FSM:
     """Class representing planner finite state machines"""
-    def __init__(self, name, inAlph, states, initState, finalState, nextPlanToInvoke, transTable, lambdaDict, lambdaDescs, logger):
+    def __init__(self, name, inAlph, states, initState, finalState, sourceFilePath, nextPlanToInvoke, transTable, lambdaDict, lambdaDescs, logger):
         self._alph = inAlph
         self._states = states
         self._initState = initState
+        self._definingFile = sourceFilePath
         self._nextPlan = nextPlanToInvoke
         self._finalState = finalState
         self._lambdas = lambdaDict      # The {letter : lambda} dictionary used in actual computation
@@ -251,6 +252,10 @@ class FSM:
     def currentTask(self):
         '''Returns the current task instance run by the FSM.'''
         return self._currentTask
+
+    @property
+    def definingFile(self):
+        return self._definingFile
 
     @property
     def currentState(self):
@@ -405,13 +410,14 @@ class FSM:
     def show(self):
         self._logger.newline()
         self._logger.info("------------------------------------------------------------------------------------------------------------------------------")
-        self._logger.info("FSM '" + self._name + "'")
+        self._logger.info("FSM '" + str(self._name + "'"))
+        self._logger.info("Defining file: " + str(self._definingFile))
         self._logger.newline()
         self._logger.info("Recognised alphabet: " + str(self._alph))
         self._logger.info("States : " + str(self._states))
         self._logger.info("Initial State: " + str(self._initState))
-        self._logger.info("Final State: " + self._finalState)
-        self._logger.info("Next plan to invoke: " + self._nextPlan)
+        self._logger.info("Final State: " + str(self._finalState))
+        self._logger.info("Next plan to invoke: " + str(self._nextPlan))
         self._logger.info("Current State: " + str(self._currentState))
         self._logger.info("Current Task: " + str(self._currentTask))
         self._logger.newline()
