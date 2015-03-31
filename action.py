@@ -114,6 +114,8 @@ class Action():
             self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
             self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
             
+            self._send_event = threading.Event()
+            
             self.recv_thread.start()
             self.send_thread.start()
     
@@ -124,6 +126,7 @@ class Action():
     def _cmd_movement(self, cmd, angle, scale):
         self.move_handle._onNextCommand()
         self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
+        self._send_event.set()
         return self.move_handle
 
     def last_command(self, offset):
@@ -151,12 +154,14 @@ class Action():
     def kick(self, scale=100):
         self.kick_handle._onNextCommand()
         self.kick_handle = KickerActionHandle(self.kick_handle.idx+1, 'K', scale)
+        self._send_event.set()
         return self.kick_handle
     
     # Catcher commands
     def _cmd_catcher(self, cmd, scale):
         self.catch_handle._onNextCommand()
         self.catch_handle = CatcherActionHandle(self.catch_handle.idx+1, cmd, scale)
+        self._send_event.set()
         return self.catch_handle
     
     def catch(self, scale=100):
@@ -234,7 +239,8 @@ class Action():
     def run_state_sender(self):
         """Sends out state messages"""
         while not self._exit:
-            time.sleep(0.120)
+            self._send_event.wait(0.120)
+            self._send_event.clear()
             
             if self.num_messages_recvd > 10:
                 message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
