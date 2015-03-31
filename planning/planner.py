@@ -11,7 +11,7 @@ class Planner:
 
     def __init__(self, world, robot, role, fsmSpecFilePaths):
 
-        logger = createLogger("PlannerLogging")
+        logger = createLogger("Planner")
         logger.info("Using the following finite state machine spec files:")
         logger.newline()
         for path in fsmSpecFilePaths:
@@ -25,7 +25,7 @@ class Planner:
             with open(pathStr, 'r') as fileObj:
                 inputText = fileObj.read()
                 if len(inputText) == 0:
-                    logger.info("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
+                    logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
                     fsmList.append(False)
                 else: 
                     parseRes = grammar.parseString(inputText)
@@ -34,7 +34,7 @@ class Planner:
 
         if False in self._fsmList:
             logger.newline()
-            logger.info("-------- PARSING FAILURE - Terminating due to the parse errors detailed above --------")
+            logger.error("-------- PARSING FAILURE - Terminating due to the parse errors detailed above --------")
             logger.newline()
             quit()
         else:

@@ -163,7 +163,7 @@ def checkTransitions(alphabet, transitions, sourceFilePath, states, logger):
     errorDiscovered=False                                                        
     if transitions[0][len(transitions[0]) - 2 : len(transitions[0]) - 1] == (['[', 'EXISTING', ']'],):
         logger.newline()                                                       # HACKY, CLEAN UP^^
-        logger.info("PARSE ERROR: Attempted invocation of existing task in very first transition in '" + str(sourceFilePath) + "'. Invalid since there won't be an existing task to execute.")
+        logger.error("PARSE ERROR: Attempted invocation of existing task in very first transition in '" + str(sourceFilePath) + "'. Invalid since there won't be an existing task to execute.")
         errorDiscovered = True
 
     for transition in transitions:
@@ -172,15 +172,15 @@ def checkTransitions(alphabet, transitions, sourceFilePath, states, logger):
             """Check each letter valid"""
             if not candidateLetter in alphabet:
                 logger.newline()
-                logger.info("PARSE ERROR: Encountered a transition statement which refers to unrecognised alphabet letters - namely: '" + str(candidateLetter) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
+                logger.error("PARSE ERROR: Encountered a transition statement which refers to unrecognised alphabet letters - namely: '" + str(candidateLetter) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
                 errorDiscovered = True
         if transition[0] not in list(states) + ["*"]:
             logger.newline()
-            logger.info("PARSE ERORR: Encountered an unrecognised state '" + str(transition[0]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
+            logger.error("PARSE ERORR: Encountered an unrecognised state '" + str(transition[0]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
             errorDiscovered = True
         if transition[len(transition) - 1] not in list(states) + ["*"]:
             logger.newline()
-            logger.info("PARSE ERROR: Encountered an unrecognised state '" + str(transition[len(transition) - 1]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
+            logger.error("PARSE ERROR: Encountered an unrecognised state '" + str(transition[len(transition) - 1]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
             errorDiscovered = True
     return errorDiscovered
 
@@ -191,7 +191,7 @@ def checkLambdas(alphabet, lambdas, sourceFilePath, logger):
     for key, code in lambdas.iteritems():
         if not key in alphabet:
             logger.newline()
-            logger.info("PARSE ERROR: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + str(key) + "' in file '" + str(sourceFilePath) + "'.")
+            logger.error("PARSE ERROR: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + str(key) + "' in file '" + str(sourceFilePath) + "'.")
             errorDiscovered = True
     return errorDiscovered
 
@@ -199,7 +199,7 @@ def checkAlphabet(alphabet, lambdas, sourceFilePath, logger):
     for letter in alphabet:
         if letter not in lambdas.keys():
             logger.newline()
-            logger.info("PARSE WARNING: The FSM alphabet letter '" + str(letter) + "' has no corresponding lambda condition trigger in spec file '" + str(sourceFilePath) + "'.")
+            logger.warning("PARSE WARNING: The FSM alphabet letter '" + str(letter) + "' has no corresponding lambda condition trigger in spec file '" + str(sourceFilePath) + "'.")
 
 
 class FSM:
