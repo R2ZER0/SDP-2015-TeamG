@@ -20,6 +20,9 @@ develop-eggs
 lib64
 __pycache__
 
+# planning code logs
+.log
+
 # Installer logs
 pip-log.txt
 
