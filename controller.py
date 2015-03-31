@@ -37,7 +37,7 @@ class Controller:
     #: Beginning initialisation time, in seconds.
     INITIALISE_TIME = 3
 
-    def __init__(self, pitch, color, our_side, attack_port, defend_port, video_port=0, fsmSpecFiles):
+    def __init__(self, pitch, color, our_side, attack_port, defend_port, video_port=0, fsmInitialRunSpecFiles, fsmDynSpecFiles):
         '''Initialises the main controller. Constructs all necessary elements; doesn't start until
         run is called.
 
@@ -73,7 +73,8 @@ class Controller:
 
         self.robot9 = Action(comm)
 
-        self.plannerSpecFiles = fsmSpecFiles
+        self.plannerSpecFiles = fsmInitialRunSpecFiles
+        self.plannerDynSpecFiles = fsmDynSpecFiles
 
         # Grab an initial frame to adjust for center position
         frame = self.camera.get_frame()
@@ -94,7 +95,7 @@ class Controller:
         self.world = World(our_side, pitch)
 
         # Set up main planner
-        self.planner = Planner(self.world, self.robot9, 'attacker', self.plannerSpecFiles)
+        self.planner = Planner(self.world, self.robot9, 'attacker', self.plannerSpecFiles, self.plannerDynSpecFiles)
 
         # Set up GUI
         self.GUI = GUI(calibration=self.calibration, pitch=self.pitch)
@@ -353,8 +354,11 @@ if __name__ == '__main__':
     parser.add_argument(
         '-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
 
-    # Planner spec files
-    parser.add_argument('plannerSpecFiles', nargs='*', type=str, help="The location of the planner finite state machine specification files")
+    # Planner std spec files
+    parser.add_argument('plannerSpecFiles', nargs='*', type=str, help="The location of the planner finite state machine specification files that begin running with the planner")
+
+    # Planner dyn spec files
+    parser.add_argument('plannerDynSpecFiles', nargs='*', type=str, help="The location of the planner finite state machine specification files that are to be used dynamically")
 
     # Communication Conditions
     parser.add_argument(
@@ -365,4 +369,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Setup controller with appropriate parameters
-    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, defend_port=args.defender, args.plannerSpecFiles).run()
+    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, defend_port=args.defender, args.plannerSpecFiles, args.plannerDynSpecFiles).run()
