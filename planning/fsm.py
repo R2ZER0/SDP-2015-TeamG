@@ -137,7 +137,7 @@ def createConfigGrammar():
     initialSDef   = Group(initSKWD + state)
 
     # A final state definition is of the form  'finalState stateName'
-    finalSDef     = Group(finalSKWD + state)
+    finalSDef     = Group(finalSKWD + state) ^ Group(finalSKWD + leftSqBrkt + unusedKWD + rightSqBrkt)
 
     # A lambda statement is of the form '"alphabetLetter" : lambda planner : code', where code is an alphanumeric 'word', with >< .+-(),\t\n characters
     lambdaStmt    = Group(sMark + letter + sMark + colon + lambdaKWD + plannerKWD + colon + Word(alphanums + "/>< .+-[]_!'=(),\t\n"))
@@ -151,6 +151,7 @@ def createConfigGrammar():
 
     # Config is the 'root' of the parse
     config         = Group(machineParamSec) + Group(transitionSec) + Group(lambdaSec)
+
 
     return config
 
@@ -305,7 +306,7 @@ class FSM:
         assert set(inp) <= set(self._alph) 
 
         # If this FSM is not active, it should not do anything - so we return 
-        if not self._active return
+        if not self._active: return
 
         # Consider each possible transition
         for tran in sorted(self._transTable, key=lambda t : 1 if t[0] == "*" else 10):
