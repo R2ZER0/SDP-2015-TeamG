@@ -52,12 +52,6 @@ def createFSM(parsedInput, sourceFilePath, logger):
     # Build the actual letter:lambda dictionary
     dic = consumeLambdas(lambdas)
 
-    # Perform sanity checks on what we've read 
-    # checkAlphabet(alphabet, lambdas, sourceFilePath)
-    # checkTransitions(alphabet, transitions, sourceFilePath)
-    # checkLambdas(alphabet, dic, sourceFilePath)
-
-    
     checkAlphabet(alphabet, dic, sourceFilePath, logger)
     transitionParseError = checkTransitions(alphabet, transitions, sourceFilePath, states, logger)
     lambdaParseError = checkLambdas(alphabet, dic, sourceFilePath, logger)
@@ -66,13 +60,10 @@ def createFSM(parsedInput, sourceFilePath, logger):
     if transitionParseError or lambdaParseError or finalStateConsistencyError:
         return False
     else:
+        # If we're here, everything is valid and we can go ahead and create the FSM
         logger.newline()
         logger.info("Parse of file '" + str(sourceFilePath) + "' successful.")
         return FSM(name, alphabet, states, startState, finalState, initiallyActive, sourceFilePath, nextPlanToInvoke, transitions, dic, lambdas, logger)
-
-    # If we're here, everything is valid and we can go ahead and create the FSM
-    # fsm = FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
-    # return fsm
 
 def createConfigGrammar():
     """Here, we define the PyParsing grammar to use when executing a parse run of an FSM
@@ -236,6 +227,7 @@ def checkFinalStateConsistencies(finalState, nextPlanSpec, sourceFilePath, logge
         logger.error("PARSE ERROR: Machine specified in file '" + str(sourceFilePath) + "' defines a final state, but no new plan to invoke after settling in this state.")
         return True
 
+
 class FSM:
     """Class representing planner finite state machines"""
     def __init__(self, name, inAlph, states, initState, finalState, initiallyActive, sourceFilePath, nextPlanToInvoke, transTable, lambdaDict, lambdaDescs, logger):
@@ -245,10 +237,10 @@ class FSM:
         self._definingFile = sourceFilePath
 
         if initiallyActive == "YES":
-            self._active = self._active = True
+            self._active = self._InitiallyActive = True
         else:
-            self._active = self._active = False
-            
+            self._active = self._InitiallyActive = False
+
         self._nextPlan = nextPlanToInvoke
         self._finalState = finalState
         self._lambdas = lambdaDict      # The {letter : lambda} dictionary used in actual computation
@@ -260,24 +252,8 @@ class FSM:
         self._name = name
 
         self._currentState = self._initState
-        # self._currentTask = AcquireBall(world,robot,"attacker")  #HACK
         self._currentTask = None
 
-    @property
-    def currentTask(self):
-        '''Returns the current task instance run by the FSM.'''
-        return self._currentTask
-
-    @property
-    def definingFile(self):
-        return self._definingFile
-
-    @property
-    def currentState(self):
-        return self._currentState
-
-    def setActive():
-        self._active = True
 
     def executeExistingTask(self):
         """tran[len(tran) - 2][1] contains the name of the task the input file
@@ -361,13 +337,6 @@ class FSM:
                     self.executeExistingTask()
                     self._currentState = tran[len(tran) - 1] 
                     return 
-                    # """tran[len(tran) - 2][1] contains the name of the task the input file
-                    # specifies to execute when leaving the current state. If EXISITING has 
-                    # been given, it is desired the current task continues executing."""
-                    # print "FSM '"+ self._name + "' executing exisiting task"
-                    # self._currentTask.execute()
-                    # print
-                    # return
                 else:
                     """If we have something other than EXISTING, a task name with arguments has
                     been given. So, we create a list of relevant information, filtering out detritus 
@@ -380,54 +349,22 @@ class FSM:
                     self.executeNewTask(tran, world, robot, role)
                     self._currentState = tran[len(tran) - 1] 
                     return
-                    # # Handle list elements that are nested [] brackets
-                    # t = []
-                    # for index, element in enumerate(tran[len(tran)-2]):
-
-                    #     # Ignore separator characters
-                    #     if element in [",", "[", "]"]:
-                    #         continue
-
-                    #     # Concatenate nested square bracket elements onto last
-                    #     elif type(element) == list:
-                    #         t[-1] = t[-1] + '[%s]' % ''.join(element)
-
-                    #     # Add normal elements into the list
-                    #     else:
-                    #         t.append(element)
-
-                    # code = t[0] + "(" + ','.join(t[1:]) + ")"
-
-                    # print "FSM '" + self._name + "' changing to execute new task - " + str(t[0]) + " with args " + "(" + ','.join(t[1:]) + ")"
-                    # self._currentTask = eval(code)
-                    # self._currentTask.execute()
-                    # print
-
-                    # return
                     
-       
         if self._finalState != "UNUSED" and self._finalState == self.currentState:
             # Here, the current FSM has entered it's final state and is done executing. We inform the users and 
             # return the next plan to execute, if there is one
             self._logger.info("FSM '" + self._name + " has entered it's final state and ceased running. ")
+
             # Machine has finished it's run, so should become inactive
             self._active = False
+
+            # Upon entering it's final state, the machine should make this known to the planner. It does this by
+            # returning the filename of the next fsm spec to make active (as opposed to None as usual).
             return self._nextPlan
         else:
-             # If we get here, we looped through the entire set of transitions and didn't find any that applied
-             # in the current situation.
+            # If we get here, we looped through the entire set of transitions and didn't find any that applied
+            # in the current situation.
             self._logger.info("FSM '" + self._name + " reports there is no transition entry for current state " + self._currentState + " and input '" + str(inp) + "'")
-
-      
-
-    def getStates(self):
-        return self._states
-
-    def getAlpha(self):
-        return self._alph
-
-    def getLambdaDic(self):
-        return self._lambdas
 
     def show(self):
         self._logger.newline()
@@ -454,3 +391,30 @@ class FSM:
             self._logger.info(lambdaDesc)
         self._logger.info("------------------------------------------------------------------------------------------------------------------------------")
         self._logger.newline()
+
+
+    @property
+    def currentTask(self):
+        '''Returns the current task instance run by the FSM.'''
+        return self._currentTask
+
+    @property
+    def definingFile(self):
+        return self._definingFile
+
+    @property
+    def currentState(self):
+        return self._currentState
+
+    def setActive():
+        self._active = True
+
+    def getStates(self):
+        return self._states
+
+    def getAlpha(self):
+        return self._alph
+
+    def getLambdaDic(self):
+        return self._lambdas
+

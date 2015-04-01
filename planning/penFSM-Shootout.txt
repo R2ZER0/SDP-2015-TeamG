@@ -1,10 +1,11 @@
 machineParams
-name 			penFsm
-inAlph			ballInZone, notGotBall, gotBall, notAtDest, atDest, shotIncomplete, shotComplete
-states 			starting, gettingBall, movingToTakeShot, takingShot
-initialState	starting
-finalState		[UNUSED]
+name 			 	 penFsm
+inAlph			 	 ballInZone, notGotBall, gotBall, notAtDest, atDest, shotIncomplete, shotComplete
+states 				 starting, gettingBall, movingToTakeShot, takingShot
+initialState		 starting
+finalState			 [UNUSED]
 nextPlanOnCompletion [NA]
+activeAtStart   	 YES
 
 
 transitions

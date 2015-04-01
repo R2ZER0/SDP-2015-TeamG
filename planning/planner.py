@@ -11,7 +11,8 @@ class Planner:
 
     def __init__(self, world, robot, role, fsmSpecFilePaths):
 
-        logger = createLogger("Planner")
+        logger = createLogger("Planner") # Create a logger object to use
+
         logger.info("Using the following finite state machine spec files to begin execution with:")
         logger.newline()
         for path in fsmSpecFilePaths:
@@ -40,8 +41,7 @@ class Planner:
                     parseRes = grammar.parseString(inputText)
                     self._fsmList.append(createFSM(parseRes, pathStr, logger))
 
-
-
+        # If False is within the list of fsms, then there has been a parse error
         if False in self._fsmList:
             logger.newline()
             logger.error("-------- PARSING FAILURE - Terminating due to the parse errors detailed above --------")
@@ -52,23 +52,11 @@ class Planner:
             logger.info("-------- SPEC FILE INPUT AND PARSING COMPLETED SUCCESSFULLY --------")
             logger.newline()
 
-        # inFile = open(fsmSpecFilePath, 'r')
-        # inputText = inFile.read()
-
-        # parseRes = grammar.parseString(inputText)    # Using PyParsing, initiate a parse run of the input config file
-    
-        # inFile.close()      # We're done reading files, so close them
-
-        # self._fsm = createFSM(parseRes) # Create the finite state machine object which the planner will use
         self._world = world
         self._robot = robot
         self._role  = role
-        # self._fsm.show()
-        logger.info("-------- Planning FSMs --------")
-        logger.newline()
-        logger.newline()
-        for fsm in self._fsmList:
-            fsm.show()
+        
+        showFsms()
 
         logger.info("-------- COMMENCING PLANNING OPERATIONS --------")
         logger.newline()
@@ -91,7 +79,12 @@ class Planner:
 
     def plan(self):
         """The heart of the planner. For every call, we determing a list of FSM letters which hold
-        in the current world state, and provide this to the machine for consumption"""
+        in the current world state for each machine, and provide that machine with the letters for consumption
+
+        If the machine responds with something other than None, this means that particular one has finished
+        running and entered it's final state. As such we look up the next machine to begin running,
+        and set it active so that it will run in future plan() calls"""
+
         logger.info("------------ plan step ------------")
         logger.newline()
         for fsm in self._fsmList:
@@ -103,6 +96,15 @@ class Planner:
                         fsm.setActive()
         logger.info("---------- end plan step ----------")
         logger.newline()
+
+    def showFsms(self):
+        logger.newline()
+        logger.info("-------- Planning FSMs --------")
+
+        for fsm in self._fsms:
+            fsm.show()
+        logger.newline()
+
 
     @property
     def current_task(self):
@@ -122,12 +124,5 @@ class Planner:
         '''Returns the Robot model pertaining to our role.'''
         return self.world.our_attacker if self._role == 'attacker' else self.world.our_defender
 
-    def showFsms(self):
-
-        logger.newline()
-        logger.info("FSMs available to the planner:")
-
-        for fsm in self._fsms:
-        fsm.show()
-        logger.newline()
+   
 
