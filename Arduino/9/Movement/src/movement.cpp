@@ -66,7 +66,7 @@ void movement_on_new_command(char cmd, float dir_, int spd)
     } else if(cmd == MOVEMENT_COMMAND_TURN) {
         current_command = cmd;
         
-        wheels_control_enabled(false);
+        wheels_control_enabled(true);
         targetAngle = normalise_angle(getAngle() + dir);
         turnSpeed = spd;
         finishedTurn = false;
@@ -96,6 +96,9 @@ void service_movement()
         
         if(current_distance <= TURN_ACCEPTABLE_RANGE) {
             // We've probably finished!
+            
+            wheels_stop();
+            
             runMotor(MOTOR_MOTOR1, 0);
             runMotor(MOTOR_MOTOR2, 0);
             runMotor(MOTOR_MOTOR3, 0);
@@ -108,39 +111,34 @@ void service_movement()
         }
         
         // Slow down as we approach the target
-        int turnSpeedA = turnSpeed;
-        int turnSpeedB = turnSpeed;
-        if(current_distance < 0.5) {
-            turnSpeedA = 30;
-            turnSpeedB = 30;
-        } else if(current_distance < 1.5) {
-            turnSpeedA = 30;
-            turnSpeedB = 30;
-        } else {
-            turnSpeedA = 40;
-            turnSpeedB = 40;
-        }
-        
-        if(millis() <= turn_quickstart_endtime) {
-            turnSpeedA = 100;
-            turnSpeedB = 100;
-        }
+//         if(current_distance < 0.5) {
+//             turnSpeed = 30;
+//         } else if(current_distance < 1.5) {
+//             turnSpeed = 30;
+//         } else {
+//             turnSpeed = 40;
+//         }
+        turnSpeed = 30;
         
         //Serial.print(current_distance);
         //Serial.print('\t');
         //Serial.println(turnSpeedA);
         
+        double speeds[NUM_MOTORS];
+        
         if(acw_dist < cw_dist) {
-            runMotor(MOTOR_MOTOR1, turnSpeedA);
-            runMotor(MOTOR_MOTOR2, turnSpeedB);
-            runMotor(MOTOR_MOTOR3, turnSpeedA);
-            runMotor(MOTOR_MOTOR4, turnSpeedB);
+            speeds[0] = turnSpeed;
+            speeds[1] = turnSpeed;
+            speeds[2] = turnSpeed;
+            speeds[3] = turnSpeed;
         } else {
-            runMotor(MOTOR_MOTOR1, -turnSpeedA);
-            runMotor(MOTOR_MOTOR2, -turnSpeedB);
-            runMotor(MOTOR_MOTOR3, -turnSpeedA);
-            runMotor(MOTOR_MOTOR4, -turnSpeedB);
+            speeds[0] = -turnSpeed;
+            speeds[1] = -turnSpeed;
+            speeds[2] = -turnSpeed;
+            speeds[3] = -turnSpeed;
         }
+        
+        wheels_set_target_speeds(speeds);
         
         //Serial.print("dist="); Serial.println(current_distance);
     }
