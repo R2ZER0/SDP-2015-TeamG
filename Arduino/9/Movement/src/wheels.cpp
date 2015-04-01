@@ -51,11 +51,15 @@ void wheels_set_target_speeds(double* speeds)
 /* Stop the wheels! */
 void wheels_stop(void)
 {
+    runMotor(MOTOR_MOTOR1, 0);
+    runMotor(MOTOR_MOTOR2, 0);
+    runMotor(MOTOR_MOTOR3, 0);
+    runMotor(MOTOR_MOTOR4, 0);
+    
     for(int i = 0; i < NUM_MOTORS; ++i) {
         wheels[i].target_speed = 0;
         wheels[i].motor_power = 0;
         wheels[i].next_update_time = 0L; /* Update immidiately */
-        runMotor(MOTOR(i), 0);
     }
 }
 
@@ -125,7 +129,11 @@ void service_wheels()
                 wheel_control_calculate(wheel);
                 
                 /* Send the result to the motor */
-                runMotor(MOTOR(i), wheel->motor_power);
+                //runMotor(MOTOR(i), wheel->motor_power);
+                if(i == 0) { runMotor(MOTOR_MOTOR1, wheel->motor_power); }
+                else if(i == 1) { runMotor(MOTOR_MOTOR2, wheel->motor_power); }
+                else if(i == 2) { runMotor(MOTOR_MOTOR3, wheel->motor_power); }
+                else if(i == 3) { runMotor(MOTOR_MOTOR4, wheel->motor_power); }
             }
             
             wheel->next_update_time = current_time + WHEELS_UPDATE_INTERVAL;
