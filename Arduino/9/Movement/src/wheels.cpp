@@ -15,12 +15,16 @@ struct wheel_control {
 };
 
 /* Motor lookup table */
-static const int8_t MOTOR[NUM_MOTORS] = {
-    MOTOR_MOTOR1,
-    MOTOR_MOTOR2,
-    MOTOR_MOTOR3,
-    MOTOR_MOTOR4
-};
+static int MOTOR(int motor) {
+    switch(motor) {
+        case 0: return MOTOR_MOTOR1;
+        case 1: return MOTOR_MOTOR2;
+        case 2: return MOTOR_MOTOR3;
+        case 3: return MOTOR_MOTOR4;
+        /* TODO: better error? */
+        default: return MOTOR_MOTOR4;
+    }
+}
 
 /* A controller instance for each wheel */
 static struct wheel_control wheels[NUM_MOTORS] = { {0} };
@@ -51,7 +55,7 @@ void wheels_stop(void)
         wheels[i].target_speed = 0;
         wheels[i].motor_power = 0;
         wheels[i].next_update_time = 0L; /* Update immidiately */
-        runMotor(MOTOR[i], 0);
+        runMotor(MOTOR(i), 0);
     }
 }
 
@@ -121,7 +125,7 @@ void service_wheels()
                 wheel_control_calculate(wheel);
                 
                 /* Send the result to the motor */
-                runMotor(MOTOR[i], wheel->motor_power);
+                runMotor(MOTOR(i), wheel->motor_power);
             }
             
             wheel->next_update_time = current_time + WHEELS_UPDATE_INTERVAL;
