@@ -5,6 +5,7 @@ states 				 starting, gettingBall, movingToTakeShot, takingShot, shotDone
 initialState		 starting
 finalState	    	 shotDone
 nextPlanOnCompletion attackerFsm.txt
+activeAtStart	     YES
 
 transitions
 <starting, ballInZone, [AcquireBall, world, robot, role], gettingBall>
