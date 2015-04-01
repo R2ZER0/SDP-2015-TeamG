@@ -9,7 +9,7 @@ import math
 
 class Planner:    
 
-    def __init__(self, world, robot, role, fsmSpecFilePaths, dynPlansPaths):
+    def __init__(self, world, robot, role, fsmSpecFilePaths):
 
         logger = createLogger("Planner")
         logger.info("Using the following finite state machine spec files to begin execution with:")
@@ -18,15 +18,9 @@ class Planner:
             logger.info(path)
 
         logger.newline()
-
-        logger.info("The following finite state machine spec files will be available to dynamically switch to:")
-        logger.newline()
-        for dynPath in dynPlansPaths:
-            logger.info(path)
         
         grammar = createConfigGrammar()  # Build the grammar used to parse input config files
         self._fsmList = []
-        self._dynFsmList = []
         self._readTexts=[]
 
 
@@ -36,7 +30,7 @@ class Planner:
                 inputText = fileObj.read()
                 
                 if inputText in self._readTexts:
-                    logger.warning("WARNING: Identified that two input spec files are identical. This could result in VERY undesirable behaviour.")
+                    logger.warning("ERROR: Identified that two input spec files are identical.")
                 self._readTexts.append(inputText)
 
                 if len(inputText) == 0:
@@ -46,23 +40,9 @@ class Planner:
                     parseRes = grammar.parseString(inputText)
                     self._fsmList.append(createFSM(parseRes, pathStr, logger))
 
-        for pathStr in dynPlansPaths:
-            with open(pathStr, 'r') as fileObj:
-                inputText = fileObj.read()
-
-                if inputText in self._readTexts:
-                    logger.warning("WARNING: Identified that two input spec files are identical. This could result in VERY undesirable behaviour.")
-                self._readTexts.append(inputText)
-                
-                if len(inputText) == 0:
-                    logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
-                    self._dynFsmList.append(False)
-                else: 
-                    parseRes = grammar.parseString(inputText)
-                    self._dynFsmList.append(createFSM(parseRes, pathStr, logger))
 
 
-        if False in self._fsmList or False in self._dynFsmList:
+        if False in self._fsmList:
             logger.newline()
             logger.error("-------- PARSING FAILURE - Terminating due to the parse errors detailed above --------")
             logger.newline()
@@ -81,8 +61,8 @@ class Planner:
 
         # self._fsm = createFSM(parseRes) # Create the finite state machine object which the planner will use
         self._world = world
-        self._robot=robot
-        self._role = role
+        self._robot = robot
+        self._role  = role
         # self._fsm.show()
         logger.info("-------- Planning FSMs --------")
         logger.newline()
@@ -118,9 +98,9 @@ class Planner:
             truths=self.checkTrueConditions(fsm)    
             machineResponse = fsm.consumeInput(truths, self._world, self._robot, self._role)
             if machineResponse != None:
-                for fsm in self._dynFsmList:
+                for fsm in self._fsmList:
                     if fsm.definingFile == machineResponse:
-                        self._fsmList.append(fsm)
+                        fsm.setActive()
         logger.info("---------- end plan step ----------")
         logger.newline()
 
@@ -145,18 +125,9 @@ class Planner:
     def showFsms(self):
 
         logger.newline()
-        logger.info("FSMs currently in use:")
+        logger.info("FSMs available to the planner:")
 
         for fsm in self._fsms:
         fsm.show()
         logger.newline()
 
-        logger.info("FSMs that began execution with the planner:")
-        for fsm in self._fsmList:
-        fsm.show()
-        logger.newline()
-
-        logger.info("FSMs available to be used dynamically:")
-        for fsm in self._dynFsmList:
-        fsm.show()
-        logger.newline()
