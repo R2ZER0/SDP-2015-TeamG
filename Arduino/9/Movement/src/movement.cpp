@@ -112,23 +112,21 @@ void service_movement()
         int turnSpeedB = turnSpeed;
         if(current_distance < 0.5) {
             turnSpeedA = 0;
-            turnSpeedB = 30;
+            turnSpeedB = 40;
         } else if(current_distance < 1.5) {
             turnSpeedA = 0;
-            turnSpeedB = 35;
+            turnSpeedB = 40;
         } else {
             turnSpeedA = 0;
-            turnSpeedB = 40;
+            turnSpeedB = 50;
         }
         
         if(millis() <= turn_quickstart_endtime) {
             //turnSpeedA = 0;
-            turnSpeedB = 100;
+            turnSpeedB = 70;
         }
         
-        //Serial.print(current_distance);
-        //Serial.print('\t');
-        //Serial.println(turnSpeedA);
+        Serial.println(current_distance);
         
         if(acw_dist < cw_dist) {
             runMotor(MOTOR_MOTOR1, turnSpeedA);
