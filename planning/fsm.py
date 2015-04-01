@@ -24,6 +24,9 @@ def createFSM(parsedInput, sourceFilePath, logger):
     # parsedInput[0][6][1:] contains the string read which represents the next plan spec file to execute (if there is one)
     nextPlanToInvoke = "".join(c for c in parsedInput[0][6][1:] if c != "[" and c != "]")
 
+    # parsedInput[0][7][1] contains the string read which represents whether the machine is initially active
+    initiallyActive = parsedInput[0][7][1]
+
     # Create the list which we'll populate with transition tuples of the form
     # (currState, letter1, letter2,..., [TaskName, arg1,arg2,..], newState)
     transitions = []
@@ -65,7 +68,7 @@ def createFSM(parsedInput, sourceFilePath, logger):
     else:
         logger.newline()
         logger.info("Parse of file '" + str(sourceFilePath) + "' successful.")
-        return FSM(name, alphabet, states, startState, finalState, sourceFilePath, nextPlanToInvoke, transitions, dic, lambdas, logger)
+        return FSM(name, alphabet, states, startState, finalState, initiallyActive, sourceFilePath, nextPlanToInvoke, transitions, dic, lambdas, logger)
 
     # If we're here, everything is valid and we can go ahead and create the FSM
     # fsm = FSM(name, alphabet, states, startState, finalState, transitions, dic, lambdas)
@@ -91,6 +94,9 @@ def createConfigGrammar():
     nextPlanKWD   = Literal("nextPlanOnCompletion")
     unusedKWD     = Literal("UNUSED")
     naKWD         = Literal("NA")
+    yesKWD        = Literal("YES")
+    noKWD         = Literal("NO")
+    activeStartKWD= Literal("activeAtStart")
 
     # Define the various single-character tokens we wish to recognise
     separator     = Literal(",")
@@ -117,6 +123,9 @@ def createConfigGrammar():
 
     # A name definition is of the form 'name identifier'
     nameDef       = Group(nameKWD + name)
+
+    # Starting active specification is of form activeAtStart followed by either YES or NO
+    startActiveDef = Group(activeStartKWD + (yesKWD ^ noKWD))
 
     # A filename is an alphanumeric word, including a period character
     fileName      = Word(alphanums+".")
@@ -145,7 +154,7 @@ def createConfigGrammar():
     # A transition is of the form '<stateName, letter1, letter2,..., [TaskName, arg1, arg2,...], newState>'
     transition    = Group(leftAngBrkt + (anyState ^ state) + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
 
-    machineParamSec= machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef + nextPlanDef
+    machineParamSec= machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef + nextPlanDef + startActiveDef
     transitionSec  = transitionsKWD + OneOrMore(transition)
     lambdaSec      = lambdaSecKWD + OneOrMore(lambdaStmt)
 
@@ -229,11 +238,17 @@ def checkFinalStateConsistencies(finalState, nextPlanSpec, sourceFilePath, logge
 
 class FSM:
     """Class representing planner finite state machines"""
-    def __init__(self, name, inAlph, states, initState, finalState, sourceFilePath, nextPlanToInvoke, transTable, lambdaDict, lambdaDescs, logger):
+    def __init__(self, name, inAlph, states, initState, finalState, initiallyActive, sourceFilePath, nextPlanToInvoke, transTable, lambdaDict, lambdaDescs, logger):
         self._alph = inAlph
         self._states = states
         self._initState = initState
         self._definingFile = sourceFilePath
+
+        if initiallyActive == "YES":
+            self._active = self._active = True
+        else:
+            self._active = self._active = False
+            
         self._nextPlan = nextPlanToInvoke
         self._finalState = finalState
         self._lambdas = lambdaDict      # The {letter : lambda} dictionary used in actual computation
@@ -260,6 +275,9 @@ class FSM:
     @property
     def currentState(self):
         return self._currentState
+
+    def setActive():
+        self._active = True
 
     def executeExistingTask(self):
         """tran[len(tran) - 2][1] contains the name of the task the input file
@@ -298,7 +316,7 @@ class FSM:
  
         return
 
-    def consumeInput(self, inp, world, robot, role):
+    def consumeInput(self, inp, world, robot, role): 
         """Takes a set of FSM letters and checks to see what transition should be executed by consulting
         the transition table. The code considers the current state, the letters that are to be consumed and
         the task invocation. 
@@ -310,6 +328,8 @@ class FSM:
         # a subset of the alphabet the machine recognises
         assert set(inp) <= set(self._alph) 
 
+        # If this FSM is not active, it should not do anything - so we return 
+        if not self._active return
 
         # Consider each possible transition
         for tran in sorted(self._transTable, key=lambda t : 1 if t[0] == "*" else 10):
@@ -390,6 +410,8 @@ class FSM:
             # Here, the current FSM has entered it's final state and is done executing. We inform the users and 
             # return the next plan to execute, if there is one
             self._logger.info("FSM '" + self._name + " has entered it's final state and ceased running. ")
+            # Machine has finished it's run, so should become inactive
+            self._active = False
             return self._nextPlan
         else:
              # If we get here, we looped through the entire set of transitions and didn't find any that applied
@@ -418,6 +440,8 @@ class FSM:
         self._logger.info("Initial State: " + str(self._initState))
         self._logger.info("Final State: " + str(self._finalState))
         self._logger.info("Next plan to invoke: " + str(self._nextPlan))
+        self._logger.info("Currently active: " + str(self._active))
+        self._logger.info("Initially active: " + str(self._InitiallyActive))
         self._logger.info("Current State: " + str(self._currentState))
         self._logger.info("Current Task: " + str(self._currentTask))
         self._logger.newline()
