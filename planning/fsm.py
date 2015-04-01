@@ -106,6 +106,9 @@ def createConfigGrammar():
     # A task invocation is either of the form '[EXISTING]' or '[TaskName, arg1, arg2, ...]']
     taskInvocation = Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + ZeroOrMore(Word(alphanums+" +-_()='.\"")^nestedExpr(opener='[', closer=']', content=Word(alphanums+" _+-=()'.\"")))) + rightSqBrkt)
 
+    # Comments are of the form -[commentBody]
+    comment = Group("-" + Word(alphanums + " \t.\"./\\_()'|<>{}[],?!@£$%^&*"))
+
     # An FSM name is an alphanumeric 'word'
     name          = Word(alphanums) 
 
@@ -152,6 +155,7 @@ def createConfigGrammar():
     # Config is the 'root' of the parse
     config         = Group(machineParamSec) + Group(transitionSec) + Group(lambdaSec)
 
+    config.ignore(comment)
 
     return config
 
