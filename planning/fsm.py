@@ -46,7 +46,7 @@ def createFSM(parsedInput, sourceFilePath, logger):
     # Create the string we'll use to contain the lambdas found during the parse
     lambdas = []
     for lambdaStmt in parsedInput[2][1:]:
-        t = ''.join(map(str, lambdaStmt))
+        t = ''.join(map(str, lambdaStmt)).rstrip()
         lambdas.append(t)
 
     # Build the actual letter:lambda dictionary
@@ -62,7 +62,7 @@ def createFSM(parsedInput, sourceFilePath, logger):
     else:
         # If we're here, everything is valid and we can go ahead and create the FSM
         logger.newline()
-        logger.info("Parse of file '" + str(sourceFilePath) + "' successful.")
+        logger.info(">>> Parse of file '" + str(sourceFilePath) + "' successful.")
         return FSM(name, alphabet, states, startState, finalState, initiallyActive, sourceFilePath, nextPlanToInvoke, transitions, dic, lambdas, logger)
 
 def createConfigGrammar():
@@ -369,7 +369,7 @@ class FSM:
         else:
             # If we get here, we looped through the entire set of transitions and didn't find any that applied
             # in the current situation.
-            self._logger.info("FSM '" + self._name + " reports there is no transition entry for current state " + self._currentState + " and input '" + str(inp) + "'")
+            self._logger.info("FSM '" + self._name + "' reports there is no transition entry for current state " + self._currentState + " and input '" + str(inp) + "'")
 
     def show(self):
         self._logger.newline()

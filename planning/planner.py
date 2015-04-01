@@ -11,31 +11,32 @@ class Planner:
 
     def __init__(self, world, robot, role, fsmSpecFilePaths):
 
-        logger = createLogger("Planner") # Create a logger object to use
+        self._logger = createLogger("Planner") # Create a logger object to use
 
-        logger.info("Using the following finite state machine spec files to begin execution with:")
-        logger.newline()
+        self._logger.info(">>> Using the following finite state machine spec files to begin execution with:")
+        self._logger.newline()
         for path in fsmSpecFilePaths:
-            logger.info(path)
+            self._logger.info(path)
 
-        logger.newline()
+        self._logger.newline()
         
         grammar = createConfigGrammar()  # Build the grammar used to parse input config files
         self._fsmList = []
         self._readTexts=[]
 
 
-        logger.info("-------- READING AND PARSING FSM SPEC FILES --------")
+        self._logger.info(">>> READING AND PARSING FSM SPEC FILES")
         for pathStr in fsmSpecFilePaths:
             with open(pathStr, 'r') as fileObj:
                 inputText = fileObj.read()
                 
                 if inputText in self._readTexts:
-                    logger.warning("ERROR: Identified that two input spec files are identical.")
+                    self._self._self._self._logger.error("ERROR: Identified that two input spec files are identical.")
+                    self._fsmList.append(False)
                 self._readTexts.append(inputText)
 
                 if len(inputText) == 0:
-                    logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
+                    self._self._self._self._logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
                     self._fsmList.append(False)
                 else: 
                     parseRes = grammar.parseString(inputText)
@@ -43,14 +44,14 @@ class Planner:
 
         # If False is within the list of fsms, then there has been a parse error
         if False in self._fsmList:
-            logger.newline()
-            logger.error("-------- PARSING FAILURE - Terminating due to the parse errors detailed above --------")
-            logger.newline()
+            self._self._self._logger.newline()
+            self._self._self._logger.error(">>> PARSING FAILURE - Terminating due to the parse errors detailed above")
+            self._self._self._logger.newline()
             quit()
         else:
-            logger.newline()
-            logger.info("-------- SPEC FILE INPUT AND PARSING COMPLETED SUCCESSFULLY --------")
-            logger.newline()
+            self._self._self._logger.newline()
+            self._self._self._logger.info(">>> SPEC FILE INPUT AND PARSING COMPLETED SUCCESSFULLY")
+            self._self._self._logger.newline()
 
         self._world = world
         self._robot = robot
@@ -58,9 +59,9 @@ class Planner:
         
         showFsms()
 
-        logger.info("-------- COMMENCING PLANNING OPERATIONS --------")
-        logger.newline()
-        logger.newline()
+        self._self._logger.info(">>> COMMENCING PLANNING OPERATIONS")
+        self._self._logger.newline()
+        self._self._logger.newline()
 
     def checkTrueConditions(self, fsm):
         """An FSM accepts a list of letters from it's alphabet which reflect conditions in the world
@@ -85,8 +86,8 @@ class Planner:
         running and entered it's final state. As such we look up the next machine to begin running,
         and set it active so that it will run in future plan() calls"""
 
-        logger.info("------------ plan step ------------")
-        logger.newline()
+        self._logger.info("------------ plan step ------------")
+        self._logger.newline()
         for fsm in self._fsmList:
             truths=self.checkTrueConditions(fsm)    
             machineResponse = fsm.consumeInput(truths, self._world, self._robot, self._role)
@@ -94,16 +95,23 @@ class Planner:
                 for fsm in self._fsmList:
                     if fsm.definingFile == machineResponse:
                         fsm.setActive()
-        logger.info("---------- end plan step ----------")
-        logger.newline()
+        self._logger.newline()
+        self._logger.info("---------- end plan step ----------")
+        self._logger.newline()
+        self._logger.newline()
+        self._logger.newline()
+        self._logger.newline()
+        self._logger.newline()
+        self._logger.newline()
+
 
     def showFsms(self):
-        logger.newline()
-        logger.info("-------- Planning FSMs --------")
+        self._logger.newline()
+        self._logger.info("-------- Planning FSMs --------")
 
         for fsm in self._fsms:
             fsm.show()
-        logger.newline()
+        self._logger.newline()
 
 
     @property
