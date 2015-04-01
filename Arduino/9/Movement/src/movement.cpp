@@ -111,14 +111,14 @@ void service_movement()
         int turnSpeedA = turnSpeed;
         int turnSpeedB = turnSpeed;
         if(current_distance < 0.5) {
-            turnSpeedA = 40;
-            turnSpeedB = 40;
+            turnSpeedA = 30;
+            turnSpeedB = 30;
         } else if(current_distance < 1.5) {
+            turnSpeedA = 30;
+            turnSpeedB = 30;
+        } else {
             turnSpeedA = 40;
             turnSpeedB = 40;
-        } else {
-            turnSpeedA = 50;
-            turnSpeedB = 50;
         }
         
         if(millis() <= turn_quickstart_endtime) {
