@@ -111,6 +111,7 @@ void service_movement()
         }
         
         // Slow down as we approach the target
+
 //         if(current_distance < 0.5) {
 //             turnSpeed = 30;
 //         } else if(current_distance < 1.5) {
