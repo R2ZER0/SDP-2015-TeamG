@@ -14,7 +14,7 @@
 
 char current_command = MOVEMENT_COMMAND_STOP;
 
-double targetAngle = 0.0; // in radians, +PI to -PI
+double targetAngle = 1.0; // in radians, +PI to -PI
 int turnSpeed = 100;
 bool finishedTurn = true;
 static unsigned long turn_quickstart_endtime = 0L;
