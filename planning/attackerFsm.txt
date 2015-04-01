@@ -1,9 +1,11 @@
 machineParams
-name 			simpleAttackerFSM
-inAlph			ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete, leavingZoneLeft, leavingZoneRight, defenderHasBall, enemyDefenderHasBall, stateNotBlocking, statesNotPassing, stateStarting, friendlyHasBall, friendlyStationary, friendlyMoving, friendlyFacingUs, friendlyFacingWall, notFriendlyFacingUs, notFriendlyFacingWall, stateNotAcquiring, notAdjacentFriendly, adjacentFriendly
-states 			idle, acquiringBall, movingToPoint, shooting, centering, mirroring, blocking, starting, receivingBounce, receivingNormal
-initialState	starting
-finalState		unnec
+name 				 simpleAttackerFSM
+inAlph			 	 ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete, leavingZoneLeft, leavingZoneRight, defenderHasBall, enemyDefenderHasBall, stateNotBlocking, statesNotPassing, stateStarting, friendlyHasBall, friendlyStationary, friendlyMoving, friendlyFacingUs, friendlyFacingWall, notFriendlyFacingUs, notFriendlyFacingWall, stateNotAcquiring, notAdjacentFriendly, adjacentFriendly
+states 			     idle, acquiringBall, movingToPoint, shooting, centering, mirroring, blocking, starting, receivingBounce, receivingNormal
+initialState		 starting
+finalState			 [UNUSED]
+nextPlanOnCompletion [NA]
+activeAtStart   	 NO
 
 transitions
 <*, leavingZoneLeft, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
