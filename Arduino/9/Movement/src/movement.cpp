@@ -118,7 +118,7 @@ void service_movement()
 //         } else {
 //             turnSpeed = 40;
 //         }
-        turnSpeed = 30;
+        turnSpeed = 25;
         
         //Serial.print(current_distance);
         //Serial.print('\t');
