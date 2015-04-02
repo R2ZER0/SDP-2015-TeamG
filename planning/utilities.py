@@ -380,7 +380,7 @@ def create_logger(loggerName):
     # Create a handler
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)
-    console_handler.setFormatter(logging.Formatter(fmt="%(name)s %(levelname)-8s: %(message)s"))
+    console_handler.setFormatter(logging.Formatter(fmt="%(message)s"))
 
     # Create a "blank line" handler
     blank_handler = logging.StreamHandler()

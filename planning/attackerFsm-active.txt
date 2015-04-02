@@ -1,0 +1,86 @@
+machineParams
+name                 simpleAttackerFSM
+inAlph               ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete, leavingZoneLeft, leavingZoneRight, defenderHasBall, enemyDefenderHasBall, stateNotBlocking, statesNotPassing, stateStarting, friendlyHasBall, friendlyStationary, friendlyMoving, friendlyFacingUs, friendlyFacingWall, notFriendlyFacingUs, notFriendlyFacingWall, statesNotShooting, notAdjacentFriendly, adjacentFriendly, enemyAttackerHasBall
+states               idle, acquiringBall, movingToPoint, shooting, centering, mirroring, blocking, starting, receivingBounce, receivingNormal
+initialState         starting
+finalState           [UNUSED]
+nextPlanOnCompletion [NA]
+activeAtStart        YES
+
+transitions
+<*, leavingZoneLeft, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
+<*, leavingZoneRight, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
+
+<*, statesNotShooting ballInZone, [AcquireBall, world, robot, role], acquiringBall>
+<*, statesNotPassing enemyAttackerHasBall, [MirrorObject, world, robot, role, world.ball], mirroring>
+<*, statesNotPassing friendlyHasBall, [MirrorObject, world, robot, role, world.ball], mirroring>
+<*, stateNotBlocking enemyDefenderHasBall, [MirrorObject, world, robot, role, world.ball], blocking>
+
+<starting, stateStarting, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
+
+<mirroring, adjacentFriendly friendlyStationary friendlyFacingUs, [TurnToPoint, world, robot, role, world.our_defender.x, world.our_defender.y], receivingNormal>
+<mirroring, adjacentFriendly friendlyStationary friendlyFacingWall, [TurnToPoint, world, robot, role, world.our_attacker.x+(-10 if world.our_attacker.zone == 2 else 10), predict_y_intersection(world, world.our_attacker.x+(-10 if world.our_attacker.zone == 2 else 10), world.our_defender, False, True)], receivingBounce>
+<mirroring, notAdjacentFriendly, [EXISTING], mirroring>
+<mirroring, friendlyMoving, [EXISTING], mirroring>
+
+<receivingNormal, notAdjacentFriendly, [MirrorObject, world, robot, role, world.ball], mirroring>
+<receivingBounce, notAdjacentFriendly, [MirrorObject, world, robot, role, world.ball], mirroring>
+
+<receivingNormal, friendlyFacingWall, [TurnToPoint, world, robot, role, world.our_attacker.x+(-10 if world.our_attacker.zone == 2 else 10), predict_y_intersection(world, world.our_attacker.x+(-10 if world.our_attacker.zone == 2 else 10), world.our_defender, False, True)], receivingBounce>
+<receivingBounce, friendlyFacingUs, [TurnToPoint, world, robot, role, world.our_defender.x, world.our_defender.y], receivingNormal>
+
+<receivingNormal, friendlyStationary, [EXISTING], receivingNormal>
+<receivingBounce, friendlyStationary, [EXISTING], receivingBounce>
+
+<blocking, enemyDefenderHasBall, [EXISTING], blocking>
+
+<centering, notAtPoint, [EXISTING], centering>
+<centering, atPoint, [EXISTING], idle>
+
+<idle, notBallInZone, [EXISTING], idle>
+
+<acquiringBall, gotBall, [MoveToPoint, world, robot, role, choose_attacker_destination(world)[0], choose_attacker_destination(world)[1], 10], movingToPoint>
+<acquiringBall, notGotBallYet, [EXISTING], acquiringBall>
+<acquiringBall, notBallInZone, [MoveToPoint, world, robot, role, 270, 150, 10], idle>
+
+<movingToPoint, atPoint, [Shoot, world, robot, role] , shooting>
+<movingToPoint, notAtPoint, [EXISTING], movingToPoint>
+
+<shooting, shotComplete, [MoveToPoint, world, robot, role, 150, 150, 10] , idle>
+<shooting, stillShooting, [EXISTING], shooting>
+
+lambdaConditions
+"notAdjacentFriendly": lambda planner: abs(planner.world.our_defender.y - planner.our_robot.y) >= 40
+"adjacentFriendly": lambda planner: abs(planner.world.our_defender.y - planner.our_robot.y) < 40
+
+"friendlyStationary":  lambda planner: planner.world.our_defender.velocity < 5
+"friendlyMoving":  lambda planner: planner.world.our_defender.velocity >= 5
+"friendlyFacingUs": lambda planner: is_facing(planner.world.our_defender, planner.our_robot)
+"notFriendlyFacingUs": lambda planner: not is_facing(planner.world.our_defender, planner.our_robot)
+"friendlyFacingWall":  lambda planner: abs(planner.world.our_defender.get_rotation_to_point(planner.world.pitch.zones[planner.world.their_attacker.zone].center()[0], planner.world.pitch.height)) < math.pi/6 if (planner.world.pitch.height - planner.world.our_defender.y) > planner.world.our_defender.y else abs(planner.world.our_defender.get_rotation_to_point(planner.world.pitch.zones[planner.world.their_attacker.zone].center()[0], 0)) < math.pi/6
+"notFriendlyFacingWall":  lambda planner: not abs(planner.world.our_defender.get_rotation_to_point(planner.world.pitch.zones[planner.world.their_attacker.zone].center()[0], planner.world.pitch.height)) < math.pi/6 or abs(planner.world.our_defender.get_rotation_to_point(planner.world.pitch.zones[planner.world.their_attacker.zone].center()[0], 0)) < math.pi/6
+
+"stateStarting": lambda planner: planner.getFSM('simpleAttackerFSM').currentState == 'starting'
+
+"statesNotShooting": lambda planner: not planner.getFSM('simpleAttackerFSM').currentState in ['acquiringBall', 'movingToPoint', 'shooting']
+"stateNotBlocking": lambda planner: planner.getFSM('simpleAttackerFSM').currentState != 'blocking'
+"statesNotPassing": lambda planner: not planner.getFSM('simpleAttackerFSM').currentState in ['mirroring', 'receivingNormal', 'receivingBounce']
+
+"leavingZoneLeft": lambda planner:  (planner.our_robot.x - planner.world.pitch.zones[planner.our_robot.zone].boundingBox()[0]) < 5
+"leavingZoneRight": lambda planner: (planner.world.pitch.zones[planner.our_robot.zone].boundingBox()[1] - planner.our_robot.x) < 5
+
+"friendlyHasBall": lambda planner:  planner.world.pitch.zones[planner.world.our_defender.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"enemyDefenderHasBall": lambda planner: planner.world.pitch.zones[planner.world.their_defender.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"enemyAttackerHasBall": lambda planner: planner.world.pitch.zones[planner.world.their_attacker.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+
+"ballInZone" : lambda planner :     planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+"notBallInZone" : lambda planner :     not planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
+
+"notGotBallYet" : lambda planner :  planner.getFSM('simpleAttackerFSM').currentTask != None and isinstance(planner.getFSM('simpleAttackerFSM').currentTask, AcquireBall) and not planner.getFSM('simpleAttackerFSM').currentTask.complete
+"gotBall" : lambda planner :        planner.getFSM('simpleAttackerFSM').currentTask != None and isinstance(planner.getFSM('simpleAttackerFSM').currentTask, AcquireBall) and planner.getFSM('simpleAttackerFSM').currentTask.complete
+
+"atPoint" : lambda planner :        planner.getFSM('simpleAttackerFSM').currentTask != None and isinstance(planner.getFSM('simpleAttackerFSM').currentTask, MoveToPoint) and planner.getFSM('simpleAttackerFSM').currentTask.complete
+"notAtPoint" : lambda planner :     planner.getFSM('simpleAttackerFSM').currentTask != None and isinstance(planner.getFSM('simpleAttackerFSM').currentTask, MoveToPoint) and not planner.getFSM('simpleAttackerFSM').currentTask.complete
+
+"stillShooting" : lambda planner :  planner.getFSM('simpleAttackerFSM').currentTask != None and isinstance(planner.getFSM('simpleAttackerFSM').currentTask, Shoot) and not planner.getFSM('simpleAttackerFSM').currentTask.complete
+"shotComplete" : lambda planner :   planner.getFSM('simpleAttackerFSM').currentTask != None and isinstance(planner.getFSM('simpleAttackerFSM').currentTask, Shoot) and planner.getFSM('simpleAttackerFSM').currentTask.complete
