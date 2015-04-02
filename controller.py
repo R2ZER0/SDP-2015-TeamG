@@ -151,6 +151,8 @@ class Controller:
         self.command_cache = [[0,0,0]]*8
         self.command = [0,0,0]
 
+        self.task = AcquireBall(self.world, self.robot9, 'attacker')
+
         # Set up predictors
         #
         # TODO: Add Robot 10 prediction here
@@ -190,7 +192,8 @@ class Controller:
                 #
                 # TODO: Add Robot 10 prediction here
                 self.command = self.command_cache.pop(0)
-                self.planner.plan()
+                #self.planner.plan()
+                self.task.execute()
                 self.command_cache.append(self.robot9.last_command())
 
                 # Predict ball position and replace regular ball position with this
@@ -207,8 +210,8 @@ class Controller:
                 }
 
                 # Information about states
-                attackerState = (self.planner.current_state, self.planner.current_state)
-                defenderState = (self.planner.current_state, self.planner.current_state)
+                attackerState = (self.planner.current_state, self.planner.current_task)
+                defenderState = (self.planner.current_state, self.planner.current_task)
 
                 attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
                 defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
@@ -366,4 +369,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Setup controller with appropriate parameters
-    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, args.plannerSpecFiles, defend_port=args.defender).run()
+    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, plannerSpecFiles=args.plannerSpecFiles, defend_port=args.defender).run()

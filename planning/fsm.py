@@ -108,7 +108,7 @@ def createConfigGrammar():
     taskInvocation = Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + ZeroOrMore(Word(alphanums+" +-_()='.\"")^nestedExpr(opener='[', closer=']', content=Word(alphanums+" _+-=()'.\"")))) + rightSqBrkt)
 
     # Comments are of the form -[commentBody]
-    comment = Group("-" + Word(alphanums + " \t.\"./\\_()'|<>{}[],?!@£$%^&*"))
+    comment = Group("-" + Word(alphanums + " \t.\"./\\_()'|<>{}[],?!@$%^&*"))
 
     # An FSM name is an alphanumeric 'word'
     name          = Word(alphanums) 
@@ -279,7 +279,7 @@ class FSM:
         """tran[len(tran) - 2][1] contains the name of the task the input file
         specifies to execute when leaving the current state. If EXISITING has 
         been given, it is desired the current task continues executing."""
-        logger.info("FSM '"+ self._name + "' executing exisiting task")
+        self._logger.info("FSM '"+ self._name + "' executing exisiting task")
         self._currentTask.execute()
         self._logger.newline()
 
@@ -418,9 +418,17 @@ class FSM:
 
 
     @property
+    def name(self):
+        return self._name
+
+    @property
     def currentTask(self):
         '''Returns the current task instance run by the FSM.'''
         return self._currentTask
+
+    @property
+    def startingActiveState(self):
+        return self._InitiallyActive
 
     @property
     def definingFile(self):
@@ -430,8 +438,12 @@ class FSM:
     def currentState(self):
         return self._currentState
 
-    def setActive():
+    def setActive(self):
         self._active = True
+
+    @property
+    def active(self):
+        return self._active
 
     def getStates(self):
         return self._states

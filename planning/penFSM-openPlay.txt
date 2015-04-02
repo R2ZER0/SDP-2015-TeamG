@@ -17,14 +17,14 @@ transitions
 <takingShot, shotComplete, [MoveToPoint, world, robot, role], shotDone>
 
 
-lamndaConditions
+lambdaConditions
 "ballInZone" : lambda planner :		planner.world.pitch.zones[planner.our_robot.zone].isInside(planner.world.ball.x, planner.world.ball.y)
 
-"notGotBall" : lambda planner :		planner.current_task != None and isinstance(planner.current_task, AcquireBall) and not planner.current_task.complete
-"gotBall" : lambda planner :		planner.current_task != None and isinstance(planner.current_task, AcquireBall) and planner.current_task.complete
+"notGotBall" : lambda planner :		planner.getFSM('penFsm').currentTask != None and isinstance(planner.getFSM('penFsm').currentTask, AcquireBall) and not planner.getFSM('penFsm').currentTask.complete
+"gotBall" : lambda planner :		planner.getFSM('penFsm').currentTask != None and isinstance(planner.getFSM('penFsm').currentTask, AcquireBall) and planner.getFSM('penFsm').currentTask.complete
 
-"notAtDest" : lambda planner :		planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and not planner.current_task.complete
-"atDest" : lambda planner : 		planner.current_task != None and isinstance(planner.current_task, MoveToPoint) and planner.current_task.complete
+"notAtDest" : lambda planner :		planner.getFSM('penFsm').currentTask != None and isinstance(planner.getFSM('penFsm').currentTask, MoveToPoint) and not planner.getFSM('penFsm').currentTask.complete
+"atDest" : lambda planner : 		planner.getFSM('penFsm').currentTask != None and isinstance(planner.getFSM('penFsm').currentTask, MoveToPoint) and planner.getFSM('penFsm').currentTask.complete
 
-"shotIncomplete" : lambda planner : planner.current_task != None and isinstance(planner.current_task, Shoot) and not planner.current_task.complete
-"shotComplete" : lambda planner :	planner.current_task != None and isinstance(planner.current_task, Shoot) and planner.current_task.complete
+"shotIncomplete" : lambda planner : planner.getFSM('penFsm').currentTask != None and isinstance(planner.getFSM('penFsm').currentTask, Shoot) and not planner.getFSM('penFsm').currentTask.complete
+"shotComplete" : lambda planner :	planner.getFSM('penFsm').currentTask != None and isinstance(planner.getFSM('penFsm').currentTask, Shoot) and planner.getFSM('penFsm').currentTask.complete

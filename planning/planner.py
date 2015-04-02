@@ -11,7 +11,7 @@ class Planner:
 
     def __init__(self, world, robot, role, fsmSpecFilePaths):
 
-        self._logger = createLogger("Planner") # Create a logger object to use for tracking operations
+        self._logger = create_logger("Planner") # Create a logger object to use for tracking operations
 
         self._logger.info(">>> Using the following finite state machine spec files to begin execution with:")
         self._logger.newline()
@@ -66,7 +66,7 @@ class Planner:
         self._role  = role
         
         # Output what we're about to work with
-        showFsms()
+        self.showFsms()
 
         self._logger.info(">>> COMMENCING PLANNING OPERATIONS")
         self._logger.newline()
@@ -86,6 +86,15 @@ class Planner:
                 trueCnds.append(letter)
 
         return trueCnds
+
+
+    def getFSM(self, name):
+        for fsm in self._fsmList:
+            if fsm.name == name:
+                return fsm
+        raise Exception("No FSM exists with name " + name)
+        
+
 
     def plan(self):
         """The heart of the planner. For every call, we determing a list of FSM letters which hold
@@ -126,12 +135,20 @@ class Planner:
 
     @property
     def current_task(self):
-        return self._fsmList[0].currentTask
-
+        activeTasks = [fsm.currentTask.__class__.__name__ for fsm in self._fsmList if fsm.active and fsm.currentTask != None]
+        if activeTasks:
+            return '\n'.join(activeTasks)
+        else:
+            return ''
+        
     @property
     def current_state(self):
-        return self._fsmList[0].currentState
-
+        activeStates = [fsm.currentState for fsm in self._fsmList if fsm.active and fsm.currentState != None]
+        if activeStates:
+            return '\n'.join(activeStates)
+        else:
+            return ''
+        
     @property
     def world(self):
         '''Returns the world instance held by the Planner.'''
