@@ -154,7 +154,7 @@ class Controller:
         self.command_cache = [[0,0]]*8
         self.command = [0,0]
 
-        self.task = AcquireBall(self.world, self.robot9, 'attacker')
+        #self.task = AcquireBall(self.world, self.robot9, 'attacker')
 
         # Set up predictors
         #
@@ -196,8 +196,8 @@ class Controller:
                 # TODO: Add Robot 10 prediction here
                 self.command = self.command_cache.pop(0)
 
-                self.task.execute()
-                #self.planner.plan()
+                #self.task.execute()
+                self.planner.plan()
                 self.command_cache.append(self.robot9.last_command(self.world.our_attacker.angle))
 
                 # Predict ball position and replace regular ball position with this

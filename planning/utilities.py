@@ -366,6 +366,7 @@ def do_nothing():
 def log_newline(self, how_many_lines=1):
     # Switch handler, output a blank line
     self.removeHandler(self.console_handler)
+    self.removeHandler(self.file_handler)
     self.addHandler(self.blank_handler)
     for i in range(how_many_lines):
         self.info('')
@@ -373,6 +374,7 @@ def log_newline(self, how_many_lines=1):
     # Switch back
     self.removeHandler(self.blank_handler)
     self.addHandler(self.console_handler)
+    self.addHandler(self.file_handler)
 
 def create_logger(loggerName):
     # Create a handler
@@ -390,9 +392,14 @@ def create_logger(loggerName):
     logger.setLevel(logging.DEBUG)
     logger.addHandler(console_handler)
 
+    file_handler = logging.FileHandler('planning.out')
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(fmt='%(name)s %(levelname)-8s: %(message)s'))
+
     # Save some data and add a method to logger object
     logger.console_handler = console_handler
     logger.blank_handler = blank_handler
+    logger.file_handler =file_handler
     logger.newline = types.MethodType(log_newline, logger)
 
     return logger

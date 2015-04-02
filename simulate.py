@@ -1,5 +1,5 @@
 from action import Action
-from planning.tasks import AcquireBall, MoveToPoint
+from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint
 from planning.planner import Planner
 from planning.models import World
 from vision.vision import Vision, Camera, GUI
@@ -50,6 +50,10 @@ class Controller:
         self.robot = SimulatedAction(self.simulator.control_robot)
         self.robot_defend = SimulatedAction(self.simulator.our_defender)
 
+        comm = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+        comm.flushInput()
+        self.robot_actual = Action(comm)
+
         frame = self.camera.get_frame()
         center_point = self.camera.get_adjusted_center(frame)
 
@@ -67,8 +71,11 @@ class Controller:
         self.world = World(our_side, self.SIM_PITCH)
 
         # Set up main planner
-        self.planner = Planner(self.world, self.robot, 'attacker', ['planning/fsmSpec.txt'])
-        self.planner2 = Planner(self.world, self.robot_defend, 'defender', ['planning/fsmSpec2.txt'])
+        #self.planner = Planner(self.world, self.robot, 'attacker', ['planning/fsmSpec.txt'])
+        #self.planner2 = Planner(self.world, self.robot_defend, 'defender', ['planning/fsmSpec2.txt'])
+        self.task = AcquireBall(self.world, self.robot, 'attacker')
+        self.task_actual = AcquireBall(self.world, self.robot_actual, 'attacker')
+
 
         # Set up GUI
         self.GUI = GUI(calibration=self.calibration, pitch=self.SIM_PITCH)
@@ -122,8 +129,11 @@ class Controller:
             # Update world state
             self.world.update_positions(model_positions)
 
-            self.planner.plan()
+            #self.planner.plan()
             #self.planner2.plan()
+
+            self.task.execute()
+            self.task_actual.execute()
 
             # Information about the grabbers from the world
             grabbers = {

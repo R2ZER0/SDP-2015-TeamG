@@ -380,7 +380,7 @@ class SimulatedRobot:
 		
 		elif self.move_handle.cmd == 'T':
 
-			target = self.move_handle.dir
+			target = -self.move_handle.dir
 			our = self.body.angle
 
 			acw_dist = (our-target+math.pi*2) if (our-target) < 0 else our-target

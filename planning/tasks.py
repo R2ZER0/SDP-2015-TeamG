@@ -43,7 +43,8 @@ class TurnToPoint(Task):
         * Check if our angle is on target; if not, adjust by rotating.
         * Otherwise, we're done.
         '''
-        if self.complete:
+        if self.complete or self.check():
+            self.complete = True
             return
 
         if self.turnHandle == None:
@@ -155,11 +156,13 @@ class AcquireBall(Task):
         self.move_task = None
         self.turn_task = None
         self.catch = None
+        self.complete = False
+        self.open_catch_handle = None
 
     def updateTurn(self):
         if self.turn_task == None:
             return
-        elif abs(self.robot_info.get_rotation_to_point(self.world.ball.x, self.world.ball.y)) > math.pi/4:
+        elif abs(self.robot_info.get_rotation_to_point(self.world.ball.x, self.world.ball.y)) > math.pi:
             self.turn_task = None
 
     def updateMove(self):
@@ -171,7 +174,7 @@ class AcquireBall(Task):
         elif self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y) < 70 and self.move_task.speed == 40:
             self.move_task = None
         elif hypot(self.move_task.x - target_x, self.move_task.y - target_y) > 20:
-	    self.move_task = None
+            self.move_task = None
 
     def execute(self):
         '''Executes another round of this Task. Performs as follows:
@@ -183,49 +186,51 @@ class AcquireBall(Task):
         '''
 
         if self.complete:
+            print '[AcquireBall]: Task complete, returning.'
             return
 
         if self.robot_info.can_catch_ball(self.world.ball):
+            print '[AcquireBall]: Can catch ball, stopping.'
             self.robot.stop()
-            if self.robot_info.catcher == 'closed':
-                self.robot.open_catcher()
-                self.robot_info.catcher = 'open'
+            #self.robot.open_catcher()
                 
-            else:
-                if self.catch == None or (self.catch.finished and not self.catch.completed):
-                    self.catch = self.robot.catch()
-                elif self.catch.completed:
-                    self.complete = True
+            if self.catch == None or (self.catch.finished and not self.catch.completed):
+                print '[AcquireBall]: Catching Ball'
+                self.catch = self.robot.catch()
+            elif self.catch.completed:
+                self.complete = True
             return
         else:
+            print '[AcquireBall]: Ball not in catcher area.'
             self.updateTurn()
 
             if self.turn_task == None:
+                print '[AcquireBall]: Generating new turn to point task.'
                 self.turn_task = TurnToPoint(self.world, self.robot, self.role, self.world.ball.x, self.world.ball.y)
                 return
             elif not self.turn_task.complete:
+                print '[AcquireBall]: Executing TurnToPoint task.'
                 self.turn_task.execute()
                 return
 
-            if self.robot_info.catcher == 'closed':
-                self.robot.open_catcher()
-                self.robot_info.catcher = 'open'
-
+            print '[AcquireBall]: Opening catcher, upating move.'
             self.updateMove()
 
             if self.move_task == None:
+                self.robot.open_catcher()
+                print '[AcquireBall]: Move task is None, generating new.'
                 scale = 40 / self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y)
                 target_x = self.world.ball.x - (self.world.ball.x - self.robot_info.x)*scale
                 target_y = self.world.ball.y - (self.world.ball.y - self.robot_info.y)*scale
                 if self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y) > 70:
                     speed = 40
                 else:
-                    speed = 40
+                    speed = 30
 
                 self.move_task = MoveToPoint(self.world, self.robot, self.role, target_x, target_y, speed = speed)
 
             elif not self.move_task.complete:
-                print "(%f, %f)" %(self.move_task.x, self.move_task.y )
+                print '[AcquireBall]: Executing move to point %f,%f.' % (self.move_task.x, self.move_task.y)
                 self.move_task.execute()
 
             else:
@@ -303,19 +308,24 @@ class KickToPoint(Task):
             return
 
         if self.turn_task is None:
+            print '[KickToPoint]: Construct new TurnToPoint'
             self.turn_task = TurnToPoint(self.world, self.robot, self.role, self.x, self.y)
 
         if not self.turn_task.complete:
+            print '[KickToPoint]: Executing TurnToPoint'
             self.turn_task.execute()
             return
         
         if self.kickHandle == None:
+            print '[KickToPoint]: Opening catcher and kicking'
             self.robot.open_catcher()
             self.kickHandle = self.robot.kick()
 
         if self.kickHandle != None and not self.kickHandle.completed:
+            print '[KickToPoint]: Kicking not completed, passing'
             pass
         else:
+            print '[KickToPoint]: Kicking completed.'
             self.complete = True
 
 class Shoot(KickToPoint):

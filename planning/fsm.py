@@ -105,7 +105,7 @@ def createConfigGrammar():
     state         = Word(alphanums)
 
     # A task invocation is either of the form '[EXISTING]' or '[TaskName, arg1, arg2, ...]']
-    taskInvocation = Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + ZeroOrMore(Word(alphanums+" +-_()='.\"")^nestedExpr(opener='[', closer=']', content=Word(alphanums+" _+-=()'.\"")))) + rightSqBrkt)
+    taskInvocation = Group(leftSqBrkt + exisitingKWD + rightSqBrkt) ^ Group(leftSqBrkt + Word(alphas) + ZeroOrMore(separator + ZeroOrMore(Word(alphanums+" +<>-_()='.\"")^nestedExpr(opener='[', closer=']', content=Word(alphanums+" _+<>-=()'.\"")))) + rightSqBrkt)
 
     # Comments are of the form -[commentBody]
     comment = Group("-" + Word(alphanums + " \t.\"./\\_()'|<>{}[],?!@$%^&*"))
@@ -123,7 +123,7 @@ def createConfigGrammar():
     startActiveDef = Group(activeStartKWD + (yesKWD ^ noKWD))
 
     # A filename is an alphanumeric word, including a period character
-    fileName      = Word(alphanums+".")
+    fileName      = Word(alphanums+"./")
 
     # An alphabet definition is of the form  'inAlph letter1,...'
     inAlphabetDef = Group(inAlphKWD + Group(letter + ZeroOrMore(separator + letter)))
