@@ -99,6 +99,7 @@ class Planner:
                 for fsm in self._fsmList:
                     if fsm.definingFile == machineResponse:
                         fsm.setActive()
+                        
         self._logger.newline()
         self._logger.info("---------- end plan step ----------")
         self._logger.newline()
