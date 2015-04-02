@@ -10,6 +10,7 @@
 #include "catcher.h"
 #include "command.h"
 #include "movement.h"
+#include "wheels.h"
 
 static char system_state = SYSTEM_STATE_STARTING;
 
@@ -39,6 +40,7 @@ void setup_system(void)
 #endif
     
     setup_command();
+    setup_wheels();
     setup_movement();
     setup_kicker();
     setup_catcher();
@@ -55,4 +57,5 @@ void service_system(void)
     MPU_service();
 #endif
     service_movement();
+    service_wheels();
 }

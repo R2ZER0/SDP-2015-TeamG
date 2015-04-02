@@ -95,8 +95,8 @@ class KalmanBallPredictor:
 
 		old_vector = world.ball.vector
 		
-		#old_vector.x = predX[0]
-		#old_vector.y = predX[1]
+		old_vector.x = predX[0]
+		old_vector.y = predX[1]
 		#for x in predX:
 		#	print x,
 		#print
@@ -137,44 +137,31 @@ class KalmanBallPredictor:
 class KalmanRobotPredictor:
 	def __init__(self,init, friction = -10, acceleration = 25):
 		t = 1
-		A = np.matrix([[1, 0, 0, t, 0, 0],
-			       [0, 1, 0, 0, t, 0],
-			       [0, 0, 1, 0, 0, 1],
-			       [0, 0, 0, 1, 0, 0],
-			       [0, 0, 0, 0, 1, 0],
-			       [0, 0, 0, 0, 0, 1]])
-		B = np.zeros((6,3))
-		B = np.matrix([[0, 0, 0],
-			       [0, 0, 0],
-			       [0, 0, 0],
-			       [t, 0, 0],
-			       [0, t, 0],
-			       [0, 0, t]])
-		C = np.matrix([[1, 0, 0, 0, 0, 0],
-			       [0, 1, 0, 0, 0, 0],
-			       [0, 0, 1, 0, 0, 0],
-			       [0, 0, 0, 1, 0, 0],
-			       [0, 0, 0, 0, 1, 0],
-			       [0, 0, 0, 0, 0, 1]])
-		Ex = np.matrix([[0, 0, 0, 0, 0, 0],
-			       [0, 0, 0, 0, 0, 0],
-			       [0, 0, 0.0001, 0, 0, 0],
-			       [0, 0, 0, 0.1, 0, 0],
-			       [0, 0, 0, 0, 0.1, 0],
-			       [0, 0, 0, 0, 0, 0.0001]])
-		Ez = np.matrix([[10, 0, 0, 0, 0, 0],
-			       [0, 10, 0, 0, 0, 0],
-			       [0, 0, 0.0005, 0, 0, 0],
-			       [0, 0, 0, 25, 0, 0],
-			       [0, 0, 0, 0, 25, 0],
-			       [0, 0, 0, 0, 0, 0.1]])
+		A = np.matrix([[1, 0, t, 0],
+			       [0, 1, 0, t],
+			       [0, 0, 1, 0],
+			       [0, 0, 0, 1]])
+		B = np.matrix([[0,0],
+			       [0,0],
+			       [t,0],
+			       [0,t]])
+		C = np.matrix([[1, 0, 0, 0],
+			       [0, 1, 0, 0],
+			       [0, 0, 1, 0],
+			       [0, 0, 0, 1]])
+		Ex = np.matrix([[0, 0, 0, 0],
+			        [0, 0, 0, 0],
+			        [0, 0, 0.1, 0],
+			        [0, 0, 0, 0.1]])
+		Ez = np.matrix([[10, 0, 0, 0],
+			        [0, 10, 0, 0],
+			        [0, 0, 25, 0],
+			        [0, 0, 0, 25]])
 
 		vector = np.array([[init.x],
 						  [init.y],
-						  [init.angle],
 						  [math.cos(init.angle)*init.velocity],
-						  [math.sin(init.angle)*init.velocity],
-						  [0]])
+						  [math.sin(init.angle)*init.velocity]])
 
 		self.filter = KalmanFilter(vector, A,B,C,Ex,Ez)
 		self.friction = friction
@@ -183,10 +170,8 @@ class KalmanRobotPredictor:
 	def predict(self, control, world, time = 8):
 		vector = np.array([[world.our_attacker.x],
 						  [world.our_attacker.y],
-						  [world.our_attacker.angle],
-						  [math.cos(world.our_attacker.angle)*world.our_attacker.velocity],
-						  [math.sin(world.our_attacker.angle)*world.our_attacker.velocity],
-						  [0]])
+						  [math.cos(world.our_attacker.velocity_dir)*world.our_attacker.velocity],
+						  [math.sin(world.our_attacker.velocity_dir)*world.our_attacker.velocity]])
 		control = np.array(control).transpose()
 		zone = None
 		predX = self.filter.step(vector, self.convert(vector, control))
@@ -202,59 +187,37 @@ class KalmanRobotPredictor:
 			for z in world._pitch._zones:
 				if z.isInside(new[0], new[1]):
 					zoneNew = z
-			if zoneNew == z:
+
+			if zoneNew is None:
 				old_vector = world.our_attacker.vector
-
-				#old_vector.x = predX.item((0, 0))
-				#old_vector.y = predX.item((1, 0))
-				#old_vector.angle = predX.item((2, 0)) % (2*math.pi)
-
+				old_vector.x = predX.item((0, 0))
+				old_vector.y = predX.item((1, 0))
 				return old_vector
 			predX = new
-			predX[2,0] = predX.item((2, 0)) % 2*math.pi
-			if predX.item((3, 0)) < 0:
-				predX[3,0] = 0
-			if predX.item((4, 0)) < 0:
-				predX[4,0] = 0
-			if predX.item((5, 0)) < 0:
-				predX[5,0] = 0
 
 		old_vector = world.our_attacker.vector
-
-		#old_vector.x = predX.item((0, 0))
-		#old_vector.y = predX.item((1, 0))
-		#old_vector.angle = predX.item((2, 0))
-
+		old_vector.x = predX.item((0, 0))
+		old_vector.y = predX.item((1, 0))
 		return old_vector
 
 	def convert(self, state, control):
 		ax = 0
 		ay = 0
-		ar = 0
-		if state.item((3, 0)) != control[0]:
+		if state.item((2, 0)) != control[0]:
 			if control[0] != 0:
-				ax = (control[0] - state.item((3, 0))) / self.a
+				ax = (control[0] - state.item((2, 0))) / self.a
 			else:
-				if abs(self.friction) < state.item((3, 0)):
+				if abs(self.friction) < state.item((2, 0)):
 					ax = self.friction
 				else:
-					ax = int(-state.item((3, 0)))
-		if state.item((4, 0)) != control[1]:
-			if control[0] != 0:
-				ay = (control[1] - state.item((4, 0))) / self.a
+					ax = int(-state.item((2, 0)))
+		if state.item((3, 0)) != control[1]:
+			if control[1] != 0:
+				ay = (control[1] - state.item((3, 0))) / self.a
 			else:
-				if abs(self.friction) < state.item((4, 0)):
+				if abs(self.friction) < state.item((3, 0)):
 					ay = self.friction
 				else:
-					ay = int(-state.item((3, 0)))
-		if state.item((5, 0)) != control[2]:
-			if control[2] != 0:
-				ar = control[2] - state.item((5, 0)) / self.a
-			else:
-				if abs(self.friction) < state.item((5, 0)):
-					ar = self.friction / 10
-				else:
-					ar = int(-state.item((5, 0)))
+					ay = int(-state.item((3	, 0)))
 		return np.matrix([[ax],
-				  [ay],
-				  [ar]])
+				  [ay]])

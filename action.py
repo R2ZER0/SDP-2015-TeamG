@@ -12,7 +12,7 @@ class ActionHandle(object):
         self._finished = False
         self._completed = False
         self._running = False
-        self.idx = idx
+        self.idx = (idx % 512)
         self.cmd = cmd
 
     @property
@@ -97,25 +97,29 @@ class Action():
         
         # Number of messages received
         self.num_messages_recvd = 0
-        
-	if self.comm:
-		# Comms threads
-		self._exit = False
-		def set_exit():
-		    self._exit = True
-		atexit.register(set_exit)
-		
-		self.prev_handler = None
-		def handler(signum, frame):
-		    self._exit = True
-		    self.prev_handler(signum, frame)
-		self.prev_handler = signal.signal(2, handler)
-		
-		self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
-		self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
-		
-		self.recv_thread.start()
-		self.send_thread.start()
+
+        self._send_event = None
+
+        if self.comm:
+            # Comms threads
+            self._exit = False
+            def set_exit():
+                self._exit = True
+            atexit.register(set_exit)
+            
+            self.prev_handler = None
+            def handler(signum, frame):
+                self._exit = True
+                self.prev_handler(signum, frame)
+            self.prev_handler = signal.signal(2, handler)
+            
+            self.recv_thread = threading.Thread(target=lambda: self.run_state_processor())
+            self.send_thread = threading.Thread(target=lambda: self.run_state_sender())
+            
+            self._send_event = threading.Event()
+            
+            self.recv_thread.start()
+            self.send_thread.start()
     
     def exit(self):
         self._exit = True
@@ -124,25 +128,27 @@ class Action():
     def _cmd_movement(self, cmd, angle, scale):
         self.move_handle._onNextCommand()
         self.move_handle = MovementActionHandle(self.move_handle.idx+1, cmd, angle, scale)
+        if self._send_event:
+            self._send_event.set()
+
         return self.move_handle
 
-    def last_command(self):
-	if self.move_handle.cmd == 'M':
-		dx = math.cos(self.move_handle.dir)*self.move_handle.spd
-		dy = math.sin(self.move_handle.dir)*self.move_handle.spd
-		return [dx,dy,0]
-	elif self.move_handle.cmd == 'T':
-		return [0,0,self.move_handle.spd]
-	else:
-		return [0,0,0]
+    def last_command(self, offset):
+        if self.move_handle.cmd == 'M':
+            dx = math.cos(-(self.move_handle.dir - math.pi/2) + offset) * self.move_handle.spd
+            dy = math.sin(-(self.move_handle.dir - math.pi/2) + offset) * self.move_handle.spd
+            return [dx,dy]
+    	elif self.move_handle.cmd == 'T':
+    		return [0,0]
+    	else:
+    		return [0,0]
 
     def move(self, angle, scale=64):
         return self._cmd_movement('M', angle+math.pi/2, scale)
         
     def turnBy(self, angle, scale=64):
-        target = mkangle(self.curr_dir + angle)
-        #print "Turning from " + str(self.curr_dir) + " to " + str(target)
-        return self._cmd_movement('T', target, scale)
+        #print "Turning from " + str(self.curr_dir) + " by " + str(angle)
+        return self._cmd_movement('T', mkangle(angle), scale)
         
     def stop(self):
         return self._cmd_movement('S', 0, 0)
@@ -151,12 +157,18 @@ class Action():
     def kick(self, scale=100):
         self.kick_handle._onNextCommand()
         self.kick_handle = KickerActionHandle(self.kick_handle.idx+1, 'K', scale)
+        if self._send_event:
+            self._send_event.set()
+
         return self.kick_handle
     
     # Catcher commands
     def _cmd_catcher(self, cmd, scale):
         self.catch_handle._onNextCommand()
         self.catch_handle = CatcherActionHandle(self.catch_handle.idx+1, cmd, scale)
+        if self._send_event:
+            self._send_event.set()
+
         return self.catch_handle
     
     def catch(self, scale=100):
@@ -222,22 +234,26 @@ class Action():
     def run_state_processor(self):
         """Processes incoming state messages"""
         while not self._exit:
-	
+    
             self.comm.timeout = 0.1
             line = self.comm.readline()
             line = line.rstrip()
-	    #if not line.startswith('dist'):
-	    #	print line
+        #if not line.startswith('dist'):
+        #    print line
             if line != "":
                 self.process_message(line)
             
     def run_state_sender(self):
         """Sends out state messages"""
         while not self._exit:
-            time.sleep(0.120)
+            if self._send_event:
+                self._send_event.wait(0.064)
+                self._send_event.clear()
+
             
             if self.num_messages_recvd > 10:
-                message = "({0} {1} {2} {3} {4} {5} {6} {7} {8} {9})".format(
+                # Fixed size message of 43 chars
+                message = "({0:> 5d} {1} {2:> 5d} {3:> 4d} {4:> 5d} {5} {6} {7:> 5d} {8} {9:> 4d})".format(
                     self.move_handle.idx, self.move_handle.cmd, f2i(self.move_handle.dir), self.move_handle.spd,
                     self.kick_handle.idx, self.kick_handle.cmd, self.kick_handle.spd,
                     self.catch_handle.idx, self.catch_handle.cmd, self.catch_handle.spd
