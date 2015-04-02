@@ -159,14 +159,19 @@ class AcquireBall(Task):
     def updateTurn(self):
         if self.turn_task == None:
             return
-        elif hypot(self.turn_task.x - self.world.ball.x, self.turn_task.y - self.world.ball.y) > 10:
+        elif abs(self.robot_info.get_rotation_to_point(self.world.ball.x, self.world.ball.y)) > math.pi/4:
             self.turn_task = None
 
     def updateMove(self):
+        scale = 40 / self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y)
+        target_x = self.world.ball.x - (self.world.ball.x - self.robot_info.x)*scale
+        target_y = self.world.ball.y - (self.world.ball.y - self.robot_info.y)*scale
         if self.move_task == None:
             return
         elif self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y) < 70 and self.move_task.speed == 40:
             self.move_task = None
+        elif hypot(self.move_task.x - target_x, self.move_task.y - target_y) > 20:
+	    self.move_task = None
 
     def execute(self):
         '''Executes another round of this Task. Performs as follows:
