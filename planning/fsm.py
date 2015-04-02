@@ -247,7 +247,7 @@ def atLeastOneInitiallyActiveFsm(fsms):
             return True
     return False
 
-    
+
 class FSM:
     """Class representing planner finite state machines"""
     def __init__(self, name, inAlph, states, initState, finalState, initiallyActive, sourceFilePath, nextPlanToInvoke, transTable, lambdaDict, lambdaDescs, logger):

@@ -33,28 +33,33 @@ class Planner:
                 
                 if inputText in self._readTexts:
                     # If we read something we've already seen, fail
-                    self._self._self._self._logger.error("ERROR: Identified that two input spec files are identical.")
+                    self._logger.error("ERROR: Identified that two input spec files are identical.")
                     self._fsmList.append(False)
                 self._readTexts.append(inputText)
 
                 if len(inputText) == 0:
                     # Empty input config files are errors
-                    self._self._self._self._logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
+                    self._logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
                     self._fsmList.append(False)
                 else: 
                     parseRes = grammar.parseString(inputText)
-                    self._fsmList.append(createFSM(parseRes, pathStr, logger))
+                    self._fsmList.append(createFSM(parseRes, pathStr, self._logger))
 
         # If False is within the list of fsms, then there has been a parse error
         if False in self._fsmList:
-            self._self._self._logger.newline()
-            self._self._self._logger.error(">>> PARSING FAILURE - Terminating due to the parse errors detailed above")
-            self._self._self._logger.newline()
+            self._logger.newline()
+            self._logger.error(">>> PARSING FAILURE - Terminating due to the parse errors detailed above")
+            self._logger.newline()
             quit()
         else:
-            self._self._self._logger.newline()
-            self._self._self._logger.info(">>> SPEC FILE INPUT AND PARSING COMPLETED SUCCESSFULLY")
-            self._self._self._logger.newline()
+            self._logger.newline()
+            self._logger.info(">>> SPEC FILE INPUT AND PARSING COMPLETED SUCCESSFULLY")
+            self._logger.newline()
+
+        if not atLeastOneInitiallyActiveFsm(self._fsmList):
+            self._logger.error(">>> PLANNER ERROR: There are no planner fsms that start active. This is useless - it means nothing will ever happen.")
+            self._logger.newline()
+            quit()
 
         self._world = world
         self._robot = robot
@@ -63,9 +68,9 @@ class Planner:
         # Output what we're about to work with
         showFsms()
 
-        self._self._logger.info(">>> COMMENCING PLANNING OPERATIONS")
-        self._self._logger.newline()
-        self._self._logger.newline()
+        self._logger.info(">>> COMMENCING PLANNING OPERATIONS")
+        self._logger.newline()
+        self._logger.newline()
 
     def checkTrueConditions(self, fsm):
         """An FSM accepts a list of letters from it's alphabet which reflect conditions in the world
@@ -114,7 +119,7 @@ class Planner:
         self._logger.newline()
         self._logger.info("-------- Planning FSMs --------")
 
-        for fsm in self._fsms:
+        for fsm in self._fsmList:
             fsm.show()
         self._logger.newline()
 
