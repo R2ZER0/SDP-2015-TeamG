@@ -1,5 +1,5 @@
 from action import Action
-from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint
+from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint, Shoot
 from planning.planner import Planner
 from planning.models import World
 from vision.vision import Vision, Camera, GUI
@@ -50,10 +50,6 @@ class Controller:
         self.robot = SimulatedAction(self.simulator.control_robot)
         self.robot_defend = SimulatedAction(self.simulator.our_defender)
 
-        comm = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-        comm.flushInput()
-        self.robot_actual = Action(comm)
-
         frame = self.camera.get_frame()
         center_point = self.camera.get_adjusted_center(frame)
 
@@ -71,10 +67,9 @@ class Controller:
         self.world = World(our_side, self.SIM_PITCH)
 
         # Set up main planner
-        #self.planner = Planner(self.world, self.robot, 'attacker', ['planning/fsmSpec.txt'])
+        self.planner = Planner(self.world, self.robot, 'attacker', ['planning/attackerFsm-active.txt'])
         #self.planner2 = Planner(self.world, self.robot_defend, 'defender', ['planning/fsmSpec2.txt'])
-        self.task = AcquireBall(self.world, self.robot, 'attacker')
-        self.task_actual = AcquireBall(self.world, self.robot_actual, 'attacker')
+        #self.task = AcquireBall(self.world, self.robot, 'attacker')
 
 
         # Set up GUI
@@ -132,8 +127,7 @@ class Controller:
             #self.planner.plan()
             #self.planner2.plan()
 
-            self.task.execute()
-            self.task_actual.execute()
+            #self.task.execute()
 
             # Information about the grabbers from the world
             grabbers = {
@@ -142,8 +136,8 @@ class Controller:
             }
 
             # Information about states
-            attackerState = (self.planner.current_state, self.planner.current_state)
-            defenderState = (self.planner2.current_state, self.planner2.current_state)
+            attackerState = (self.planner.current_state, self.planner.current_task)#('', '')
+            defenderState = ('', '')#(self.planner2.current_state, self.planner2.current_state)
 
             attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
             defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
@@ -167,6 +161,7 @@ class Controller:
         
         if self.robot is not None:
             self.robot.stop()
+            self.robot.exit()
 
     def _get_sim_colors(self):
         '''Retrieves colour calibrations for the Simulator, based upon the colours assigned in :mod:`simulator.simulator`.

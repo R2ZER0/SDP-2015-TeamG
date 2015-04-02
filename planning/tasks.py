@@ -69,11 +69,11 @@ class TurnToPoint(Task):
                     self.turnHandle = None
 
             elif self.turnHandle.finished:
-        		self.pitch_object = pitch_object
-        		self.move_task = None
+                self.pitch_object = pitch_object
+                self.move_task = None
 
-	def should_move(self):
-		return abs(self.pitch_object.y - self.robot_info.y) > 2
+    def should_move(self):
+        return abs(self.pitch_object.y - self.robot_info.y) > 2
 
 class MoveToPoint(Task):
     '''Movement Task. Travels to point(x,y) within some threshold.
@@ -162,16 +162,16 @@ class AcquireBall(Task):
     def updateTurn(self):
         if self.turn_task == None:
             return
-        elif abs(self.robot_info.get_rotation_to_point(self.world.ball.x, self.world.ball.y)) > math.pi:
+        elif abs(self.robot_info.get_rotation_to_point(self.world.ball.x, self.world.ball.y)) > math.pi/8 and self.turn_task.complete:
             self.turn_task = None
 
     def updateMove(self):
-        scale = 40 / self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y)
+        scale = 30 / self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y)
         target_x = self.world.ball.x - (self.world.ball.x - self.robot_info.x)*scale
         target_y = self.world.ball.y - (self.world.ball.y - self.robot_info.y)*scale
         if self.move_task == None:
             return
-        elif self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y) < 70 and self.move_task.speed == 40:
+        elif self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y) < 70 and self.move_task.speed == 60:
             self.move_task = None
         elif hypot(self.move_task.x - target_x, self.move_task.y - target_y) > 20:
             self.move_task = None
@@ -191,16 +191,19 @@ class AcquireBall(Task):
 
         if self.robot_info.can_catch_ball(self.world.ball):
             print '[AcquireBall]: Can catch ball, stopping.'
-            self.robot.stop()
-            #self.robot.open_catcher()
-                
-            if self.catch == None or (self.catch.finished and not self.catch.completed):
+            if self.catch == None or not self.catch.finished:
                 print '[AcquireBall]: Catching Ball'
                 self.catch = self.robot.catch()
-            elif self.catch.completed:
+                self.robot_info.catcher = 'closed'
                 self.complete = True
+            elif self.catch.completed:
+                print '[AcquireBall]: Done!'
+                self.complete = True
+                self.robot_info.catcher = 'closed'
+            self.robot.stop()
             return
         else:
+            self.catch = None
             print '[AcquireBall]: Ball not in catcher area.'
             self.updateTurn()
 
@@ -217,9 +220,12 @@ class AcquireBall(Task):
             self.updateMove()
 
             if self.move_task == None:
-                self.robot.open_catcher()
+                
+                if self.robot_info.catcher == 'closed':
+                    self.robot.open_catcher()
+                    self.robot_info.catcher = 'open'
                 print '[AcquireBall]: Move task is None, generating new.'
-                scale = 40 / self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y)
+                scale = 30 / self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y)
                 target_x = self.world.ball.x - (self.world.ball.x - self.robot_info.x)*scale
                 target_y = self.world.ball.y - (self.world.ball.y - self.robot_info.y)*scale
                 if self.robot_info.get_displacement_to_point(self.world.ball.x, self.world.ball.y) > 70:

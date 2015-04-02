@@ -525,8 +525,8 @@ class World(object):
         # Define catchment areas for our robots. If the ball enters these areas then our robot
         # believes it can catch the ball. Width is parallel to front/rear and height is parallel
         # to the sides of our robot.
-        self.our_defender.catcher_area = {'width' : 21, 'height' : 23, 'front_offset' : 20}
-        self.our_attacker.catcher_area = {'width' : 21, 'height' : 23, 'front_offset' : 20}
+        self.our_defender.catcher_area = {'width' : 21, 'height' : 23, 'front_offset' : 16}
+        self.our_attacker.catcher_area = {'width' : 21, 'height' : 23, 'front_offset' : 16}
 
         # Calculate the goals as being in fixes positions halfway up the pitch. The latter
         # goal 'faces' towards the left of the pitch.

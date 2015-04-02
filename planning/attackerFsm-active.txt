@@ -1,6 +1,6 @@
 machineParams
 name                 simpleAttackerFSM
-inAlph               ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete, leavingZoneLeft, leavingZoneRight, defenderHasBall, enemyDefenderHasBall, stateNotBlocking, statesNotPassing, stateStarting, friendlyHasBall, friendlyStationary, friendlyMoving, friendlyFacingUs, friendlyFacingWall, notFriendlyFacingUs, notFriendlyFacingWall, statesNotShooting, notAdjacentFriendly, adjacentFriendly, enemyAttackerHasBall
+inAlph               ballInZone, notBallInZone, notGotBallYet, gotBall, atPoint, notAtPoint, stillShooting, shotComplete, leavingZoneLeft, leavingZoneRight, defenderHasBall, enemyDefenderHasBall, stateNotBlocking, statesNotPassing, stateStarting, friendlyHasBall, friendlyStationary, friendlyMoving, friendlyFacingUs, friendlyFacingWall, notFriendlyFacingUs, notFriendlyFacingWall, statesNotShooting, notAdjacentFriendly, adjacentFriendly, enemyAttackerHasBall, notFinalShot
 states               idle, acquiringBall, movingToPoint, shooting, centering, mirroring, blocking, starting, receivingBounce, receivingNormal
 initialState         starting
 finalState           [UNUSED]
@@ -12,9 +12,9 @@ transitions
 <*, leavingZoneRight, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
 
 <*, statesNotShooting ballInZone, [AcquireBall, world, robot, role], acquiringBall>
-<*, statesNotPassing enemyAttackerHasBall, [MirrorObject, world, robot, role, world.ball], mirroring>
-<*, statesNotPassing friendlyHasBall, [MirrorObject, world, robot, role, world.ball], mirroring>
-<*, stateNotBlocking enemyDefenderHasBall, [MirrorObject, world, robot, role, world.ball], blocking>
+<*, notFinalShot statesNotPassing enemyAttackerHasBall, [MirrorObject, world, robot, role, world.ball], mirroring>
+<*, notFinalShot statesNotPassing friendlyHasBall, [MirrorObject, world, robot, role, world.ball], mirroring>
+<*, notFinalShot stateNotBlocking enemyDefenderHasBall, [MirrorObject, world, robot, role, world.ball], blocking>
 
 <starting, stateStarting, [MoveToPoint, world, robot, role, world.pitch.zones[world.our_attacker.zone].center()[0], world.pitch.zones[world.our_attacker.zone].center()[1]], centering>
 
@@ -62,6 +62,7 @@ lambdaConditions
 
 "stateStarting": lambda planner: planner.getFSM('simpleAttackerFSM').currentState == 'starting'
 
+"notFinalShot": lambda planner: not planner.getFSM('simpleAttackerFSM').currentState in ['movingToPoint', 'shooting']
 "statesNotShooting": lambda planner: not planner.getFSM('simpleAttackerFSM').currentState in ['acquiringBall', 'movingToPoint', 'shooting']
 "stateNotBlocking": lambda planner: planner.getFSM('simpleAttackerFSM').currentState != 'blocking'
 "statesNotPassing": lambda planner: not planner.getFSM('simpleAttackerFSM').currentState in ['mirroring', 'receivingNormal', 'receivingBounce']
