@@ -15,7 +15,6 @@
 char current_command = MOVEMENT_COMMAND_STOP;
 
 double targetAngle = 1.0; // in radians, +PI to -PI
-int turnSpeed = 100;
 bool finishedTurn = true;
 static unsigned long turn_quickstart_endtime = 0L;
 
@@ -68,7 +67,6 @@ void movement_on_new_command(char cmd, float dir_, int spd)
         
         wheels_control_enabled(false);
         targetAngle = normalise_angle(getAngle() + dir);
-        turnSpeed = spd;
         finishedTurn = false;
         
         turn_quickstart_endtime = millis() + TURN_QUICKSTART_TIME;
@@ -101,32 +99,36 @@ void service_movement()
             runMotor(MOTOR_MOTOR3, 0);
             runMotor(MOTOR_MOTOR4, 0);
             
-            finishedTurn = true;
-            command_finished_movement();
-            //Serial.println("Finished turn!");
+            double average_speed = wheels_get_speed(0) + 
+                                   wheels_get_speed(1) +
+                                   wheels_get_speed(2) +
+                                   wheels_get_speed(3); 
+            
+            if(abs(average_speed) < WHEELS_DEADZONE_SIZE*4) {
+                finishedTurn = true;
+                command_finished_movement();
+            }
             return;
         }
         
         // Slow down as we approach the target
-        int turnSpeedA = turnSpeed;
-        int turnSpeedB = turnSpeed;
+        int turnSpeedA;
+        int turnSpeedB;
         if(current_distance < 0.5) {
-            turnSpeedB = 35;
-            turnSpeedA = 35;
+            turnSpeedB = 30;
+            turnSpeedA = 30;
         } else if(current_distance < 1.5) {
+            turnSpeedB = 40;
+            turnSpeedA = 40;
+        } else {
             turnSpeedB = 45;
             turnSpeedA = 45;
-        } else {
-            turnSpeedB = 50;
-            turnSpeedA = 50;
         }
         
         if(millis() <= turn_quickstart_endtime) {
             //turnSpeedA = 100;
             turnSpeedB = 100;
         }
-        
-        Serial.println(current_distance);
         
         if(acw_dist < cw_dist) {
             runMotor(MOTOR_MOTOR1, turnSpeedA);
@@ -140,6 +142,7 @@ void service_movement()
             runMotor(MOTOR_MOTOR4, -turnSpeedB);
         }
         
-        Serial.print("dist="); Serial.println(current_distance);
+        Serial.print("dist="); Serial.print(current_distance);
+        Serial.print("\tgyro="); Serial.println(getAngle());
     }
 }
