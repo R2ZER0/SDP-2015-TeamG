@@ -37,7 +37,7 @@ class Controller:
     #: Beginning initialisation time, in seconds.
     INITIALISE_TIME = 3
 
-    def __init__(self, pitch, color, our_side, attack_port, defend_port, video_port=0, plannerSpecFiles):
+    def __init__(self, pitch, color, our_side, attack_port, defend_port, plannerSpecFiles, video_port=0):
         '''Initialises the main controller. Constructs all necessary elements; doesn't start until
         run is called.
 
@@ -366,4 +366,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Setup controller with appropriate parameters
-    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, defend_port=args.defender, args.plannerSpecFiles).run()
+    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, args.plannerSpecFiles, defend_port=args.defender).run()
