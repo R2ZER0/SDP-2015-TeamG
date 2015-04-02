@@ -239,13 +239,13 @@ def checkFinalStateConsistencies(finalState, nextPlanSpec, sourceFilePath, logge
         logger.error("PARSE ERROR: Machine specified in file '" + str(sourceFilePath) + "' defines a final state, but no new plan to invoke after settling in this state.")
         return True
 
-def atLeastOneInitiallyActiveFsm(fsms):
-    """Ensure there is at least one fsm that starts active - otherwise we'd get no activity!"""
-    machinesThatStartActive = 0
-    for fsm in fsms:
-        if fsm.startingActiveState:
-            return True
-    return False
+# def atLeastOneInitiallyActiveFsm(fsms):
+#     """Ensure there is at least one fsm that starts active - otherwise we'd get no activity!"""
+#     machinesThatStartActive = 0
+#     for fsm in fsms:
+#         if fsm.startingActiveState:
+#             return True
+#     return False
 
 
 class FSM:
@@ -429,6 +429,10 @@ class FSM:
     @property
     def currentState(self):
         return self._currentState
+
+    @property
+    def nextPlanToInvoke(self):
+        return self._nextPlan
 
     def setActive():
         self._active = True

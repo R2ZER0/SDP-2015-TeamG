@@ -7,6 +7,26 @@ from pyparsing import *
 from planning.fsm import *
 import math
 
+def atLeastOneInitiallyActiveFsm(fsms):
+    """Ensure there is at least one fsm that starts active - otherwise we'd get no activity!"""
+    machinesThatStartActive = 0
+    for fsm in fsms:
+        if fsm.startingActiveState:
+            return True
+    return False
+
+def checkFileReferenceErrors(fsms, logger):
+    fileNames = []
+    errorFound = False
+    for fsm in fsms:
+        fileNames.append(fsm.definingFile)
+
+    for fsm in fsms:
+        if not [fsm.nextPlanToInvoke] == ["NA"] and not set([fsm.nextPlanToInvoke]) <= set(fileNames):
+            logger.info("PARSE ERROR: Found a reference to an unknown file. File '" + str(fsm.definingFile) + "' referenced a file '" + str(fsm.nextPlanToInvoke) + "', and this is unrecognised.")
+            errorFound = True
+    return errorFound
+
 class Planner:    
 
     def __init__(self, world, robot, role, fsmSpecFilePaths):
@@ -59,6 +79,8 @@ class Planner:
         if not atLeastOneInitiallyActiveFsm(self._fsmList):
             self._logger.error(">>> PLANNER ERROR: There are no planner fsms that start active. This is useless - it means nothing will ever happen.")
             self._logger.newline()
+            quit()
+        elif checkFileReferenceErrors(self._fsmList, self._logger):
             quit()
 
         self._world = world
