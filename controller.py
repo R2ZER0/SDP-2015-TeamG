@@ -73,6 +73,7 @@ class Controller:
 
         self.robot9 = Action(comm)
 
+        # The input spec files
         self.plannerSpecFiles = plannerSpecFiles
 
         # Grab an initial frame to adjust for center position
@@ -353,7 +354,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-c', '--color', default='yellow', help="The color of our team ['yellow', 'blue'] allowed. [Default: yellow]")
 
-    # Planner std spec files
+    # Planner spec files
     parser.add_argument('plannerSpecFiles', nargs='*', type=str, help="The location of the planner finite state machine specification files")
 
     # Communication Conditions

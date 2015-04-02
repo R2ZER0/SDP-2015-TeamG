@@ -52,6 +52,7 @@ def createFSM(parsedInput, sourceFilePath, logger):
     # Build the actual letter:lambda dictionary
     dic = consumeLambdas(lambdas)
 
+    # Perform sanity checks
     checkAlphabet(alphabet, dic, sourceFilePath, logger)
     transitionParseError = checkTransitions(alphabet, transitions, sourceFilePath, states, logger)
     lambdaParseError = checkLambdas(alphabet, dic, sourceFilePath, logger)
@@ -148,6 +149,7 @@ def createConfigGrammar():
     # A transition is of the form '<stateName, letter1, letter2,..., [TaskName, arg1, arg2,...], newState>'
     transition    = Group(leftAngBrkt + (anyState ^ state) + separator + OneOrMore(letter) + separator + taskInvocation + separator + state + rightAngBrkt)
 
+    # Bring everything together
     machineParamSec= machineSecKWD + nameDef + inAlphabetDef + statesDef + initialSDef + finalSDef + nextPlanDef + startActiveDef
     transitionSec  = transitionsKWD + OneOrMore(transition)
     lambdaSec      = lambdaSecKWD + OneOrMore(lambdaStmt)
@@ -155,6 +157,7 @@ def createConfigGrammar():
     # Config is the 'root' of the parse
     config         = Group(machineParamSec) + Group(transitionSec) + Group(lambdaSec)
 
+    # Ignore comments 
     config.ignore(comment)
 
     return config
@@ -197,14 +200,17 @@ def checkTransitions(alphabet, transitions, sourceFilePath, states, logger):
                 logger.newline()
                 logger.error("PARSE ERROR: Encountered a transition statement which refers to unrecognised alphabet letters - namely: '" + str(candidateLetter) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
                 errorDiscovered = True
+
         if transition[0] not in list(states) + ["*"]:
             logger.newline()
             logger.error("PARSE ERORR: Encountered an unrecognised state '" + str(transition[0]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
             errorDiscovered = True
+
         if transition[len(transition) - 1] not in list(states) + ["*"]:
             logger.newline()
             logger.error("PARSE ERROR: Encountered an unrecognised state '" + str(transition[len(transition) - 1]) + "' in transition\n'" + str(transition) + "'\nin file '" + str(sourceFilePath) + "'.")
             errorDiscovered = True
+
     return errorDiscovered
 
 def checkLambdas(alphabet, lambdas, sourceFilePath, logger):
@@ -216,6 +222,7 @@ def checkLambdas(alphabet, lambdas, sourceFilePath, logger):
             logger.newline()
             logger.error("PARSE ERROR: Found a lambda statement whose key is inconsistent with the FSM alphabet definition, the offending key being '" + str(key) + "' in file '" + str(sourceFilePath) + "'.")
             errorDiscovered = True
+
     return errorDiscovered
 
 def checkAlphabet(alphabet, lambdas, sourceFilePath, logger):
@@ -246,7 +253,7 @@ class FSM:
         else:
             self._active = self._InitiallyActive = False
 
-        self._nextPlan = nextPlanToInvoke
+        self._nextPlan = nextPlanToInvoke   # The name of the next plan file to invoke (if there is one)
         self._finalState = finalState
         self._lambdas = lambdaDict      # The {letter : lambda} dictionary used in actual computation
         self._lambdaDescs = lambdaDescs # This is a print-friendly form of self._lambdas
@@ -267,6 +274,7 @@ class FSM:
         logger.info("FSM '"+ self._name + "' executing exisiting task")
         self._currentTask.execute()
         self._logger.newline()
+
         return
 
     def executeNewTask(self, tran, world, robot, role):
@@ -387,14 +395,17 @@ class FSM:
         self._logger.info("Current State: " + str(self._currentState))
         self._logger.info("Current Task: " + str(self._currentTask))
         self._logger.newline()
+        
         self._logger.info("Transitions and associated tasks bindings: ")
         for trans in self._transTable:
             self._logger.info(trans)
         self._logger.newline()
+
         self._logger.info("Lambda condition triggers")
         for lambdaDesc in self._lambdaDescs:
             self._logger.info(lambdaDesc)
         self._logger.info("------------------------------------------------------------------------------------------------------------------------------")
+
         self._logger.newline()
 
 

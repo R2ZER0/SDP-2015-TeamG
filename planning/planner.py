@@ -11,7 +11,7 @@ class Planner:
 
     def __init__(self, world, robot, role, fsmSpecFilePaths):
 
-        self._logger = createLogger("Planner") # Create a logger object to use
+        self._logger = createLogger("Planner") # Create a logger object to use for tracking operations
 
         self._logger.info(">>> Using the following finite state machine spec files to begin execution with:")
         self._logger.newline()
@@ -21,21 +21,24 @@ class Planner:
         self._logger.newline()
         
         grammar = createConfigGrammar()  # Build the grammar used to parse input config files
-        self._fsmList = []
-        self._readTexts=[]
+        self._fsmList = []               # List to store the FSMs the planner is to work with
+        self._readTexts=[]               # Stores the text of each file that's been read - used to detect when we read in duplicates
 
 
+        # We read each file specified by the 
         self._logger.info(">>> READING AND PARSING FSM SPEC FILES")
         for pathStr in fsmSpecFilePaths:
             with open(pathStr, 'r') as fileObj:
                 inputText = fileObj.read()
                 
                 if inputText in self._readTexts:
+                    # If we read something we've already seen, fail
                     self._self._self._self._logger.error("ERROR: Identified that two input spec files are identical.")
                     self._fsmList.append(False)
                 self._readTexts.append(inputText)
 
                 if len(inputText) == 0:
+                    # Empty input config files are errors
                     self._self._self._self._logger.error("FSM FILE INPUT ERROR: Spec file '" + str(filePath) + "' is empty.")
                     self._fsmList.append(False)
                 else: 
@@ -57,6 +60,7 @@ class Planner:
         self._robot = robot
         self._role  = role
         
+        # Output what we're about to work with
         showFsms()
 
         self._self._logger.info(">>> COMMENCING PLANNING OPERATIONS")
