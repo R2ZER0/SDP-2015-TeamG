@@ -363,7 +363,6 @@ def calculate_motor_speed(displacement, angle, backwards_ok=False, careful=False
 def do_nothing():
     return {'left_motor': 0, 'right_motor': 0, 'kicker': 0, 'catcher': 0}
 
-
 def log_newline(self, how_many_lines=1):
     # Switch handler, output a blank line
     self.removeHandler(self.console_handler)
@@ -397,3 +396,10 @@ def create_logger(loggerName):
     logger.newline = types.MethodType(log_newline, logger)
 
     return logger
+
+def dist_point_to_line(startX,startY,endX,endY,pntX,pntY):
+    ''' 
+    Returns the shortest distance between a point (pntX,pntY)
+    and a line (NOT line segment) defined by start point (startX,startY) and end point (endX,endY)
+    '''
+    return abs((endY-startY)*pntX-(endX-startX)*pntY+endX*startY-endY*startX)/sqrt((endY-startY)**2+(endX-startX)**2)

@@ -383,7 +383,7 @@ class GUI(object):
                     self.draw_velocity(
                         frame_with_blank, (frame_width, frame_height),
                         model_positions[key].x, model_positions[key].y,
-                        model_positions[key].angle, model_positions[key].velocity)
+                        model_positions[key].velocity_dir, model_positions[key].velocity)
 
         # Draw center of uncroppped frame (test code)
         # cv2.circle(frame_with_blank, (266,147), 1, BGR_COMMON['black'], 1)

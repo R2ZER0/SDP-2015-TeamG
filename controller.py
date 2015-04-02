@@ -1,5 +1,5 @@
 from action import Action
-from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint
+from planning.tasks import AcquireBall, MoveToPoint, TurnToPoint, MirrorObject, Shoot
 from planning.planner import Planner
 from planning.models import World
 from vision.vision import Vision, Camera, GUI
@@ -120,7 +120,7 @@ class Controller:
 
                 # Update world state
                 self.world.update_positions(model_positions)
-
+                
                 # Information about the grabbers from the world
                 grabbers = {
                     'our_defender': self.world.our_defender.catcher_area,
@@ -146,10 +146,15 @@ class Controller:
                     defenderState, attacker_actions, defender_actions, grabbers,
                     our_color=self.color, our_side=self.side, key=c, preprocess=pre_options)
                 counter += 1
-        
+
+        center_zone = self.world.pitch.zones[self.world.our_attacker.zone].center()
+        self.task = MirrorObject(self.world, self.robot9, 'attacker',self.world.ball)
+
         # Set up our cache of commands for the predictors
-        self.command_cache = [[0,0,0]]*8
-        self.command = [0,0,0]
+        self.command_cache = [[0,0]]*8
+        self.command = [0,0]
+
+        self.task = AcquireBall(self.world, self.robot9, 'attacker')
 
         # Set up predictors
         #
@@ -190,16 +195,18 @@ class Controller:
                 #
                 # TODO: Add Robot 10 prediction here
                 self.command = self.command_cache.pop(0)
-                self.planner.plan()
-                self.command_cache.append(self.robot9.last_command())
+
+                self.task.execute()
+                #self.planner.plan()
+                self.command_cache.append(self.robot9.last_command(self.world.our_attacker.angle))
 
                 # Predict ball position and replace regular ball position with this
                 ball_doubtful, self.world.ball.vector = self.ball_predictor.predict(self.world, time = 8)
                 if regular_positions['ball']:
                     regular_positions['ball']['x'] = self.world.ball.vector.x
                     regular_positions['ball']['y'] = self.world._pitch.height -  self.world.ball.vector.y
+                
                 self.world.our_attacker.vector = self.robot_predictor.predict(self.command, self.world, time = 8)
-
                 # Information about the grabbers from the world
                 grabbers = {
                     'our_defender': self.world.our_defender.catcher_area,
@@ -207,8 +214,8 @@ class Controller:
                 }
 
                 # Information about states
-                attackerState = (self.planner.current_state, self.planner.current_state)
-                defenderState = (self.planner.current_state, self.planner.current_state)
+                attackerState = (self.planner.current_state, self.planner.current_task)
+                defenderState = (self.planner.current_state, self.planner.current_task)
 
                 attacker_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
                 defender_actions = {'left_motor' : 0, 'right_motor' : 0, 'speed' : 0, 'kicker' : 0, 'catcher' : 0}
@@ -366,4 +373,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Setup controller with appropriate parameters
-    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, args.plannerSpecFiles, defend_port=args.defender).run()
+    c = Controller(pitch=args.pitch, color=args.color, our_side=args.side, attack_port=args.attacker, plannerSpecFiles=args.plannerSpecFiles, defend_port=args.defender).run()

@@ -42,6 +42,7 @@ static int  recv_buffer_i = 0;
 void movement_on_new_command(char cmd, float dir, int spd);
 void run_movement_command(unsigned long id, char cmd, float dir, int speed)
 {
+    movement_command_fin = false;
     movement_on_new_command(cmd, dir, speed);
         
     movement_command_id = id;
@@ -53,6 +54,7 @@ void run_movement_command(unsigned long id, char cmd, float dir, int speed)
 void kicker_on_new_command(char cmd, int spd);
 void run_kicker_command(unsigned long id, char cmd)
 {
+    kicker_command_fin = false;
     kicker_on_new_command(cmd, 100);
     
     kicker_command_id = id;
@@ -63,6 +65,7 @@ void run_kicker_command(unsigned long id, char cmd)
 void catcher_on_new_command(char cmd, int spd);
 void run_catcher_command(unsigned long id, char cmd)
 {
+    catcher_command_fin = false;
     catcher_on_new_command(cmd, 100);
     
     catcher_command_id = id;
